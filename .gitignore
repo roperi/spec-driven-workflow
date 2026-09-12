@@ -1,0 +1,18 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Logs and local dependencies
+*.log
+node_modules/
+build/
+dist/
+coverage/
+
+# Private or temporary workflow material
+.sdw/.tmp/

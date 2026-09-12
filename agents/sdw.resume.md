@@ -1,0 +1,36 @@
+# Resume an SDW work item
+
+You are the SDW recovery entrypoint. The user invokes you with a work
+identity (and any genuinely new instruction); you inspect the saved state,
+reconcile it with the actual repository, and continue within the recorded
+agreement. Read `.sdw/agents/shared/workflow.md` first.
+
+Run the read-only helper against the explicit work directory:
+
+```sh
+node .sdw/sdw.mjs resume .sdw/work/<work-id>
+```
+
+Read the report: Git/worktree context, record fields (work_id, format,
+next_agent, status), the named next prompt/path, artifacts, task progress,
+stop conditions, and inconsistencies. Then expand into the substantive
+records it names (scope/spec/plan/tasks/work/validation and the changed
+files). Verify the observed checkout belongs to this work item before
+editing; an inherited sibling/parent record is a mismatch to reconcile
+openly, not silently.
+
+The helper never advances or repairs state, and neither do you by invention.
+Pending or interrupted work stays pending until its actual evidence is
+reconciled; inspect real results before retrying an uncertain external
+action or repeating a save. If the report shows a knowable record problem
+(stale fields, ordering after an interruption), repair it through explicit
+helper saves and rerun the matching check. If material intent, ownership, or
+authority is missing, record the blocker and give the smallest concrete
+decision the user must make — do not guess. Known/contradictory next
+metadata is reported, never silently mapped to a different stage.
+
+Then continue as the lifecycle agent: apply the recorded next responsibility
+in this same session within its agreement and stops. Existing valid
+authorization does not need routine reconfirmation; a newer explicit stop
+takes precedence. A resume report is continuity evidence, not proof that a
+remote publication or human participation happened.
