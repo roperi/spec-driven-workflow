@@ -1,5 +1,7 @@
 # Tasks
 
+<!-- Standard work: keep this concise. Hardened work: add the Negative-Space Readiness Audit and mapped task fields from `.sdw/agents/shared/workflow.md`. -->
+
 ## Stable Task IDs
 
 TODO: give each task a stable ID and mark it `[ ]` pending or `[x]` complete.

@@ -338,6 +338,791 @@ const closureConsistency = (reports) => {
   return errors
 }
 
+// Progressive assurance: bounded line parsers for the frozen hardened grammar.
+// These establish syntax, IDs, mappings, required fields, declared oracle/status
+// coherence, and summaries only. They never judge prose, infer approval or
+// independence, or execute project commands.
+const ASSURANCE_PROFILES = Object.freeze(['standard', 'hardened'])
+const HARDENED_KINDS = Object.freeze(['positive', 'negative', 'failure-injection', 'end-to-end', 'manual', 'external'])
+const HARDENED_RESULT_STATUSES = Object.freeze(['PASS', 'FAIL', 'BLOCKED', 'SKIPPED'])
+const HARDENED_CONTEXTS = Object.freeze(['self', 'fresh', 'independent'])
+const HARDENED_SUMMARIES = Object.freeze(['PASS', 'FAIL', 'BLOCKED'])
+const HARDENED_ORACLE_MATCHES = Object.freeze(['yes', 'no', 'unknown'])
+const HARDENED_PLAN_FIELDS = Object.freeze([
+  'Authoritative state', 'Mutation points', 'Preconditions', 'Postconditions',
+  'Preserved invariants', 'Recovery states', 'Unchanged-state comparison', 'Known limitations',
+])
+const HARDENED_V_FIELDS = Object.freeze(['Proves', 'Kind', 'Stimulus', 'Expected'])
+const HARDENED_TASK_FIELDS = Object.freeze([
+  'Satisfies', 'Verifies', 'Depends on', 'Cohesion group', 'Authority',
+  'Mutation boundary', 'Preserved invariants', 'Adversarial cases', 'Completion check', 'Evidence',
+])
+const HARDENED_RESULT_FIELDS = Object.freeze([
+  'Proves', 'Source', 'Expected', 'Observed', 'Resulting state', 'Oracle matched', 'Evidence', 'Limitations',
+])
+const HARDENED_ACTIVITY_FILES = Object.freeze({
+  plan: ['spec.md', 'plan.md'],
+  task: ['spec.md', 'plan.md', 'tasks.md'],
+  execute: ['spec.md', 'plan.md', 'tasks.md'],
+  handoff: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
+  validate: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
+  review: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
+  publish: ['plan.md', 'tasks.md', 'validation.md'],
+  finalize: ['plan.md', 'tasks.md', 'validation.md'],
+  retrospect: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
+  wrap: ['plan.md', 'tasks.md', 'validation.md'],
+  resume: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
+})
+const HARDENED_RESULT_ACTIVITIES = new Set(['validate', 'review', 'publish', 'finalize', 'retrospect', 'wrap'])
+const HARDENED_ID = Object.freeze({
+  AC: /^AC(?!000)\d{3}$/u,
+  V: /^V(?!000)\d{3}$/u,
+  T: /^T(?!000)\d{3}$/u,
+  G: /^G(?!000)\d{3}$/u,
+  N: /^N(?!000)\d{3}$/u,
+})
+const HARDENED_PLACEHOLDER = /^(?:TODO|TBD|FIXME|pending)$/iu
+
+const diagnostic = (code, artifact, line, message) => `[${code}] ${artifact}${line ? `:${line}` : ''}: ${message}`
+
+// A duplicate-section diagnostic should point at the offending second heading.
+const duplicateHeadingLine = (section) => (section.ranges?.[1]?.start ?? section.start ?? 0) + 1
+
+const HARDENED_STRUCTURAL_NOTE = 'assurance hardened; structural traceability only — semantic correctness, approval, and validation independence were not established'
+
+// The frozen grammar ignores only surrounding ASCII whitespace on declaration
+// lines; JavaScript trim() would also fold Unicode whitespace.
+const asciiTrim = (value) => value.replace(/^[ \t\v\f\r]+|[ \t\v\f\r]+$/gu, '')
+
+const hardenedProse = (value) => {
+  if (typeof value !== 'string') return false
+  const trimmed = value.trim()
+  return trimmed !== '' && !HARDENED_PLACEHOLDER.test(trimmed)
+}
+
+const parseIdList = (value, prefix) => {
+  const parts = value.split(', ')
+  if (parts.some((part) => part === '' || !HARDENED_ID[prefix].test(part))) return { error: 'malformed' }
+  if (new Set(parts).size !== parts.length) return { error: 'duplicate' }
+  return { ids: parts }
+}
+
+const fencedLineMask = (lines) => {
+  const mask = new Array(lines.length).fill(false)
+  let fence = null
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index]
+    if (fence === null) {
+      const open = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/u)
+      // A backtick fence info string may not itself contain a backtick.
+      if (open && !(open[1][0] === '`' && open[2].includes('`'))) {
+        fence = { marker: open[1][0], length: open[1].length }
+        mask[index] = true
+      }
+      continue
+    }
+    mask[index] = true
+    const close = line.match(/^ {0,3}(`{3,}|~{3,})[ \t]*$/u)
+    if (close && close[1][0] === fence.marker && close[1].length >= fence.length) fence = null
+  }
+  return mask
+}
+
+// Exact headings only, fenced content excluded, and every matching range is
+// returned so duplicate/authority decisions see the same evidence.
+const sectionDetails = (content, heading) => {
+  const lines = content.split(/\r?\n/u)
+  const mask = fencedLineMask(lines)
+  const indexes = []
+  for (let index = 0; index < lines.length; index += 1) {
+    if (mask[index]) continue
+    if (lines[index] === `## ${heading}`) indexes.push(index)
+  }
+  const ranges = indexes.map((start) => {
+    let end = lines.length
+    for (let index = start + 1; index < lines.length; index += 1) {
+      if (mask[index]) continue
+      if (/^##(?:\s|$)/u.test(lines[index]) || /^#(?:\s|$)/u.test(lines[index])) { end = index; break }
+    }
+    return { start, end }
+  })
+  const first = ranges[0] ?? null
+  return {
+    heading,
+    found: ranges.length > 0,
+    duplicate: ranges.length > 1,
+    start: first?.start ?? -1,
+    end: first?.end ?? -1,
+    ranges,
+    lines,
+    mask,
+  }
+}
+
+const lineIsSkippable = (line, mask, index) => mask[index] || line.trim() === '' || /^\s*>/u.test(line)
+
+const parseAssuranceDeclarations = (content) => {
+  const section = sectionDetails(content, 'Assurance')
+  const result = { section, declaration: null, value: null, malformed: [], duplicates: [] }
+  if (!section.found) return result
+  const seen = []
+  for (const range of section.ranges) {
+    for (let index = range.start + 1; index < range.end; index += 1) {
+      if (lineIsSkippable(section.lines[index], section.mask, index)) continue
+      const stripped = asciiTrim(section.lines[index])
+      if (!/^Assurance profile\b/u.test(stripped)) continue
+      const match = stripped.match(/^Assurance profile: (standard|hardened)$/u)
+      if (!match) { result.malformed.push({ line: index + 1, text: stripped }); continue }
+      seen.push({ line: index + 1, value: match[1] })
+    }
+  }
+  if (seen.length > 1) result.duplicates = seen
+  else if (seen.length === 1) { result.declaration = seen[0]; result.value = seen[0].value }
+  return result
+}
+
+const parseHardenedSpec = (content) => {
+  const errors = []
+  const acs = new Map()
+  const vs = new Map()
+  const rawVs = []
+  const lines = content.split(/\r?\n/u)
+  const mask = fencedLineMask(lines)
+
+  const acSection = sectionDetails(content, 'Acceptance Criteria')
+  if (acSection.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'spec.md', duplicateHeadingLine(acSection), 'spec.md has more than one exact ## Acceptance Criteria heading'))
+  if (acSection.found) {
+    for (let index = acSection.start + 1; index < acSection.end; index += 1) {
+      if (lineIsSkippable(lines[index], mask, index)) continue
+      const line = lines[index]
+      const match = line.match(/^- (AC\S*) — (.+)$/u)
+      const id = match?.[1] ?? ''
+      if (!match || !HARDENED_ID.AC.test(id) || !hardenedProse(match[2])) {
+        errors.push(diagnostic('HARDENED_AC_ID_MALFORMED', 'spec.md', index + 1, `'${line.trim()}' is not a valid '- AC001 — prose' acceptance entry`))
+        continue
+      }
+      if (acs.has(id)) { errors.push(diagnostic('HARDENED_AC_DUPLICATE', 'spec.md', index + 1, `acceptance criterion ${id} is defined more than once`)); continue }
+      acs.set(id, { id, prose: match[2].trim(), line: index + 1 })
+    }
+  }
+  if (acs.size === 0) errors.push(diagnostic('HARDENED_AC_ID_MALFORMED', 'spec.md', acSection.found ? acSection.start + 1 : 1, 'the exact ## Acceptance Criteria section has no valid AC entry'))
+
+  const vSection = sectionDetails(content, 'Validation')
+  if (vSection.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'spec.md', duplicateHeadingLine(vSection), 'spec.md has more than one exact ## Validation heading'))
+  if (vSection.found) {
+    let index = vSection.start + 1
+    while (index < vSection.end) {
+      if (lineIsSkippable(lines[index], mask, index)) { index += 1; continue }
+      const line = lines[index]
+      if (line.startsWith('  - ')) {
+        errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `unexpected verification child line '${line.trim()}' without an entry`))
+        index += 1
+        continue
+      }
+      const entry = line.match(/^- (V\S*) — (.+)$/u)
+      const id = entry?.[1] ?? ''
+      if (!entry || !HARDENED_ID.V.test(id) || !hardenedProse(entry[2])) {
+        errors.push(diagnostic('HARDENED_V_ID_MALFORMED', 'spec.md', index + 1, `'${line.trim()}' is not a valid '- V001 — prose' verification entry`))
+        index += 1
+        continue
+      }
+      const v = { id, prose: entry[2].trim(), line: index + 1, proves: null, kind: null, stimulus: null, expected: null }
+      index += 1
+      const seen = []
+      let sawBlank = false
+      let blankFlagged = false
+      while (index < vSection.end) {
+        if (mask[index] || /^\s*>/u.test(lines[index])) { index += 1; continue }
+        const child = lines[index]
+        if (child.trim() === '') { sawBlank = true; index += 1; continue }
+        if (child.startsWith('- ')) break
+        if (!child.startsWith('  - ')) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} has an unexpected child line '${child.trim()}'`))
+          index += 1
+          continue
+        }
+        if (sawBlank && !blankFlagged) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} has a blank line inside its entry`))
+          blankFlagged = true
+        }
+        const field = child.match(/^  - ([^:]+):(?: (.*))?$/u)
+        if (!field) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} has an unexpected child line '${child.trim()}'`))
+          index += 1
+          continue
+        }
+        const label = field[1]
+        const value = (field[2] ?? '').trim()
+        if (!HARDENED_V_FIELDS.includes(label)) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} has unknown field '${label}'`))
+          index += 1
+          continue
+        }
+        if (seen.includes(label)) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} repeats field '${label}'`))
+          index += 1
+          continue
+        }
+        if (HARDENED_V_FIELDS.indexOf(label) !== seen.length) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} field '${label}' is out of order`))
+        }
+        seen.push(label)
+        if (!hardenedProse(value)) {
+          errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} field '${label}' is empty or placeholder-only`))
+          index += 1
+          continue
+        }
+        if (label === 'Proves') {
+          const proves = parseIdList(value, 'AC')
+          if (proves.error) errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', index + 1, `${id} Proves is not a valid AC ID list (${proves.error})`))
+          else v.proves = proves.ids
+        } else if (label === 'Kind') {
+          if (!HARDENED_KINDS.includes(value)) errors.push(diagnostic('HARDENED_V_KIND_INVALID', 'spec.md', index + 1, `${id} kind '${value}' is not one of ${HARDENED_KINDS.join(', ')}`))
+          else v.kind = value
+        } else if (label === 'Stimulus') v.stimulus = value
+        else v.expected = value
+        index += 1
+      }
+      for (const label of HARDENED_V_FIELDS) {
+        if (!seen.includes(label)) errors.push(diagnostic('HARDENED_V_FIELD_MISSING', 'spec.md', v.line, `${id} is missing required field '${label}'`))
+      }
+      if (vs.has(id)) errors.push(diagnostic('HARDENED_V_DUPLICATE', 'spec.md', v.line, `verification case ${id} is defined more than once`))
+      else { vs.set(id, v); rawVs.push(v) }
+    }
+  }
+  if (vs.size === 0) errors.push(diagnostic('HARDENED_V_ID_MALFORMED', 'spec.md', vSection.found ? vSection.start + 1 : 1, 'the exact ## Validation section has no valid V entry'))
+
+  if (errors.length === 0) {
+    for (const v of rawVs) {
+      if (!v.proves) continue
+      for (const ac of v.proves) {
+        if (!acs.has(ac)) errors.push(diagnostic('HARDENED_AC_UNDEFINED', 'spec.md', v.line, `${v.id} references undefined acceptance criterion ${ac}`))
+      }
+    }
+    for (const ac of acs.values()) {
+      if (!rawVs.some((v) => v.proves?.includes(ac.id))) errors.push(diagnostic('HARDENED_AC_UNROUTED', 'spec.md', ac.line, `acceptance criterion ${ac.id} has no verification case`))
+    }
+  }
+  return { errors, acs, vs, rawVs }
+}
+
+const parseHardenedPlan = (content) => {
+  const errors = []
+  const groups = new Map()
+  const lines = content.split(/\r?\n/u)
+  const mask = fencedLineMask(lines)
+  const assurance = sectionDetails(content, 'Assurance')
+  if (assurance.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'plan.md', duplicateHeadingLine(assurance), 'plan.md has more than one exact ## Assurance heading'))
+  const values = new Map()
+  const seen = []
+  if (assurance.found) {
+    let blockStarted = false
+    let sawBlank = false
+    let blankFlagged = false
+    for (let index = assurance.start + 1; index < assurance.end; index += 1) {
+      if (mask[index] || /^\s*>/u.test(lines[index])) continue
+      const line = lines[index]
+      if (line.trim() === '') { sawBlank = true; continue }
+      const declarationLine = /^Assurance profile\b/u.test(asciiTrim(line))
+      if (sawBlank && blockStarted && !blankFlagged) {
+        errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', index + 1, 'the Assurance block has a blank line inside it'))
+        blankFlagged = true
+      }
+      sawBlank = false
+      blockStarted = true
+      if (declarationLine) continue
+      const match = line.match(/^- ([^:]+): (.*)$/u)
+      if (!match) { errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', index + 1, `unexpected Assurance line '${line.trim()}'`)); continue }
+      const label = match[1]
+      const value = (match[2] ?? '').trim()
+      if (!HARDENED_PLAN_FIELDS.includes(label)) { errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', index + 1, `unknown Assurance field '${label}'`)); continue }
+      if (seen.includes(label)) { errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', index + 1, `duplicate Assurance field '${label}'`)); continue }
+      if (HARDENED_PLAN_FIELDS.indexOf(label) !== seen.length) errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', index + 1, `Assurance field '${label}' is out of order`))
+      seen.push(label)
+      if (!hardenedProse(value) || value.toLowerCase() === 'none') {
+        errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', index + 1, `Assurance field '${label}' is empty, placeholder-only, or an unqualified 'none'`))
+        continue
+      }
+      values.set(label, value)
+    }
+  }
+  for (const label of HARDENED_PLAN_FIELDS) {
+    if (!seen.includes(label)) errors.push(diagnostic('HARDENED_PLAN_FIELD_MISSING', 'plan.md', assurance.start + 1, `plan is missing required Assurance field '${label}'`))
+  }
+
+  const groupSection = sectionDetails(content, 'Cohesion Groups')
+  if (groupSection.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'plan.md', duplicateHeadingLine(groupSection), 'plan.md has more than one exact ## Cohesion Groups heading'))
+  if (!groupSection.found) {
+    errors.push(diagnostic('HARDENED_GROUP_ID_MALFORMED', 'plan.md', 1, 'plan.md has no ## Cohesion Groups section'))
+  } else {
+    let entries = 0
+    let noneEntry = null
+    for (let index = groupSection.start + 1; index < groupSection.end; index += 1) {
+      if (lineIsSkippable(lines[index], mask, index)) continue
+      const line = lines[index]
+      if (!line.startsWith('- ')) { errors.push(diagnostic('HARDENED_GROUP_ID_MALFORMED', 'plan.md', index + 1, `unexpected Cohesion Groups line '${line.trim()}'`)); continue }
+      const noneMatch = line.match(/^- none — (.+)$/u)
+      if (noneMatch && hardenedProse(noneMatch[1])) {
+        if (noneEntry) errors.push(diagnostic('HARDENED_GROUP_DUPLICATE', 'plan.md', index + 1, 'Cohesion Groups repeats the reasoned none entry'))
+        else noneEntry = { line: index + 1 }
+        entries += 1
+        continue
+      }
+      const match = line.match(/^- (G\S*) — (.+)$/u)
+      const id = match?.[1] ?? ''
+      if (!match || !HARDENED_ID.G.test(id) || !hardenedProse(match[2])) {
+        errors.push(diagnostic('HARDENED_GROUP_ID_MALFORMED', 'plan.md', index + 1, `'${line.trim()}' is not a valid '- G001 — prose' or '- none — reason' entry`))
+        continue
+      }
+      if (groups.has(id)) errors.push(diagnostic('HARDENED_GROUP_DUPLICATE', 'plan.md', index + 1, `cohesion group ${id} is defined more than once`))
+      else groups.set(id, { id, prose: match[2].trim(), line: index + 1 })
+      entries += 1
+    }
+    if (noneEntry && groups.size > 0) errors.push(diagnostic('HARDENED_GROUP_DUPLICATE', 'plan.md', noneEntry.line, `Cohesion Groups mixes a none entry with ${[...groups.keys()].join(', ')}`))
+    if (entries === 0) errors.push(diagnostic('HARDENED_GROUP_ID_MALFORMED', 'plan.md', groupSection.start + 1, 'Cohesion Groups has no valid entry'))
+  }
+  return { errors, groups, values }
+}
+
+const parseHardenedTasks = (content, spec, groups, activity) => {
+  const errors = []
+  const tasks = new Map()
+  const rawTasks = []
+  const audit = []
+  const lines = content.split(/\r?\n/u)
+  const mask = fencedLineMask(lines)
+
+  const assurance = sectionDetails(content, 'Assurance')
+  if (assurance.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'tasks.md', duplicateHeadingLine(assurance), 'tasks.md has more than one exact ## Assurance heading'))
+
+  const auditSection = sectionDetails(content, 'Negative-Space Readiness Audit')
+  if (auditSection.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'tasks.md', duplicateHeadingLine(auditSection), 'tasks.md has more than one exact ## Negative-Space Readiness Audit heading'))
+  if (!auditSection.found) {
+    errors.push(diagnostic('HARDENED_AUDIT_MISSING', 'tasks.md', 1, 'tasks.md is missing the ## Negative-Space Readiness Audit section'))
+  } else {
+    let structured = 0
+    let index = auditSection.start + 1
+    while (index < auditSection.end) {
+      if (lineIsSkippable(lines[index], mask, index)) { index += 1; continue }
+      const line = lines[index]
+      const entry = line.match(/^- (N\S*) — (.+)$/u)
+      const id = entry?.[1] ?? ''
+      if (!entry || !HARDENED_ID.N.test(id) || !hardenedProse(entry[2])) {
+        errors.push(diagnostic('HARDENED_AUDIT_ID_MALFORMED', 'tasks.md', index + 1, `'${line.trim()}' is not a valid '- N001 — prose' audit entry`))
+        index += 1
+        continue
+      }
+      const entryItem = { id, line: index + 1, disposition: null }
+      index += 1
+      let dispositionSeen = false
+      let sawBlank = false
+      while (index < auditSection.end) {
+        if (mask[index] || /^\s*>/u.test(lines[index])) { index += 1; continue }
+        const child = lines[index]
+        if (child.trim() === '') { sawBlank = true; index += 1; continue }
+        if (child.startsWith('- ')) break
+        if (!child.startsWith('  - ')) { errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', index + 1, `${id} has unexpected child line '${child.trim()}'`)); index += 1; continue }
+        if (sawBlank && !dispositionSeen) { errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', index + 1, `${id} has a blank line inside its entry`)); sawBlank = false }
+        const field = child.match(/^  - Disposition: (.*)$/u)
+        if (!field) { errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', index + 1, `${id} has unexpected child line '${child.trim()}'`)); index += 1; continue }
+        if (dispositionSeen) { errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', index + 1, `${id} repeats its Disposition`)); index += 1; continue }
+        dispositionSeen = true
+        const value = field[1].trim()
+        const covered = value.match(/^covered by (.+)$/u)
+        const accepted = value.match(/^accepted limitation — (.+)$/u)
+        if (covered && hardenedProse(covered[1])) {
+          const ids = parseIdList(covered[1].trim(), 'V')
+          if (ids.error) errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', index + 1, `${id} Disposition 'covered by' needs a valid V ID list (${ids.error})`))
+          else entryItem.disposition = { kind: 'covered', ids: ids.ids }
+        } else if (accepted && hardenedProse(accepted[1])) {
+          entryItem.disposition = { kind: 'accepted', reason: accepted[1].trim() }
+        } else {
+          errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', index + 1, `${id} Disposition is not 'covered by <V-id-list>' or 'accepted limitation — prose'`))
+        }
+        index += 1
+      }
+      if (!dispositionSeen) errors.push(diagnostic('HARDENED_AUDIT_DISPOSITION_INVALID', 'tasks.md', entryItem.line, `${id} is missing its Disposition child`))
+      if (audit.some((existing) => existing.id === id)) errors.push(diagnostic('HARDENED_AUDIT_DUPLICATE', 'tasks.md', entryItem.line, `readiness defect ${id} is defined more than once`))
+      else audit.push(entryItem)
+      structured += 1
+    }
+    if (structured === 0) errors.push(diagnostic('HARDENED_AUDIT_MISSING', 'tasks.md', auditSection.start + 1, "the '## Negative-Space Readiness Audit' section has no structured N entry"))
+  }
+
+  const taskSection = sectionDetails(content, 'Tasks')
+  if (taskSection.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'tasks.md', duplicateHeadingLine(taskSection), 'tasks.md has more than one exact ## Tasks heading'))
+  if (!taskSection.found) {
+    errors.push(diagnostic('HARDENED_TASK_ID_MALFORMED', 'tasks.md', 1, 'tasks.md has no ## Tasks section'))
+  } else {
+    let index = taskSection.start + 1
+    while (index < taskSection.end) {
+      if (lineIsSkippable(lines[index], mask, index)) { index += 1; continue }
+      const line = lines[index]
+      const entry = line.match(/^- \[([ xX])\] (T\S*) — (.+)$/u)
+      const id = entry?.[2] ?? ''
+      if (!entry || !HARDENED_ID.T.test(id) || !hardenedProse(entry[3])) {
+        errors.push(diagnostic('HARDENED_TASK_ID_MALFORMED', 'tasks.md', index + 1, `'${line.trim()}' is not a valid '- [ ] T001 — prose' task`))
+        index += 1
+        continue
+      }
+      const task = { id, complete: entry[1].toLowerCase() === 'x', line: index + 1, fields: new Map(), verifies: null, satisfies: null, depends: null, group: null, evidence: [] }
+      index += 1
+      const seen = []
+      let evidenceMode = false
+      let sawBlank = false
+      let blankFlagged = false
+      while (index < taskSection.end) {
+        if (mask[index] || /^\s*>/u.test(lines[index])) { index += 1; continue }
+        const child = lines[index]
+        if (child.trim() === '') { sawBlank = true; index += 1; continue }
+        if (/^-\s*\[/u.test(child) || child.startsWith('- ')) break
+        if (sawBlank && !blankFlagged) {
+          errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', index + 1, `${id} has a blank line inside its entry`))
+          blankFlagged = true
+        }
+        const evidence = child.match(/^    - (.+)$/u)
+        if (evidence) {
+          const item = evidence[1].match(/^(V\S*): (.*)$/u)
+          const itemValue = item ? item[2].trim() : ''
+          if (!evidenceMode) {
+            errors.push(diagnostic('HARDENED_TASK_EVIDENCE_INVALID', 'tasks.md', index + 1, `${id} has an evidence item outside its Evidence field`))
+          } else if (!item || !HARDENED_ID.V.test(item[1]) || !(hardenedProse(itemValue) || itemValue === 'pending')) {
+            errors.push(diagnostic('HARDENED_TASK_EVIDENCE_INVALID', 'tasks.md', index + 1, `${id} evidence '${evidence[1].trim()}' is not '<V-id>: prose'`))
+          } else {
+            task.evidence.push({ id: item[1], value: itemValue, line: index + 1 })
+          }
+          index += 1
+          continue
+        }
+        const field = child.match(/^  - ([^:]+):(?: (.*))?$/u)
+        if (!field) { errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', index + 1, `${id} has unexpected child line '${child.trim()}'`)); index += 1; continue }
+        const label = field[1]
+        const value = (field[2] ?? '').trim()
+        if (!HARDENED_TASK_FIELDS.includes(label)) { errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', index + 1, `${id} has unknown field '${label}'`)); index += 1; continue }
+        if (seen.includes(label)) { errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', index + 1, `${id} repeats field '${label}'`)); index += 1; continue }
+        if (HARDENED_TASK_FIELDS.indexOf(label) !== seen.length) errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', index + 1, `${id} field '${label}' is out of order`))
+        seen.push(label)
+        if (label === 'Evidence') {
+          evidenceMode = true
+          index += 1
+          continue
+        }
+        if (!hardenedProse(value)) { errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', index + 1, `${id} field '${label}' is empty or placeholder-only`)); index += 1; continue }
+        task.fields.set(label, value)
+        index += 1
+      }
+      for (const label of HARDENED_TASK_FIELDS) {
+        if (!seen.includes(label)) errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', task.line, `${id} is missing required field '${label}'`))
+      }
+      if (task.fields.has('Satisfies')) {
+        const satisfies = parseIdList(task.fields.get('Satisfies'), 'AC')
+        if (satisfies.error) errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', task.line, `${id} Satisfies is not a valid AC ID list (${satisfies.error})`))
+        else task.satisfies = satisfies.ids
+      }
+      if (task.fields.has('Verifies')) {
+        const verifies = parseIdList(task.fields.get('Verifies'), 'V')
+        if (verifies.error) errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', task.line, `${id} Verifies is not a valid V ID list (${verifies.error})`))
+        else task.verifies = verifies.ids
+      }
+      if (task.fields.has('Depends on')) {
+        const value = task.fields.get('Depends on')
+        if (value === 'none') task.depends = 'none'
+        else {
+          const parts = value.split(', ')
+          if (parts.some((part) => part === '' || !HARDENED_ID.T.test(part))) {
+            errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', task.line, `${id} Depends on is not 'none' or a valid T ID list`))
+          } else {
+            task.depends = parts
+          }
+        }
+      }
+      if (task.fields.has('Cohesion group')) {
+        const value = task.fields.get('Cohesion group')
+        if (value === 'none') task.group = 'none'
+        else if (HARDENED_ID.G.test(value)) task.group = value
+        else errors.push(diagnostic('HARDENED_TASK_FIELD_MISSING', 'tasks.md', task.line, `${id} Cohesion group is not 'none' or a valid G ID`))
+      }
+      if (task.verifies) {
+        const ids = task.evidence.map((item) => item.id)
+        if (ids.length !== task.verifies.length || ids.some((value, position) => value !== task.verifies[position])) {
+          errors.push(diagnostic('HARDENED_TASK_EVIDENCE_INVALID', 'tasks.md', task.line, `${id} evidence IDs ${JSON.stringify(ids)} must match Verifies ${JSON.stringify(task.verifies)} in order`))
+        }
+        if (task.complete && task.evidence.some((item) => item.value === 'pending')) {
+          errors.push(diagnostic('HARDENED_TASK_EVIDENCE_PENDING', 'tasks.md', task.line, `${id} is checked but retains pending evidence`))
+        }
+      }
+      if (tasks.has(id)) errors.push(diagnostic('HARDENED_TASK_DUPLICATE', 'tasks.md', task.line, `task ${id} is defined more than once`))
+      else { tasks.set(id, task); rawTasks.push(task) }
+    }
+    if (tasks.size === 0) errors.push(diagnostic('HARDENED_TASK_ID_MALFORMED', 'tasks.md', taskSection.start + 1, 'the ## Tasks section has no valid task entry'))
+  }
+
+  if (errors.length === 0) {
+    const taskOrder = rawTasks.map((task) => task.id)
+    if (spec) {
+      for (const task of rawTasks) {
+        let undefinedReference = false
+        if (task.verifies) {
+          for (const vid of task.verifies) {
+            if (!spec.vs.has(vid)) { errors.push(diagnostic('HARDENED_V_UNDEFINED', 'tasks.md', task.line, `${task.id} verifies undefined verification case ${vid}`)); undefinedReference = true }
+          }
+        }
+        if (task.satisfies) {
+          for (const ac of task.satisfies) {
+            if (!spec.acs.has(ac)) { errors.push(diagnostic('HARDENED_AC_UNDEFINED', 'tasks.md', task.line, `${task.id} Satisfies references undefined acceptance criterion ${ac}`)); undefinedReference = true }
+          }
+        }
+        if (!undefinedReference && task.verifies && task.satisfies) {
+          const union = new Set()
+          for (const vid of task.verifies) {
+            const definition = spec.vs.get(vid)
+            if (definition?.proves) for (const ac of definition.proves) union.add(ac)
+          }
+          const same = task.satisfies.length === union.size && task.satisfies.every((ac) => union.has(ac))
+          if (!same) errors.push(diagnostic('HARDENED_TASK_AC_MISMATCH', 'tasks.md', task.line, `${task.id} Satisfies ${JSON.stringify(task.satisfies)} is not the AC union ${JSON.stringify([...union])} proved by Verifies`))
+        }
+      }
+      for (const definition of spec.vs.values()) {
+        if (!rawTasks.some((task) => task.verifies?.includes(definition.id))) errors.push(diagnostic('HARDENED_V_UNROUTED', 'tasks.md', definition.line, `verification case ${definition.id} has no task route`))
+      }
+      for (const item of audit) {
+        if (item.disposition?.kind !== 'covered') continue
+        for (const vid of item.disposition.ids) {
+          if (!spec.vs.has(vid)) errors.push(diagnostic('HARDENED_V_UNDEFINED', 'tasks.md', item.line, `${item.id} disposition references undefined verification case ${vid}`))
+        }
+      }
+    }
+    for (const task of rawTasks) {
+      if (task.group && task.group !== 'none' && groups && !groups.has(task.group)) {
+        errors.push(diagnostic('HARDENED_GROUP_UNDEFINED', 'tasks.md', task.line, `${task.id} names undefined cohesion group ${task.group}`))
+      }
+      if (task.depends && task.depends !== 'none') {
+        if (new Set(task.depends).size !== task.depends.length) errors.push(diagnostic('HARDENED_TASK_DEPENDENCY_INVALID', 'tasks.md', task.line, `${task.id} repeats a dependency`))
+        for (const dependency of task.depends) {
+          if (dependency === task.id) errors.push(diagnostic('HARDENED_TASK_DEPENDENCY_INVALID', 'tasks.md', task.line, `${task.id} cannot depend on itself`))
+          else if (!taskOrder.includes(dependency)) errors.push(diagnostic('HARDENED_TASK_DEPENDENCY_INVALID', 'tasks.md', task.line, `${task.id} depends on undefined task ${dependency}`))
+          else if (taskOrder.indexOf(dependency) >= taskOrder.indexOf(task.id)) errors.push(diagnostic('HARDENED_TASK_DEPENDENCY_INVALID', 'tasks.md', task.line, `${task.id} depends on ${dependency}, which is not earlier in the checklist`))
+        }
+      }
+    }
+    if (HARDENED_RESULT_ACTIVITIES.has(activity)) {
+      const unchecked = rawTasks.filter((task) => !task.complete)
+      if (unchecked.length) errors.push(diagnostic('HARDENED_TASK_INCOMPLETE', 'tasks.md', unchecked[0].line, `${unchecked.length} task(s) remain unchecked before ${activity}`))
+    }
+  }
+  return { errors, tasks, rawTasks, audit }
+}
+
+const parseHardenedValidation = (content, spec) => {
+  const errors = []
+  const results = new Map()
+  const rawResults = []
+  const lines = content.split(/\r?\n/u)
+  const mask = fencedLineMask(lines)
+  const assurance = sectionDetails(content, 'Assurance')
+  if (assurance.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'validation.md', duplicateHeadingLine(assurance), 'validation.md has more than one exact ## Assurance heading'))
+  const section = sectionDetails(content, 'Results')
+  if (section.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', 'validation.md', duplicateHeadingLine(section), 'validation.md has more than one exact ## Results heading'))
+  const metadata = { candidate: null, context: null, summary: null }
+  const metaLabels = ['Candidate', 'Validation context', 'Validation summary']
+  const seenMeta = []
+
+  if (section.found) {
+    let index = section.start + 1
+    let sawBlank = false
+    let metaBlankFlagged = false
+    while (index < section.end) {
+      if (mask[index] || /^\s*>/u.test(lines[index])) { index += 1; continue }
+      const line = lines[index]
+      if (line.trim() === '') { sawBlank = true; index += 1; continue }
+      if (line.startsWith('- ')) break
+      if (line.startsWith('  - ')) { index += 1; continue }
+      const match = line.match(/^(Candidate|Validation context|Validation summary):(?: (.*))?$/u)
+      if (!match) { errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, `unexpected Results metadata line '${line.trim()}'`)); index += 1; continue }
+      const label = match[1]
+      const value = (match[2] ?? '').trim()
+      if (seenMeta.includes(label)) { errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, `duplicate metadata '${label}'`)); index += 1; continue }
+      if (sawBlank && seenMeta.length > 0 && !metaBlankFlagged) { errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, 'the Results metadata block has a blank line inside it')); metaBlankFlagged = true }
+      sawBlank = false
+      if (metaLabels.indexOf(label) !== seenMeta.length) errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, `metadata '${label}' is out of order`))
+      seenMeta.push(label)
+      if (!hardenedProse(value)) { errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, `metadata '${label}' is empty or placeholder-only`)); index += 1; continue }
+      if (label === 'Validation context' && !HARDENED_CONTEXTS.includes(value)) { errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, `Validation context '${value}' is not one of ${HARDENED_CONTEXTS.join(', ')}`)); index += 1; continue }
+      if (label === 'Validation summary' && !HARDENED_SUMMARIES.includes(value)) { errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', index + 1, `Validation summary '${value}' is not one of ${HARDENED_SUMMARIES.join(', ')}`)); index += 1; continue }
+      if (label === 'Candidate') metadata.candidate = value
+      else if (label === 'Validation context') metadata.context = value
+      else metadata.summary = value
+      index += 1
+    }
+    for (const label of metaLabels) {
+      if (!seenMeta.includes(label)) errors.push(diagnostic('HARDENED_VALIDATION_META_INVALID', 'validation.md', section.start + 1, `Results is missing '${label}'`))
+    }
+
+    while (index < section.end) {
+      if (lineIsSkippable(lines[index], mask, index)) { index += 1; continue }
+      const line = lines[index]
+      const entry = line.match(/^- (V\S*) — (PASS|FAIL|BLOCKED|SKIPPED)$/u)
+      const id = entry?.[1] ?? ''
+      if (!entry || !HARDENED_ID.V.test(id)) {
+        errors.push(diagnostic('HARDENED_RESULT_ID_MALFORMED', 'validation.md', index + 1, `'${line.trim()}' is not a valid '- V001 — PASS' result`))
+        index += 1
+        continue
+      }
+      const result = { id, status: entry[2], line: index + 1, fields: new Map(), proves: null, expected: null, oracle: null }
+      index += 1
+      const seen = []
+      let sawFieldBlank = false
+      let blankFlagged = false
+      while (index < section.end) {
+        if (mask[index] || /^\s*>/u.test(lines[index])) { index += 1; continue }
+        const child = lines[index]
+        if (child.trim() === '') { sawFieldBlank = true; index += 1; continue }
+        if (child.startsWith('- ')) break
+        if (!child.startsWith('  - ')) { errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} has unexpected child line '${child.trim()}'`)); index += 1; continue }
+        if (sawFieldBlank && !blankFlagged) { errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} has a blank line inside its entry`)); blankFlagged = true }
+        const field = child.match(/^  - ([^:]+):(?: (.*))?$/u)
+        if (!field) { errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} has unexpected child line '${child.trim()}'`)); index += 1; continue }
+        const label = field[1]
+        const value = (field[2] ?? '').trim()
+        if (!HARDENED_RESULT_FIELDS.includes(label)) { errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} has unknown field '${label}'`)); index += 1; continue }
+        if (seen.includes(label)) { errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} repeats field '${label}'`)); index += 1; continue }
+        if (HARDENED_RESULT_FIELDS.indexOf(label) !== seen.length) errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} field '${label}' is out of order`))
+        seen.push(label)
+        if (!hardenedProse(value)) { errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} field '${label}' is empty or placeholder-only`)); index += 1; continue }
+        result.fields.set(label, value)
+        if (label === 'Proves') {
+          const proves = parseIdList(value, 'AC')
+          if (proves.error) errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} Proves is not a valid AC ID list (${proves.error})`))
+          else result.proves = proves.ids
+        } else if (label === 'Expected') result.expected = value
+        else if (label === 'Oracle matched') {
+          if (!HARDENED_ORACLE_MATCHES.includes(value)) errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', index + 1, `${id} Oracle matched '${value}' is not one of ${HARDENED_ORACLE_MATCHES.join(', ')}`))
+          else result.oracle = value
+        }
+        index += 1
+      }
+      for (const label of HARDENED_RESULT_FIELDS) {
+        if (!seen.includes(label)) errors.push(diagnostic('HARDENED_RESULT_FIELD_MISSING', 'validation.md', result.line, `${id} is missing required field '${label}'`))
+      }
+      if (results.has(id)) errors.push(diagnostic('HARDENED_RESULT_DUPLICATE', 'validation.md', result.line, `result ${id} is recorded more than once`))
+      else { results.set(id, result); rawResults.push(result) }
+    }
+  }
+
+  if (errors.length === 0 && spec) {
+    for (const result of rawResults) {
+      if (!spec.vs.has(result.id)) { errors.push(diagnostic('HARDENED_RESULT_UNEXPECTED', 'validation.md', result.line, `result ${result.id} has no specification definition`)); continue }
+      const definition = spec.vs.get(result.id)
+      if (result.proves) {
+        const undefinedAc = result.proves.find((ac) => !spec.acs.has(ac))
+        if (undefinedAc) errors.push(diagnostic('HARDENED_AC_UNDEFINED', 'validation.md', result.line, `${result.id} Proves references undefined acceptance criterion ${undefinedAc}`))
+        else if (definition.proves) {
+          const same = result.proves.length === definition.proves.length && result.proves.every((ac) => definition.proves.includes(ac))
+          if (!same) errors.push(diagnostic('HARDENED_RESULT_AC_MISMATCH', 'validation.md', result.line, `${result.id} Proves ${JSON.stringify(result.proves)} differs from the specification ${JSON.stringify(definition.proves)}`))
+        }
+      }
+      if (result.expected && definition.expected && result.expected !== definition.expected) {
+        errors.push(diagnostic('HARDENED_RESULT_EXPECTED_MISMATCH', 'validation.md', result.line, `${result.id} Expected text differs from the specification oracle`))
+      }
+      if (result.oracle) {
+        const consistent = (result.status === 'PASS' && result.oracle === 'yes')
+          || (result.status === 'FAIL' && result.oracle === 'no')
+          || ((result.status === 'BLOCKED' || result.status === 'SKIPPED') && result.oracle === 'unknown')
+        if (!consistent) errors.push(diagnostic('HARDENED_RESULT_ORACLE_MISMATCH', 'validation.md', result.line, `${result.id} status ${result.status} requires a different 'Oracle matched' value`))
+      }
+    }
+    for (const definition of spec.vs.values()) {
+      if (!results.has(definition.id)) errors.push(diagnostic('HARDENED_RESULT_MISSING', 'validation.md', 1, `verification case ${definition.id} has no validation result`))
+    }
+    if (errors.length === 0 && metadata.summary) {
+      const statuses = rawResults.map((result) => result.status)
+      const allPass = statuses.every((status) => status === 'PASS')
+      const anyFail = statuses.some((status) => status === 'FAIL')
+      const anyBlocked = statuses.some((status) => status === 'BLOCKED' || status === 'SKIPPED')
+      const summaryOk = metadata.summary === 'PASS' ? allPass : metadata.summary === 'FAIL' ? anyFail : !anyFail && anyBlocked
+      if (!summaryOk) errors.push(diagnostic('HARDENED_SUMMARY_MISMATCH', 'validation.md', section.start + 1, `Validation summary ${metadata.summary} does not match the result statuses ${JSON.stringify(statuses)}`))
+      else if (!allPass) {
+        const first = rawResults.find((result) => result.status !== 'PASS')
+        errors.push(diagnostic('HARDENED_RESULT_NONPASSING', 'validation.md', first?.line ?? 1, `${first?.id ?? 'A result'} ${first?.status ?? 'FAIL'} makes the coherent result set nonpassing, so the hardened validation gate cannot pass`))
+      }
+    }
+  }
+  return { errors, results, rawResults, metadata }
+}
+
+const hardenedConsistency = (workDir, activity, reports) => {
+  const errors = []
+  const files = HARDENED_ACTIVITY_FILES[activity]
+  if (!files) return { errors, profile: null }
+  const contentFor = (artifact) => {
+    const report = reports.find((entry) => entry.artifact === artifact)
+    if (report) return report.errors.length ? null : report.content
+    const probe = readWorkFile(workDir, artifact)
+    return probe.error === null ? probe.content : null
+  }
+  const planContent = contentFor('plan.md')
+  if (planContent === null) return { errors, profile: null }
+  const planDeclarations = parseAssuranceDeclarations(planContent)
+  for (const malformed of planDeclarations.malformed) {
+    errors.push(diagnostic('ASSURANCE_PROFILE_MALFORMED', 'plan.md', malformed.line, `'${malformed.text}' is not exactly 'Assurance profile: standard' or 'Assurance profile: hardened'`))
+  }
+  if (planDeclarations.duplicates.length) errors.push(diagnostic('ASSURANCE_PROFILE_DUPLICATE', 'plan.md', planDeclarations.duplicates[1].line, "plan.md has more than one recognized 'Assurance profile' declaration"))
+  const profile = planDeclarations.value
+  const planDeclarationInvalid = planDeclarations.malformed.length > 0 || planDeclarations.duplicates.length > 0
+
+  const repeatedDeclarations = () => {
+    for (const artifact of files) {
+      if (artifact === 'plan.md' || artifact === 'spec.md') continue
+      const content = contentFor(artifact)
+      if (content === null) continue
+      const parsed = parseAssuranceDeclarations(content)
+      const section = sectionDetails(content, 'Assurance')
+      if (section.found && section.duplicate) errors.push(diagnostic('HARDENED_SECTION_DUPLICATE', artifact, duplicateHeadingLine(section), `${artifact} has more than one exact ## Assurance heading`))
+      for (const malformed of parsed.malformed) errors.push(diagnostic('ASSURANCE_PROFILE_MALFORMED', artifact, malformed.line, `'${malformed.text}' is not exactly 'Assurance profile: standard' or 'Assurance profile: hardened'`))
+      if (parsed.duplicates.length) errors.push(diagnostic('ASSURANCE_PROFILE_DUPLICATE', artifact, parsed.duplicates[1].line, `${artifact} has more than one recognized 'Assurance profile' declaration`))
+      if (profile === 'hardened') {
+        if (!planDeclarationInvalid && parsed.value === null && parsed.malformed.length === 0 && parsed.duplicates.length === 0) errors.push(diagnostic('ASSURANCE_PROFILE_MISSING', artifact, section.found ? section.start + 1 : 1, `hardened ${artifact} requires a repeated 'Assurance profile: hardened' declaration`))
+        else if (!planDeclarationInvalid && parsed.value !== null && parsed.value !== 'hardened') errors.push(diagnostic('ASSURANCE_PROFILE_CONFLICT', artifact, parsed.declaration.line, `repeated declaration '${parsed.value}' differs from the plan declaration 'hardened'`))
+      } else if (!planDeclarationInvalid && parsed.value !== null && parsed.value !== profile) {
+        errors.push(diagnostic('ASSURANCE_PROFILE_CONFLICT', artifact, parsed.declaration.line, profile === null ? `'${parsed.value}' appears without an authoritative plan declaration` : `repeated declaration '${parsed.value}' differs from the plan declaration '${profile}'`))
+      }
+    }
+  }
+
+  if (profile === null) {
+    repeatedDeclarations()
+    return { errors, profile: null }
+  }
+  if (profile === 'standard') {
+    repeatedDeclarations()
+    return { errors, profile }
+  }
+
+  repeatedDeclarations()
+  const planParsed = parseHardenedPlan(planContent)
+  errors.push(...planParsed.errors)
+  // A hardened-required artifact that cannot be resolved and is not already
+  // reported by the structural channel fails closed with its production code
+  // rather than silently dropping cross-checks.
+  const contentOrEmpty = (artifact) => {
+    if (!files.includes(artifact)) return null
+    const content = contentFor(artifact)
+    if (content !== null) return content
+    const alreadyReported = reports.some((entry) => entry.artifact === artifact && entry.errors.length > 0)
+    return alreadyReported ? null : ''
+  }
+  const specContent = contentOrEmpty('spec.md')
+  const specParsed = specContent === null ? null : parseHardenedSpec(specContent)
+  if (specParsed) errors.push(...specParsed.errors)
+  const specClean = specParsed && specParsed.errors.length === 0 ? specParsed : null
+  const groupsClean = planParsed.errors.length === 0 ? planParsed.groups : null
+  const tasksContent = contentOrEmpty('tasks.md')
+  if (tasksContent !== null) errors.push(...parseHardenedTasks(tasksContent, specClean, groupsClean, activity).errors)
+  const validationContent = contentOrEmpty('validation.md')
+  if (validationContent !== null) errors.push(...parseHardenedValidation(validationContent, specClean).errors)
+  return { errors, profile }
+}
+
 const taskProgress = (content) => {
   const details = taskDetails(content)
   return {
@@ -559,6 +1344,8 @@ const check = (workDirValue, activity) => {
       if (pending) errors.push(`next.md: status is 'complete' but ${pending} task(s) remain unchecked; closure must be honest`)
     }
   }
+  const assurance = format === 'compact' ? { errors: [], profile: null } : hardenedConsistency(workDir, activity, reports)
+  errors.push(...assurance.errors)
   if (errors.length) {
     return [`Check failed for ${activity}:`, ...errors.map((error) => `- ${error}`)].join('\n')
   }
@@ -572,7 +1359,10 @@ const check = (workDirValue, activity) => {
       const prompt = promptAvailability(agent)
       return prompt.available ? `; next agent: ${agent} (prompt: ${prompt.target})` : `; next agent: ${agent} (prompt missing: ${prompt.target})`
     })()
-  return `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}`
+  const assuranceNote = assurance.profile === 'hardened'
+    ? `; ${HARDENED_STRUCTURAL_NOTE}`
+    : assurance.profile === 'standard' ? '; assurance standard' : ''
+  return `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}`
 }
 
 const gitContext = (workDir) => {
@@ -598,6 +1388,15 @@ const resume = (value) => {
   const tasksReport = reports.find((report) => report.artifact === 'tasks.md')
   const progress = tasksReport ? taskProgress(tasksReport.content) : null
   const inconsistencies = [...reports.flatMap((report) => report.errors), ...taskConsistency(reports), ...recordConsistency(reports)]
+  const nextReport = reports.find((report) => report.artifact === 'next.md')
+  const compact = nextReport !== undefined && parseNextRecord(nextReport.content, workDir).record?.format === 'compact'
+  const assurance = compact ? { errors: [], profile: null } : hardenedConsistency(workDir, 'resume', reports)
+  inconsistencies.push(...assurance.errors)
+  const assuranceLine = compact
+    ? 'assurance: compact records bypass assurance parsing'
+    : assurance.profile === 'hardened'
+      ? HARDENED_STRUCTURAL_NOTE
+      : assurance.profile === 'standard' ? 'assurance standard' : 'assurance: no exact declaration; current structural checks only'
 
   let recordNote = '(no next.md record)'
   let promptNote = ''
@@ -628,6 +1427,7 @@ const resume = (value) => {
     promptNote,
     `Artifacts: ${available.join(', ') || '(none)'}`,
     taskLine,
+    assuranceLine,
     `Inconsistencies: ${inconsistencies.length ? inconsistencies.join(' | ') : '(none detected)'}`,
     'Resume is read-only; inspect and repair artifacts with explicit saves before continuing.',
   ].filter(Boolean).join('\n')

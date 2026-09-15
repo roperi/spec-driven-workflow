@@ -14,6 +14,19 @@ concrete completion check. Update `next.md` so the next responsibility is
 usually `sdw.execute` (or as the agreement directs), recording any
 deliberate change of executor session.
 
+For hardened work, `tasks.md` repeats the hardened declaration and adds an
+exact `## Negative-Space Readiness Audit` and task entries whose fields are
+`Satisfies`, `Verifies`, `Depends on`, `Cohesion group`, `Authority`,
+`Mutation boundary`, `Preserved invariants`, `Adversarial cases`,
+`Completion check`, and `Evidence`. Map every task to its V route, keep coupled
+work in one cohesion group, and record one pending or interpreted evidence item
+per `Verifies` ID. When hardened cross-context work needs a new executable
+oracle, split verification seeding from production implementation into two
+dependent tasks: the seed task is tests/oracles only and stops before
+production edits, and the implementation task's authority excludes the
+protected seed set. The complete grammar lives once in `.sdw/agents/shared/workflow.md`;
+standard tasks keep the current concise shape.
+
 Save it, then run:
 
 ```sh

@@ -11,6 +11,14 @@ its detail; do not mechanically rewrite detailed upstream requirements, and
 flag inconsistencies with the actual repository rather than silently
 hiding them.
 
+For hardened work (an exact `Assurance profile: hardened` in `plan.md`), write
+stable `AC###` acceptance criteria and `V###` verification cases with
+`Proves`, `Kind`, `Stimulus`, and `Expected` fields in `spec.md`; the expected
+value is the observable oracle and must name the complete compared state when
+preservation is claimed. The complete grammar lives once in
+`.sdw/agents/shared/workflow.md`; do not restate it. For standard work keep the current
+concise criteria and validation targets.
+
 Record missing access as a blocker rather than inventing evidence. Save the
 named artifact, update `next.md`, then run:
 

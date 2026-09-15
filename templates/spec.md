@@ -1,5 +1,7 @@
 # Specification
 
+<!-- Standard work: keep this concise. Hardened work: use the AC###/V### grammar in `.sdw/agents/shared/workflow.md`; do not copy it here. -->
+
 ## Intended Behavior
 
 TODO: describe the behavior in terms another agent can implement and inspect.

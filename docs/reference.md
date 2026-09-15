@@ -57,6 +57,54 @@ actions/progress, checks/results, outcome/lessons) plus `next.md`; expand to
 normal records only through an explicit superseding decision, keeping one
 mutable authority.
 
+## Assurance profiles
+
+Normal work records one explicit assurance profile in `plan.md` under an exact
+`## Assurance` heading:
+
+```text
+Assurance profile: standard
+```
+
+or
+
+```text
+Assurance profile: hardened
+```
+
+The value is exact and case-sensitive; surrounding ASCII whitespace is ignored.
+Compact work skips assurance. A normal plan saved without an exact declaration
+keeps the current structural behavior and is not required to add hardened
+fields. There is no record marker that can distinguish an intentionally removed
+declaration, so the plan template, the planning prompt, and semantic review own
+that limitation.
+
+`standard` is the default experience and keeps the concise task and validation
+shapes. `hardened` is an explicit choice for safety-boundary work and activates
+stable `AC###`/`V###` traceability, the eight-field hardened plan and cohesion
+groups, mapped tasks with a negative-space readiness audit, and one validation
+result per `V`. Hardened `tasks.md` and `validation.md` repeat `Assurance
+profile: hardened` and must match the plan.
+
+The hardened gates are progressive: `check plan` verifies the profile and the
+hardened plan and specification; `check task` adds tasks, readiness, mappings,
+and cohesion groups; `check validate` adds complete results and requires every
+task checked with nonpending evidence. A passing hardened check appends the
+structural-only disclaimer. The helper checks exact syntax, IDs, mappings,
+required fields, declared oracle/status coherence, and summaries only. It never
+judges prose or test truth, infers approval or independence, or executes project
+commands. The installed [shared workflow
+instructions](../agents/shared/workflow.md) own the exact grammar; this page
+does not restate it.
+
+For hardened cross-context work that introduces a new executable oracle, the
+[shared workflow instructions](../agents/shared/workflow.md) additionally own a
+verification seed convention: the seed is authored and observed red against the
+exact production candidate before production edits, its paths and SHA-256
+hashes are protected and verified read-only by each implementing context, and
+review performs one bounded full-surface pass. This stays transparent for
+ordinary and compact work.
+
 Isolated parallel work uses separate Git worktrees with distinct work IDs and
 their own mutable records; comparison and integration are separate
 responsibilities that reference candidate artifacts and their shared input

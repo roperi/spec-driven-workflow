@@ -8,8 +8,24 @@ commands, working directories, versions, exit results, and limitations in
 external publication, real adoption, and user experience; never record a
 syntax pass or simulated interaction as stronger evidence than it is.
 
-If a check fails: diagnose within the authorized scope, repair, and rerun
-the affected checks. Do not weaken requirements, retry indefinitely, or
+For hardened work, record the exact candidate and `Validation context`
+(`self`, `fresh`, or `independent`) and one result per `V###` with `Proves`,
+`Source`, `Expected`, `Observed`, `Resulting state`, `Oracle matched`,
+`Evidence`, and `Limitations`. Reconcile an exit-zero command that contradicts
+its oracle as `Oracle matched: no` and `FAIL` instead of treating command status
+as the conclusion. Context `self` is same-context implementer evidence; use
+`fresh` or `independent` only when that context really existed. For a
+quantified claim, record the planned universe, the expected count, the
+executed count, and the lifecycle-based exclusions; a selected subset or a
+green exit status cannot establish the whole claim. Evidence from
+different fixtures or runs must not be spliced into one end-to-end claim; an
+end-to-end case uses one candidate's own coherent evidence. Repairs rerun the
+affected cases plus their cohesion-group, shared-invariant, and end-to-end
+cases. The complete grammar lives once in `.sdw/agents/shared/workflow.md`; do
+not restate it.
+
+If a check fails: diagnose within the authorized scope, repair, and rerun the
+affected checks. Do not weaken requirements, retry indefinitely, or
 turn unavailable access into a passing claim. Save the evidence before the
 continuation record, then update `next.md` with the candidate state and any
 failed or blocked checks, then run:

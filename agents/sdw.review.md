@@ -7,6 +7,17 @@ context, and independently requested review for which a separate session or
 context is required — same-context review must never be described as
 independent.
 
+For hardened work, review semantic sufficiency rather than accepting the
+structural pass: inspect whether the stimuli, oracles, preserved invariants,
+recovery states, readiness dispositions, and negative-space coverage actually
+externalize the reviewer's reasoning, and whether the default path stays
+light. A structural success cannot establish semantic correctness or negative
+coverage. Complete one bounded full-surface pass over seed integrity,
+coverage closure, observation semantics, every AC/V route, and adjacent
+negative space before returning ownership, and return ordinary findings
+batched in one consolidated package rather than stopping at the first
+blocker. The complete grammar lives once in `.sdw/agents/shared/workflow.md`.
+
 Inspect what the work item's scope actually requires: minimality, artifact
 safety, stopping behavior, and the specific candidate surfaces involved.
 Run focused critical checks personally where evidence is insufficient; reuse

@@ -62,3 +62,190 @@ bounded work may use the compact `work.md` plus `next.md` shape instead;
 expand explicitly if the work grows, keeping one mutable authority. Do not
 manufacture completed work to fill a template; honest pending or unresolved
 sections are correct when they are true.
+
+## Progressive assurance
+
+Normal work records an assurance profile in `plan.md` under an exact
+`## Assurance` heading. The only authoritative declaration is one exact line:
+
+```text
+Assurance profile: standard
+```
+
+or
+
+```text
+Assurance profile: hardened
+```
+
+The value is case-sensitive and closed; surrounding ASCII whitespace is
+ignored, and whitespace inside the label or value is not normalized. A
+declaration anywhere else is ordinary prose. Compact work bypasses assurance
+entirely. A normal plan with no exact declaration keeps the existing structural
+behavior and gains no assurance checks. `standard` activates declaration syntax
+and coherence only and adds no hardened fields. `hardened` activates every rule
+below for each checked artifact that the activity already requires. Hardened
+`tasks.md` and `validation.md` repeat `Assurance profile: hardened` under their
+own exact `## Assurance` heading, and any repeated declaration must match the
+plan. New normal work chooses one profile; the shipped plan template makes the
+choice explicit.
+
+Recommend `hardened` when the work touches filesystem containment or deletion,
+symlinks, transactions, interruption or recovery, migrations, authentication or
+private data, external mutation or publication, concurrency, or multiple
+persisted projections. Uncertain safety-boundary cases resolve to hardened. The
+user may override the proposed profile; a change from standard to hardened
+returns to specification and task preparation until every hardened record is
+complete. It is never an automatic classifier.
+
+### Hardened identifiers and enums
+
+Stable IDs are a nonzero three-digit suffix: `AC###` acceptance criteria,
+`V###` verification cases, `T###` tasks, `G###` cohesion groups, and `N###`
+readiness-audit defects. An ID list separates IDs with exactly `, `; its written
+order matters for rendering but mappings compare as sets. Reference only
+defined IDs. Definition lines have no leading indentation, child fields use
+exactly two leading spaces, and evidence items use exactly four.
+
+- Verification kind: `positive`, `negative`, `failure-injection`,
+  `end-to-end`, `manual`, or `external`.
+- Result status: `PASS`, `FAIL`, `BLOCKED`, or `SKIPPED`.
+- Validation context: `self`, `fresh`, or `independent`.
+- Validation summary: `PASS`, `FAIL`, or `BLOCKED`.
+- Oracle match: `yes`, `no`, or `unknown`.
+
+`TODO`, `TBD`, `FIXME`, and `pending` are not meaningful prose except where
+`pending` is explicitly allowed.
+
+The grammar is line-oriented and exact: headings, field labels, enum values, and
+the em dash (`—`) are case-sensitive; newlines may be LF or CRLF; tabs are never
+indentation. A definition line has no leading indentation, a child field uses
+exactly two leading spaces, and an evidence item uses exactly four. Blank lines
+may occur between complete entries but not within one entry. Each named hardened
+section occurs exactly once, and outside fenced code blocks its nonblank content
+must be the applicable productions; introductory prose belongs outside the
+section. Definitions in prose, fenced code, or block quotes are not
+authoritative. Only surrounding ASCII whitespace is ignored on declaration
+lines.
+
+### Hardened specification
+
+Under `## Acceptance Criteria`, write `- AC### — condition`. Under
+`## Validation`, write a `- V### — name` entry followed by exactly these
+two-space child fields in order: `- Proves:` (an AC ID list), `- Kind:`,
+`- Stimulus:` (fixture or precondition, action, and injected failure), and
+`- Expected:` (the observable oracle, including the complete compared state
+when preservation is claimed). Every AC has at least one V route and every
+referenced AC exists.
+
+### Hardened plan
+
+Under the exact `## Assurance` heading, follow the declaration with these eight
+ordered, nonempty fields: `Authoritative state`, `Mutation points`,
+`Preconditions`, `Postconditions`, `Preserved invariants`, `Recovery states`,
+`Unchanged-state comparison`, and `Known limitations`. `none` alone is not a
+reason; state why a field does not apply. Under `## Cohesion Groups`, provide
+one or more `- G### — shared invariant and group completion oracle` entries, or
+one reasoned `- none — ...` entry, never both. Expand broad claims: `atomic`
+needs a transaction boundary, mutation sequence, failure points, and permitted
+residual state; `safe` needs a threat surface, rejected inputs, and a complete
+unchanged-state oracle; `deterministic` needs canonical inputs and every bound
+field; `complete` needs a closed shape and cross-field invariants;
+`recoverable` needs recognized crash states, the exact recovery result, and
+fail-closed tamper states.
+
+### Hardened tasks and readiness
+
+`tasks.md` repeats the hardened declaration and adds an exact
+`## Negative-Space Readiness Audit` section with at least one
+`- N### — plausible escaped defect` entry. Each entry has exactly one
+`- Disposition:` child, either `covered by <V-id-list>` or
+`accepted limitation — <reason and review consequence>`.
+
+Each task is `- [ ] T### — description` with every field in this order:
+`Satisfies`, `Verifies`, `Depends on` (`none` or earlier T IDs), `Cohesion
+group` (`none` or a defined G ID), `Authority`, `Mutation boundary`,
+`Preserved invariants`, `Adversarial cases` (named failures, not a category
+label), `Completion check`, and `Evidence`. `Satisfies` equals the union of ACs
+proved by `Verifies`. `Evidence` holds exactly one four-space `- V###: ...`
+item per `Verifies` ID in the same order; a checked task may hold no `pending`
+item. A green local example does not complete a cohesion group while a shared
+invariant is contradicted.
+
+### Hardened execution
+
+Load the `AC###`/`V###` mappings and cohesion group before editing. Implement
+every named `V###` case where it is locally executable, recording red evidence
+first. After the change, perform a bounded mutation and negative-space sweep
+over the named adversarial cases and the shared invariant. Never edit the agreed
+acceptance or verification definitions to fit the implementation; report an
+infeasible or conflicting case back to the planning owner and keep a grouped
+task unchecked while its local evidence contradicts the shared boundary or its
+group-level completion oracle is unsatisfied.
+
+### Hardened validation
+
+`validation.md` repeats the hardened declaration. Under `## Results`, record
+`Candidate:`, `Validation context:`, and `Validation summary:` on ordered single
+lines, then one `- V### — STATUS` result per specification V with these ordered
+fields: `Proves`, `Source`, `Expected`, `Observed`, `Resulting state`, `Oracle
+matched`, `Evidence`, and `Limitations`. `Proves` and `Expected` must equal the
+specification definition. `PASS` requires `Oracle matched: yes`; `FAIL` requires
+`no`; `BLOCKED` and `SKIPPED` require `unknown`. A summary of `PASS` requires
+every result to be `PASS`; `FAIL` requires at least one `FAIL`; `BLOCKED`
+requires no `FAIL` and at least one `BLOCKED` or `SKIPPED`. An exit-zero command
+that contradicts its oracle is recorded as `Oracle matched: no` and `FAIL`; the
+command status is not the conclusion. Missing, skipped, blocked, failed, or
+contradictory evidence prevents a passing summary. Only a complete all-PASS set
+can satisfy the hardened validation gate, and validation or a later activity
+requires every task checked with nonpending evidence. Use `fresh` or
+`independent` only when that context really existed. Evidence from different
+fixtures or runs must not be spliced into one end-to-end claim; an end-to-end
+case uses one candidate's own coherent evidence. Repairs rerun the affected
+cases plus their cohesion-group, shared-invariant, and end-to-end cases.
+
+### Hardened verification seeding (cross-context)
+
+When hardened cross-context work needs a new executable oracle for
+transactions, recovery, filesystem safety, authentication or private data,
+external mutation, concurrency, or multiple persisted projections, task
+preparation separates verification seeding from production implementation as
+two ordinary tasks on the existing checklist.
+
+Before the seed is authored, the planning/verification owner performs a
+reconciliation of the intended state and operation model against retained
+behavior: every `all`, `every`, `complete`, or `cross-product` claim names its
+finite inventory, expected cardinality, and permitted exclusions, and every
+exclusion is justified by the lifecycle contract, never by fixture
+convenience. Intentional changes to retained behavior are recorded
+explicitly.
+
+The seed task edits tests or oracle helpers and workflow evidence only. It
+runs the seeded oracle red against the exact production candidate before any
+production edits, records the candidate commit and every protected seed path
+with its SHA-256 in the existing evidence and handoff records, writes the
+normal handoff, and stops. The implementation task verifies the branch,
+checkpoint, and every protected seed hash before its first edit; the
+protected seed paths are read-only to it, and subordinate tests may be added
+only outside the protected set. A mismatched, stale, infeasible, or
+contradictory seed returns to the planning owner with the implementation task
+left unchecked; the implementation context never edits its own judge.
+
+Validation evidence for a quantified claim records the planned universe, the
+expected count, the executed count, and the exclusions with their lifecycle
+justification; a selected subset, convenient fixture order, green exit
+status, or reconstructed post-edit red run cannot establish the full claim.
+Review performs one bounded full-surface pass over seed integrity, coverage
+closure, observation semantics, every AC/V route, and adjacent negative
+space, and returns ordinary findings batched in one consolidated package
+before handback, unless a recorded safety, cost, authority, or missing-evidence
+stop prevents finishing the pass. Prompt wording, recorded hashes, and helper
+checks observe bytes and structure only; chronology, semantic truth, and
+model behavior remain the responsibility of honest records and fresh review.
+
+The helper checks exact syntax, IDs, mappings, required fields, declared
+oracle/status coherence, and summaries only. It never judges prose or test
+truth, infers approval or independence, or executes project commands. A passing
+hardened check means structural traceability only; semantic correctness,
+approval, and validation independence remain the responsibility of strong
+planning and fresh review.

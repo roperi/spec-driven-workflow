@@ -43,6 +43,11 @@ tasks document, stop after planning, and leave `next.md` naming that stop. A
 later session reads the handoff, runs the relevant `check` activity, then
 continues only after resolving any reported inconsistency.
 
+Ordinary normal work stays standard: the only added planning step is recording
+`Assurance profile: standard` in `plan.md`. Hardened work is opt-in for
+safety-boundary changes and adds traceability, readiness, and evidence fields;
+see [reference.md](reference.md) for the profiles and gates.
+
 Update installed prompts after reviewing the dry run:
 
 ```bash

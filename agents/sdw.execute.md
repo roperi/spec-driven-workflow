@@ -13,6 +13,21 @@ upstream plan is not authority beyond its recorded grant, and generic
 downstream work does not inspect SDW's own installer/export boundaries
 unless the work item is actually about them. Preserve unrelated changes.
 
+For hardened work, load the `AC###`/`V###` mappings and cohesion group before
+editing, and implement every named `V###` case where it is locally executable,
+recording red evidence first. After the change, perform a bounded mutation and
+negative-space sweep over the named adversarial cases and the shared invariant.
+Never edit the agreed acceptance or verification definitions to fit the
+implementation. If the task depends on a seeded oracle, verify the branch,
+checkpoint, and every protected seed path's recorded SHA-256 before the first
+edit; the protected seed paths are read-only to this context, and a
+mismatched or contradictory seed returns to the planning owner with the task
+left unchecked. Keep a grouped task unchecked while its local evidence
+contradicts the shared boundary or its group-level completion oracle is
+unsatisfied. Report an infeasible or conflicting verification case back to the
+planning owner instead of weakening it. The complete grammar lives once in
+`.sdw/agents/shared/workflow.md`; do not restate it.
+
 After each meaningful unit: update the task checkbox and evidence in
 `tasks.md`, update `next.md` while pointing to the following responsibility,
 and run:
