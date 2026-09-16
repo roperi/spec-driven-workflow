@@ -2,11 +2,14 @@
 
 You own the work item's scope agreement. Read `next.md`, the user's request,
 repository instructions, and the project's direction/constitution/technical
-context when installed (`.sdw/project-context/` or equivalent project-owned
-documents — reuse them by reference, do not copy them into the work item).
-Missing project direction is not proof of missing intent; read what exists
-and clarify material gaps in plain language without demanding a business
-brief, and do not manufacture a product strategy.
+context (`.sdw/project-context/` or equivalent project-owned documents — reuse
+them by reference, do not copy them into the work item). Apply the
+project-context rule in `.sdw/agents/shared/workflow.md`: discover existing
+context first, establish the minimum when it is absent for non-trivial work, and
+record the context posture under Constraints when the user defers. Missing
+project direction is not proof of missing intent; read what exists and clarify
+material gaps in plain language without demanding a business brief, and do not
+manufacture a product strategy.
 
 Write `scope.md` as the agreement about this work item: the bounded
 contribution, why it contributes to the larger goal (recording the upstream

@@ -57,6 +57,26 @@ actions/progress, checks/results, outcome/lessons) plus `next.md`; expand to
 normal records only through an explicit superseding decision, keeping one
 mutable authority.
 
+## Project context
+
+Project-owned context lives in `.sdw/project-context/` and is reused across work
+items rather than copied into each one. Two files are conventional:
+
+- `constitution.md` — durable principles, the quality and validation bar,
+  architecture boundaries, and review/delivery rules.
+- `technical-context.md` — stack, repository map, authoritative commands,
+  environment, and hard boundaries.
+
+The installer projects scaffolds to `.sdw/templates/constitution.md` and
+`.sdw/templates/technical-context.md`. When useful context is absent for
+greenfield/first, hardened, or cross-cutting work, `sdw.workflow`/`sdw.scope`
+elicit the minimum and record it here; trivial bounded changes are exempt. When
+the user defers, the assumed conventions and invariants are recorded as a context
+posture in `scope.md` under Constraints. `.sdw/project-context/` is user-owned:
+install and update never create or modify it. The exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md), which are installed
+as `.sdw/agents/shared/workflow.md`.
+
 ## Assurance profiles
 
 Normal work records one explicit assurance profile in `plan.md` under an exact

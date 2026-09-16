@@ -7,8 +7,10 @@ prompt. Read `.sdw/agents/shared/workflow.md` first.
 
 ## Entering an objective
 
-Read the relevant project guidance (README, AGENTS.md, project-context when
-installed) and confirm the repository and Git context. Use an explicitly supplied work ID; otherwise list existing candidates under
+Read the relevant project guidance and confirm the repository and Git context,
+applying the project-context rule in `.sdw/agents/shared/workflow.md`: discover
+existing project context first, establish the minimum when it is absent for
+non-trivial work, and record the posture when the user defers. Use an explicitly supplied work ID; otherwise list existing candidates under
 `.sdw/work/` and choose only when the objective identifies one unambiguously.
 Ask for the smallest missing decision when it does not.
 

@@ -22,6 +22,9 @@ PR/merge behavior is verified against the real remote, never claimed from a
 fixture.
 
 After publishing, check actual remote status before merge/finalization
-steps. Authorized review findings are addressed per the agreement. Stop
-truthfully when the authorized publication action completes or is blocked;
-preserve unrelated dirty work.
+steps. Authorized review findings are addressed per the agreement. Consume
+external findings under the shared external-review-consumption rule in
+`.sdw/agents/shared/workflow.md` before finalize: one disposition per finding,
+stop on the recorded convergence condition, and never self-close a semantic
+decline about the judge. Stop truthfully when the authorized publication action
+completes or is blocked; preserve unrelated dirty work.

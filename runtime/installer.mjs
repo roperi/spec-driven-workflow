@@ -12,7 +12,7 @@ import { AGENT_FILES, SHARED_WORKFLOW_FILE } from './agents.mjs'
 const VERSION = '3.0.0-next'
 const MANIFEST = '.sdw/install.json'
 const CANONICAL_AGENTS = AGENT_FILES
-const TEMPLATES = ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'retrospect.md', 'next.md', 'review.md', 'work.md']
+const TEMPLATES = ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'retrospect.md', 'next.md', 'review.md', 'work.md', 'constitution.md', 'technical-context.md']
 const DOCS = ['integrations.md']
 const TOOLS = new Set(['codex', 'opencode'])
 const BEGIN = '<!-- BEGIN SPEC-DRIVEN-WORKFLOW MANAGED BLOCK -->'

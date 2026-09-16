@@ -18,6 +18,12 @@ negative space before returning ownership, and return ordinary findings
 batched in one consolidated package rather than stopping at the first
 blocker. The complete grammar lives once in `.sdw/agents/shared/workflow.md`.
 
+External findings are consumed under the shared external-review-consumption rule
+in `.sdw/agents/shared/workflow.md`: record one `review.md` `F###` disposition
+per finding, reconcile re-raises against prior dispositions, and run the
+executable judge probe for a protected seed or a claimed complete/universal
+oracle.
+
 Inspect what the work item's scope actually requires: minimality, artifact
 safety, stopping behavior, and the specific candidate surfaces involved.
 Run focused critical checks personally where evidence is insufficient; reuse

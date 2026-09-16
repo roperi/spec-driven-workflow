@@ -63,6 +63,84 @@ expand explicitly if the work grows, keeping one mutable authority. Do not
 manufacture completed work to fill a template; honest pending or unresolved
 sections are correct when they are true.
 
+## Project context
+
+SDW keeps project context reusable across work items rather than inside one:
+product direction (or an equivalent README/initiative brief), a constitution of
+durable principles, and technical context (stack, architecture, conventions,
+commands, boundaries). Reuse existing project-owned documents by reference and
+never copy their full text into `.sdw/work/`.
+
+Before agreeing scope for a new work item, discover what exists: `README.md`,
+`AGENTS.md`, `docs/`, an existing `.sdw/project-context/`, or an equivalent
+conventions, architecture, or principles document. Prefer those over creating
+new documents.
+
+If useful context is absent:
+
+- For greenfield or first work, hardened work, or cross-cutting work, elicit the
+  minimum in plain language and record `.sdw/project-context/constitution.md`
+  and/or `.sdw/project-context/technical-context.md`, using
+  `.sdw/templates/constitution.md` and `.sdw/templates/technical-context.md` as
+  shapes. Keep each concise and project-specific, and replace all template
+  guidance with real content.
+- For a trivial bounded change in a repository whose conventions are already
+  visible, do not create context for ceremony.
+
+If the user declines or defers creation, record a short context posture in
+`scope.md` under Constraints naming the conventions, invariants, and assumptions
+the work relies on, and proceed only within that stated posture. Never claim a
+principle or invariant that was not established. A missing context file is not
+by itself an error once the posture is recorded.
+
+`.sdw/project-context/` is user-owned: SDW reads it and may create it
+deliberately, but install and update never modify it.
+
+## External review consumption
+
+When a published candidate receives findings from an external reviewer (human or
+automated), consume them in the cumulative `review.md` before any re-invocation.
+Record one `F###` entry per finding with origin, path/lines, claim, and the
+reviewer's severity when supplied (advisory only). Give each exactly one outcome
+with rationale and evidence: `applied`; `declined` with reproduced evidence and a
+re-open trigger; `deferred` with owner and trigger; `duplicate of F###`; or
+`escalated`. No finding is deleted and every outcome is re-openable.
+
+Classify each finding material or immaterial. Material means it implicates an
+`AC###`/`V###` route, the protected seed set, a safety, authority, or containment
+boundary, a default-path regression, or a claim the contract makes; everything
+else is immaterial. Only material repairs require a protected-byte re-freeze and
+fresh re-verification; immaterial findings are batched. Reconcile new findings
+against prior dispositions before repairing or re-invoking: a re-raise cites the
+prior `F###` id and is `duplicate` unless it brings new evidence, which re-opens
+the prior disposition without consuming a repair round.
+
+A factual decline requires reproduced evidence. A semantic or design decline
+about the judge or contract the implementing context authored is never
+self-closed: leave it `open` (blocking the stop) or record it `escalated` to the
+planning owner. No decline is permanent; re-opening needs no new authority.
+
+A cycle stops when every posted finding has exactly one disposition, no material
+finding is open, the latest completed full-surface pass added no new material
+finding, and no protected or judge path has changed since that pass — or when the
+authorized owner records a stop with rationale. Record the stop in `next.md` and
+the `review.md` conclusion; it is never silent and is not a dismissal. After the
+recorded pass budget with continuing new material findings, stop and escalate any
+open material finding to the planning owner with a convergence assessment
+instead of re-invoking again. The budget is a guidance value set with the
+agreement.
+
+For a work item carrying a protected verification seed or a claimed complete or
+universal observation or comparison oracle, the fresh review names the judge's
+central claim, exercises the observable (removing a claimed dimension makes the
+oracle fail, or the claimed operations execute), records claim, method, observed
+result, and verdict, and reports a claim establishable only declaratively as a
+blocking finding or an explicit recorded limitation — never as accepted.
+
+This convention uses existing Markdown, Git, and test facilities; it adds no
+command, stage, artifact, required section, parser field, or default-path
+requirement, treats human and automated reviewers alike, and names no provider.
+
 ## Progressive assurance
 
 Normal work records an assurance profile in `plan.md` under an exact
