@@ -12,8 +12,8 @@ then renders the selected native files. It does not change global harness
 configuration. Keep `AGENTS.md` project instructions; the installer adds one
 marker-delimited workflow block.
 
-Start a work item by invoking the installed `sdw.workflow` entrypoint with
-your objective. The primary session creates `.sdw/work/<work-id>/` and its
+Start a work item by asking your agent to do the work using SDW, with the
+objective in plain language. The session creates `.sdw/work/<work-id>/` and its
 initial artifacts; you do not need to initialize the helper separately.
 
 For a new or non-trivial project, that first session also checks for project
@@ -23,17 +23,19 @@ questions and records a minimal version from the shipped guidance templates, so
 later work stays aligned. Trivial edits in a repository whose conventions are
 already visible do not need this.
 
-For Codex, use the direct primary-session route:
+For a terminal command instead:
 
 ```bash
-codex --cd . "Use SDW sdw.workflow for work item fix-login-timeout: Fix the login timeout."
+codex --cd . "Use SDW for work item fix-login-timeout: Fix the login timeout."
 ```
-
-For OpenCode, select the installed primary agent:
 
 ```bash
-opencode run --dir . --agent sdw.workflow "Use work item fix-login-timeout: Fix the login timeout."
+opencode run --dir . "Use SDW for work item fix-login-timeout: Fix the login timeout."
 ```
+
+The generated native agents (`.codex/agents/`, `.opencode/agents/`) are still
+available if you prefer to pin the `sdw.workflow` entrypoint explicitly; see
+[integrations.md](integrations.md).
 
 The primary lifecycle session may continue through scope, specification, and
 planning when your request authorizes that work. It must preserve an explicit

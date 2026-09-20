@@ -5,6 +5,14 @@ file.
 
 ## [Unreleased]
 
+- **DOCS**: Refreshed the project README — a clearer value proposition covering
+  continuity across sessions, models, and tools, a quick start that reflects
+  normal use inside your coding agent, prerequisites and install footprint, a
+  "What you get" feature list, and a dated comparison table of SDW against other
+  spec-driven development tools. The quick start, integrations, and product guide
+  were aligned with the README, and a plain-language SDW request is now the
+  documented path for both supported harnesses.
+
 - **NEW**: Plain-language-first reporting — every SDW stage now explains what
   happened to the user in a short, plain-language summary before any technical
   detail. The summary states the outcome, what the user must decide next, each

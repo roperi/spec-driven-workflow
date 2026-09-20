@@ -3,8 +3,9 @@
 Spec Driven Workflow keeps the full instructions in `.sdw/agents/`. The
 renderer derives native files from those exact bodies. It does not select a
 model, reasoning setting, permission mode, external service, or global
-configuration. `sdw.workflow` is the user-facing primary entrypoint: pass it the
-objective and let that session create the work item and initial artifacts.
+configuration. The repository `AGENTS.md` block routes an explicit SDW request to
+`sdw.workflow`, the primary entrypoint that creates the work item and initial
+artifacts from your objective.
 
 ## Codex CLI
 
@@ -18,16 +19,17 @@ and [custom agent documentation](https://learn.chatgpt.com/docs/agent-configurat
 The direct primary-session route is:
 
 ```sh
-codex --cd . "Use SDW sdw.workflow for work item fix-login-timeout: Fix the login timeout."
+codex --cd . "Use SDW for work item fix-login-timeout: Fix the login timeout."
 ```
 
-Codex also loads repository `AGENTS.md` guidance. Start the session from the
-repository root or pass the directory explicitly; keep model and reasoning
-choices in the normal Codex configuration. The generated `.codex/agents/`
-files are available to native Codex delegation. Codex's primary CLI does not
-provide a project-agent selector, so its direct route uses the repository
-bootstrap plus a goal-only prompt. The sdw.workflow instructions perform the
-work-item initialization; sdw.resume continues an existing work item.
+Codex also loads repository `AGENTS.md` guidance, so a plain-language SDW request
+works from an ordinary session. Start the session from the repository root or pass
+the directory explicitly; keep model and reasoning choices in the normal Codex
+configuration. The generated `.codex/agents/` files are available to native Codex
+delegation. Codex's primary CLI does not provide a project-agent selector, so its
+route uses the repository bootstrap plus a goal-only prompt. The sdw.workflow
+instructions perform the work-item initialization; sdw.resume continues an
+existing work item.
 
 ## OpenCode
 
@@ -41,14 +43,21 @@ source for this adapter.
 The direct primary-session route is:
 
 ```sh
-opencode run --dir . --agent sdw.workflow "Fix the login timeout."
+opencode run --dir . "Use SDW for work item fix-login-timeout: Fix the login timeout."
 ```
 
-OpenCode combines project `AGENTS.md` instructions with its selected agent.
-The generated `.opencode/agents/` files provide the native primary-agent
-selection surface; the direct `opencode run` route does not spawn a child
-agent. The [OpenCode CLI reference](https://opencode.ai/docs/cli/) documents
-`run`, `--dir`, and `--agent`.
+OpenCode combines project `AGENTS.md` instructions with the active agent, so a
+plain-language SDW request is enough from an ordinary session. The generated
+`.opencode/agents/` files provide a native primary-agent surface when you want to
+pin the entrypoint explicitly:
+
+```sh
+opencode run --dir . --agent sdw.workflow "Use SDW for work item fix-login-timeout: Fix the login timeout."
+```
+
+The direct `opencode run` route does not spawn a child agent. The
+[OpenCode CLI reference](https://opencode.ai/docs/cli/) documents `run`,
+`--dir`, and `--agent`.
 
 ## Evidence boundary
 

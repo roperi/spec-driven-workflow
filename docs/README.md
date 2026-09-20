@@ -1,7 +1,8 @@
 # Spec Driven Workflow
 
-Spec Driven Workflow keeps AI-assisted work understandable across sessions by
-storing scope, decisions, tasks, checks, and the next action in Markdown.
+Spec Driven Workflow helps you understand and agree the work, then carries it
+through implementation and verification while preserving decisions, progress,
+and authority across sessions, models, and tools — in plain Markdown.
 Install it in an ordinary Git repository, choose the harnesses that should
 receive native projections, and keep the work artifacts under version control
 when they are useful to the project.
@@ -51,10 +52,11 @@ remain ignored.
 ## Support
 
 Native files and direct primary-session routes are supplied for Codex and
-OpenCode. Invoke `sdw.workflow` with the user's objective; it owns creation
-of the work directory and initial artifacts and the whole authorized lifecycle
-in one primary session; `sdw.resume` continues an existing work item. Other
-harnesses can read the canonical Markdown prompts directly.
+OpenCode. Invoke SDW with the user's objective; `sdw.workflow` owns creation of
+the work directory and initial artifacts and the whole authorized lifecycle in
+one primary session, and `sdw.resume` continues an existing work item in the same
+or another supported harness. Other harnesses can read the canonical Markdown
+prompts directly.
 The installer does not configure credentials, permissions, models, or global
 settings. Node.js 18 or newer is required by the helper.
 
