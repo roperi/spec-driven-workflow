@@ -5,6 +5,24 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Plain-language-first reporting — every SDW stage now explains what
+  happened to the user in a short, plain-language summary before any technical
+  detail. The summary states the outcome, what the user must decide next, each
+  material decision with the alternative that was rejected, and any known risks
+  or open questions, and it defines an unavoidable technical term on first use.
+  The technical detail stays complete for readers who need it; the plain summary
+  never replaces the record or hides a decision, risk, or failure.
+
+- **NEW**: Self-guided project-context templates — the shipped
+  `.sdw/templates/constitution.md` and `.sdw/templates/technical-context.md` now
+  explain what each document is, what it is not, and how to build one from
+  scratch. The constitution template follows a preamble plus numbered,
+  checkable articles with enforcement and amendments; the technical-context
+  template covers project and stack, repository map, authoritative commands,
+  environment, and hard boundaries, with a greenfield note. Both require
+  replacing every guidance comment and placeholder with project-specific
+  content.
+
 - **NEW**: Project context for new projects — on the first non-trivial work
   item, SDW checks for existing project guidance and, when none is present, asks
   a few plain-language questions and records a concise constitution and

@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "e29c943b3be93941a7ca8ac2b61443310200dbeb4cd2b3a0d15d9e2b8c16b060",
+  "export_tree_sha256": "8560fc05c848e003a87e1fd68227e872a81b17c516fcd347d4f0db923c3af45a",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "59f3664306c6f73abe801f058850aa83cb69dd3f7c822e07960f42ecb0846922"
+      "sha256": "94d4240cb0c6c883836b34f1e8bec7071e184766e7d030c3cd39c44200aa43c8"
     },
     {
       "mode": "0644",
@@ -99,7 +99,7 @@
     {
       "mode": "0644",
       "path": "agents/shared/workflow.md",
-      "sha256": "01953a207885b99558c6865610bc7f7c778a578fdd202aedf52b3c795e9ce2ac"
+      "sha256": "977e0841557a76c2e9671aaa2a1b7cf2bff12502a7f8ee868265436e30d1f892"
     },
     {
       "mode": "0644",
@@ -114,7 +114,7 @@
     {
       "mode": "0644",
       "path": "docs/customization.md",
-      "sha256": "29ef4a04fa78a9695a24dcc273e870166af70713180673ad4f94b52af4345a3c"
+      "sha256": "a43720e0182b36488adaabc8918f85d308d060db1b78114582ea1d7546b050d1"
     },
     {
       "mode": "0644",
@@ -124,12 +124,12 @@
     {
       "mode": "0644",
       "path": "docs/quickstart.md",
-      "sha256": "8458e6900d1cf386319f98be4c31f0d60903b988be3fe6abf9575dadba06655e"
+      "sha256": "38b39c2f9be17bfbc64c9ffddf848b153b1cd91d2152a382bfd256323621cd69"
     },
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "26588ebf4773e59fa40881577c795a032f89be3cae281244e5245787e4904761"
+      "sha256": "50cdaaa1e8ab2e8524aa32bcac9f38c4b64e977ad4f2ff17ba4f477d21e1a4f1"
     },
     {
       "mode": "0644",
@@ -149,7 +149,7 @@
     {
       "mode": "0755",
       "path": "runtime/installer.mjs",
-      "sha256": "b5cf244f7908b5668091702194701ccd52f8f3a522a6aaa9348ae4f6ac002492"
+      "sha256": "750e2336e7635dddcea36cbd1c4c5cff52b0263c2b4467a0d93e9ad14aff315c"
     },
     {
       "mode": "0644",
@@ -169,7 +169,7 @@
     {
       "mode": "0644",
       "path": "templates/constitution.md",
-      "sha256": "4334d1fb33b92fe259d483ba9033dbf036f6f78bdd6cdbf63285409cc4ec8ef5"
+      "sha256": "8a68f4d4f32f131d5993799192e9ddcbcc2fa7f7efbefb6945b933670eeac720"
     },
     {
       "mode": "0644",
@@ -209,7 +209,7 @@
     {
       "mode": "0644",
       "path": "templates/technical-context.md",
-      "sha256": "a1ba83ed272dc970fa2df8f7164542a04147d76597f5747bfc5c78d66779a637"
+      "sha256": "81134eb7e2420ebe13b2ea0a5ca1ebba4a83e367b7b227a5abdd04c57315c01a"
     },
     {
       "mode": "0644",

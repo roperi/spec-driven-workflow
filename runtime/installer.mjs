@@ -151,6 +151,8 @@ The entrypoint owns creating .sdw/work/<work-id>/ and the initial artifacts; the
 user does not need to run the helper first. Use node .sdw/sdw.mjs for start, saves,
 checks, and read-only resume. Read the shared lifecycle instructions at
 .sdw/agents/shared/workflow.md with the relevant canonical instruction.
+Report to the user in plain language before technical detail, and keep material
+decisions, rejected alternatives, and risks visible.
 Respect explicit stops and preserve user-owned files, model settings, and unrelated configuration.
 ${END}`
 

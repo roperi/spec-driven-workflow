@@ -17,10 +17,11 @@ your objective. The primary session creates `.sdw/work/<work-id>/` and its
 initial artifacts; you do not need to initialize the helper separately.
 
 For a new or non-trivial project, that first session also checks for project
-context under `.sdw/project-context/` — a constitution of durable principles and
-a technical context. If none exists it asks a few plain-language questions and
-records a minimal version, so later work stays aligned. Trivial edits in a
-repository whose conventions are already visible do not need this.
+context under `.sdw/project-context/` — a constitution of durable, checkable
+articles and a technical context. If none exists it asks a few plain-language
+questions and records a minimal version from the shipped guidance templates, so
+later work stays aligned. Trivial edits in a repository whose conventions are
+already visible do not need this.
 
 For Codex, use the direct primary-session route:
 

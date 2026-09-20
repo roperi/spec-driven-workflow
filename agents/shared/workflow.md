@@ -5,6 +5,34 @@ agent; the sdw.workflow and sdw.resume entrypoints read it in their primary
 session, and every sdw.* stage prompt applies the relevant part of it. Every sdw.* prompt reads the relevant part of its content in the same
 primary session; a stage never requires spawning another agent process.
 
+## Communication with the user
+
+Every stage reports to the user in two layers, in this order: a plain summary,
+then the technical detail. The plain summary comes first so a reader without the
+project's technical background can follow the outcome and stop there when that
+is all they need; the technical detail follows for readers and downstream agents
+who need it. This is a reporting contract, not a style preference.
+
+The plain summary is short (a few sentences) and uses ordinary language. It
+avoids undefined jargon, acronyms, and internal terms; when a technical term
+cannot be avoided, it is defined in plain words at first use. It states, in
+plain language:
+
+- what was done or decided, and the result the user can observe;
+- what the user must know, review, approve, or decide next;
+- each material decision, why it was made, and the alternative that was
+  rejected;
+- known risks, limitations, or open questions that could affect the user later.
+
+The technical detail keeps the full precision the artifacts and downstream
+agents need. The plain layer is added to the report; it never replaces a
+technical record, and it never hides, softens, or omits a material decision,
+risk, failure, or uncertainty. When the user asks for plain English or an
+overview, answer with the plain summary first and add the technical detail only
+as needed. Where an artifact is itself the thing the user must read or approve,
+its plain statement accompanies it in the report rather than weakening the
+artifact's required content.
+
 ## Progression loop
 
 When you own a stage responsibility (sdw.scope, sdw.spec, sdw.plan, sdw.task,
@@ -82,8 +110,15 @@ If useful context is absent:
   minimum in plain language and record `.sdw/project-context/constitution.md`
   and/or `.sdw/project-context/technical-context.md`, using
   `.sdw/templates/constitution.md` and `.sdw/templates/technical-context.md` as
-  shapes. Keep each concise and project-specific, and replace all template
-  guidance with real content.
+  shapes. A recorded constitution is durable project law: a short preamble plus
+  a few project-specific articles in MUST/MUST NOT/SHOULD form, then Enforcement
+  and Amendments, with every article checkable by a reviewer. Record technical
+  context as the present-day stack, repository map, authoritative commands,
+  environment, and hard boundaries. Keep each concise; replace all template
+  guidance, placeholders, and TODO text with real content; do not invent a
+  principle, command, or boundary the project has not established, and record a
+  genuine unknown as an open question. For a brand-new project, record only what
+  is actually decided.
 - For a trivial bounded change in a repository whose conventions are already
   visible, do not create context for ceremony.
 

@@ -62,13 +62,21 @@ mutable authority.
 Project-owned context lives in `.sdw/project-context/` and is reused across work
 items rather than copied into each one. Two files are conventional:
 
-- `constitution.md` — durable principles, the quality and validation bar,
-  architecture boundaries, and review/delivery rules.
-- `technical-context.md` — stack, repository map, authoritative commands,
-  environment, and hard boundaries.
+- `constitution.md` — durable project law: a preamble and a small set of
+  project-specific articles in MUST/MUST NOT/SHOULD form, plus enforcement and
+  amendments. It constrains every scope, specification, plan, implementation,
+  validation, and review.
+- `technical-context.md` — the current technical orientation: project and stack,
+  repository map, authoritative commands, environment and tooling, and hard
+  boundaries.
 
-The installer projects scaffolds to `.sdw/templates/constitution.md` and
-`.sdw/templates/technical-context.md`. When useful context is absent for
+The installer projects guidance templates to `.sdw/templates/constitution.md`
+and `.sdw/templates/technical-context.md`. The constitution template follows the
+Spec-Kit convention of a preamble plus numbered, checkable articles; the
+technical-context template carries a greenfield note so a brand-new project
+records what is decided and marks the rest open rather than inventing commands.
+Both require every placeholder and guidance comment to be replaced with
+project-specific content. When useful context is absent for
 greenfield/first, hardened, or cross-cutting work, `sdw.workflow`/`sdw.scope`
 elicit the minimum and record it here; trivial bounded changes are exempt. When
 the user defers, the assumed conventions and invariants are recorded as a context
