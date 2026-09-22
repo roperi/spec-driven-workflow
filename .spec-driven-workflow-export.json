@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "8a6e788353d81d49f3c87ce34c293802b4e8ce6a832784bc73e4dbf03092ed63",
+  "export_tree_sha256": "30906fb6424dd75103df603bbbb29d59649c6e02ebe6976953c220584735db54",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "48a70b8e0d0f687eb6cb38f86de656bc2bc703bdc6f0d80f43357b87392e2e8a"
+      "sha256": "9c0a9c46d5acc2be8812a40ff6b9fc4ef8df91887bf4e0b0a8a2e62bfd224272"
     },
     {
       "mode": "0644",
@@ -99,7 +99,7 @@
     {
       "mode": "0644",
       "path": "agents/shared/workflow.md",
-      "sha256": "977e0841557a76c2e9671aaa2a1b7cf2bff12502a7f8ee868265436e30d1f892"
+      "sha256": "657f74244f71399941fc48ca50ccc2500a47dc6e7eae01139993505d187c8145"
     },
     {
       "mode": "0644",
@@ -114,7 +114,7 @@
     {
       "mode": "0644",
       "path": "docs/customization.md",
-      "sha256": "a43720e0182b36488adaabc8918f85d308d060db1b78114582ea1d7546b050d1"
+      "sha256": "6bbc7129a30fa5c8c16f45907f8b7f359329a6e2b5dd7ffeacc1816a7958ccd1"
     },
     {
       "mode": "0644",
@@ -129,7 +129,7 @@
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "50cdaaa1e8ab2e8524aa32bcac9f38c4b64e977ad4f2ff17ba4f477d21e1a4f1"
+      "sha256": "d413a8946ed8dffdf89ef23cb4e32894aae8e2eee487f36e6de9c8c9ef6e0fed"
     },
     {
       "mode": "0644",
@@ -169,7 +169,7 @@
     {
       "mode": "0644",
       "path": "templates/constitution.md",
-      "sha256": "8a68f4d4f32f131d5993799192e9ddcbcc2fa7f7efbefb6945b933670eeac720"
+      "sha256": "82b51842c7facbe8d56314ff756d4903bc38030efd23752bf824f5723570b605"
     },
     {
       "mode": "0644",

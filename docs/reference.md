@@ -62,22 +62,28 @@ mutable authority.
 Project-owned context lives in `.sdw/project-context/` and is reused across work
 items rather than copied into each one. Two files are conventional:
 
-- `constitution.md` — durable project law: a preamble and a small set of
-  project-specific articles in MUST/MUST NOT/SHOULD form, plus enforcement and
-  amendments. It constrains every scope, specification, plan, implementation,
-  validation, and review.
+- `constitution.md` — durable development law governing how specifications
+  become code, not operational procedure or product policy: a preamble and a
+  small set of project-specific, checkable articles in MUST/MUST NOT/SHOULD
+  form, plus enforcement and amendments. It constrains every scope,
+  specification, plan, implementation, validation, and review. Commands, stack,
+  boundaries, and data handling belong in `technical-context.md`; product
+  direction belongs in the roadmap or product docs.
 - `technical-context.md` — the current technical orientation: project and stack,
   repository map, authoritative commands, environment and tooling, and hard
   boundaries.
 
 The installer projects guidance templates to `.sdw/templates/constitution.md`
 and `.sdw/templates/technical-context.md`. The constitution template follows the
-Spec-Kit convention of a preamble plus numbered, checkable articles; the
-technical-context template carries a greenfield note so a brand-new project
-records what is decided and marks the rest open rather than inventing commands.
-Both require every placeholder and guidance comment to be replaced with
-project-specific content. When useful context is absent for
-greenfield/first, hardened, or cross-cutting work, `sdw.workflow`/`sdw.scope`
+Spec-Kit convention of a preamble plus numbered, checkable articles and states
+that the constitution governs how specifications become code, not operational
+procedure or product policy; operational detail goes to `technical-context.md`
+and product direction to the roadmap or product docs. The technical-context
+template carries a greenfield note so a brand-new project records what is
+decided and marks the rest open rather than inventing commands. Both require
+every placeholder and guidance comment to be replaced with project-specific
+content. When useful context is absent for greenfield/first, hardened, or
+cross-cutting work, `sdw.workflow`/`sdw.scope`
 elicit the minimum and record it here; trivial bounded changes are exempt. When
 the user defers, the assumed conventions and invariants are recorded as a context
 posture in `scope.md` under Constraints. `.sdw/project-context/` is user-owned:

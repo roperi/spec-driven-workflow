@@ -110,11 +110,15 @@ If useful context is absent:
   minimum in plain language and record `.sdw/project-context/constitution.md`
   and/or `.sdw/project-context/technical-context.md`, using
   `.sdw/templates/constitution.md` and `.sdw/templates/technical-context.md` as
-  shapes. A recorded constitution is durable project law: a short preamble plus
-  a few project-specific articles in MUST/MUST NOT/SHOULD form, then Enforcement
-  and Amendments, with every article checkable by a reviewer. Record technical
-  context as the present-day stack, repository map, authoritative commands,
-  environment, and hard boundaries. Keep each concise; replace all template
+  shapes. A recorded constitution is durable project law governing how
+  specifications become code, not operational procedure or product policy: a
+  short preamble plus a few project-specific articles in MUST/MUST NOT/SHOULD
+  form, then Enforcement and Amendments, with every article a checkable
+  principle rather than a procedure. Direct operational detail (commands, stack,
+  boundaries, data handling) to `technical-context.md` and product direction to
+  the roadmap or product docs. Record technical context as the present-day
+  stack, repository map, authoritative commands, environment, and hard
+  boundaries. Keep each concise; replace all template
   guidance, placeholders, and TODO text with real content; do not invent a
   principle, command, or boundary the project has not established, and record a
   genuine unknown as an open question. For a brand-new project, record only what

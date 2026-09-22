@@ -8,14 +8,22 @@ project-owned result to `.sdw/project-context/constitution.md`, replace every
 placeholder with real content, and delete every comment (including this one).
 
 WHAT A CONSTITUTION IS
-- The project's durable development law: the principles every scope,
-  specification, plan, task, implementation, validation, review, and release
-  MUST satisfy.
+- The project's durable development law: the principles that govern how
+  specifications become code and that every scope, specification, plan, task,
+  implementation, validation, review, and release MUST satisfy.
+- Development law only, not operational procedure or product policy.
+  Operational detail belongs in `technical-context.md`; product direction
+  belongs in the roadmap or product docs.
 - Project-specific and checkable. A reviewer should be able to decide whether a
   change violates an article.
 - Stable across work items, like a codebase's architectural DNA.
 
 WHAT IT IS NOT
+- Not an operational runbook or procedure. Commands, stack, service boundaries,
+  and data handling are present-day technical reality and belong in
+  `technical-context.md`.
+- Not product-domain policy. Product direction and domain policy belong in the
+  roadmap or product docs, not in development law.
 - Not a README, roadmap, product vision, architecture guide, or command list.
   Those belong in `README.md`, the roadmap, `docs/`, and `technical-context.md`.
 - Not a record of the current task. Work-specific decisions belong in
@@ -42,7 +50,9 @@ HOW TO BUILD YOURS (GREENFIELD OR EXISTING)
    - Which decisions, interfaces, or formats are locked, and why?
    - How may this constitution change, and who approves it?
 3. Turn each answer into an article a reviewer could check. Use MUST, MUST NOT,
-   or SHOULD, and give the rationale when it is not obvious.
+   or SHOULD, and give the rationale when it is not obvious. State a principle
+   a reviewer can check, not a procedure; a step, command, or data-handling
+   routine belongs in `technical-context.md` or the product docs.
 4. Keep the article set small and enforceable. The named articles below are a
    recommended starting set: rename, delete, merge, or add to fit the project,
    then renumber in order.

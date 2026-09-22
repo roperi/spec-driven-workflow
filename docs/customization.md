@@ -14,8 +14,11 @@ private raw logs in tracked work artifacts.
 Edit `.sdw/project-context/constitution.md` and
 `.sdw/project-context/technical-context.md` deliberately as the project's durable
 law and technical orientation. The constitution is a preamble plus a few
-project-specific, checkable articles; the technical context is the current stack,
-repository map, commands, environment, and boundaries. Keep both concise, reuse
+project-specific, checkable articles; it governs how specifications become code,
+so operational procedure (commands, stack, boundaries, data handling) belongs in
+the technical context and product direction belongs in the roadmap or product
+docs. The technical context is the current stack, repository map, commands,
+environment, and boundaries. Keep both concise, reuse
 existing project documents instead of duplicating them, and replace all template
 guidance and placeholders with real content. SDW reads them across work items;
 their guidance templates live in `.sdw/templates/`.

@@ -5,6 +5,13 @@ file.
 
 ## [Unreleased]
 
+- **DOCS**: Constitution guardrail — the constitution guidance now states that a
+  constitution governs how specifications become code (development law), not
+  operational procedure or product policy. Operational detail such as commands,
+  stack, boundaries, and data handling is directed to `technical-context.md`,
+  product direction to the roadmap or product docs, and project-defined articles
+  must be principles a reviewer can check rather than procedures.
+
 - **DOCS**: Refreshed the project README — a clearer value proposition covering
   continuity across sessions, models, and tools, a quick start that reflects
   normal use inside your coding agent, prerequisites and install footprint, a
