@@ -25,6 +25,10 @@ waits or the endpoint changed, record `status: waiting` with the condition
 and owner instead — a local, plan-only, operational, or PR-stop endpoint
 closes exactly as far as its agreement reached.
 
+Apply the shared completion contract before choosing the status: a normal
+completion requires the review and retrospect artifacts, or a recorded closure
+exception. The single rule lives in `.sdw/agents/shared/workflow.md`.
+
 Apply the shared terminal-state reconciliation rule before choosing the status.
 Do not close a stale `waiting` record as `complete`: if reconciliation observes
 the external action complete, move the record through `reconcile` to `complete`

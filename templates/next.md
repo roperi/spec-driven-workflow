@@ -3,9 +3,12 @@ work_id: TODO
 record_format: TODO
 next_agent: TODO
 status: TODO
+closure: full
 ---
 
 Status values: `ready` (local next responsibility), `waiting` (externally blocked), `reconcile` (external action observable as complete, record not yet reconciled), `complete` (terminal), `abandoned` (terminal, not completed or superseded). Reconcile with `node .sdw/sdw.mjs reconcile <work-id>`; it is read-only and grants no merge, closure, or publication authority.
+
+The optional `closure` field declares the completion path for normal records: `full` (default, requires the review and retrospect artifacts at completion), `planning-only` (bounded at planning), or a recorded exception — `parked`, `interrupted`, `superseded`, or `abandoned`. Compact records bypass the closure contract. The exact rule lives in `.sdw/agents/shared/workflow.md`.
 
 # Next
 

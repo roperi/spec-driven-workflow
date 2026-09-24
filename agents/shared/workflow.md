@@ -117,6 +117,35 @@ recorded. A work item whose endpoint was a merge, issue closure, or publication
 is not `complete` until a human with that authority confirms it or the record
 carries the applicable external evidence.
 
+## Completion contract and closure exceptions
+
+Normal completion is proportional to the declared lifecycle path. A `full`
+record whose position has passed the review or retrospect responsibility must
+carry that responsibility's artifact: a normal `status: complete` record
+requires `review.md` and `retrospect.md`. Compact work keeps its smaller
+`work.md` plus `next.md` contract and is never required to add them.
+
+`next.md` accepts one optional fixed field, `closure`, whose closed values
+declare the path: `full` (the default when absent), `planning-only`, `parked`,
+`interrupted`, `superseded`, or `abandoned`. `full` requires the review and
+retrospect artifacts at completion. A declared exception (`planning-only`,
+`parked`, `interrupted`, `superseded`, `abandoned`) bounds the endpoint, so the
+required set stays the bounded closure-activity set rather than the full path.
+The exception values also constrain status: `parked` requires `status: waiting`;
+`interrupted` requires `waiting` or `abandoned`; `superseded` and `abandoned`
+require `status: abandoned` with the reason recorded. Declare the exception
+honestly — it records the endpoint, and it is not a license to skip work that was
+actually performed.
+
+Choose the closure honestly. A missing responsibility fails the check with a
+diagnostic that names it — for example, `normal completion requires review.md
+(the review responsibility) or a recorded closure exception`. A historical
+normal record that omitted an artifact is reported rather than silently passing;
+add the artifact or record the applicable closure exception. The optional field
+defaults to `full`, so records written before it stay readable. The helper
+checks structure and declared coherence only; it never infers approval, review
+quality, or independence from prose.
+
 ## Saving checkpoints
 
 Save substantive artifacts before `next.md`; `next.md` is written last as the

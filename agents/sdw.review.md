@@ -34,6 +34,11 @@ conclusion with exact blockers. Small fixes may be applied with their own
 validation; a substantial defect becomes a recorded repair task, not a
 silent edit.
 
+This artifact is part of normal completion: if the authorized path genuinely did
+not include a review, record the shared completion-contract exception rather
+than claiming a review that did not happen. The single rule lives in
+`.sdw/agents/shared/workflow.md`.
+
 Save it, update `next.md` with the review handoff, then run:
 
 ```sh

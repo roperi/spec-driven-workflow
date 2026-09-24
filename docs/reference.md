@@ -44,7 +44,7 @@ The canonical stages and their helper checks:
 | Retrospect (`sdw.retrospect`) | all relevant records | evidence-based outcome and follow-up |
 | Wrap (`sdw.wrap`) | closure record | `check WORK_DIR wrap`; `next_agent: none` + `status: complete` for honest closure |
 
-`next.md` records four fixed fields (`work_id`, `record_format`,
+`next.md` records four required fixed fields (`work_id`, `record_format`,
 `next_agent`, `status`) plus readable Agreement / Next action / Waiting on /
 Work context sections. `next_agent` is one of the eleven bounded
 responsibilities or `none`; `status` is one of `ready`, `waiting`, `reconcile`,
@@ -57,6 +57,24 @@ work ended without completion or was superseded. Unknown or contradictory
 metadata is reported, never silently mapped, and nothing is inferred from
 approval-sounding prose; closure checks report unresolved blockers and pending
 tasks.
+
+`next.md` also accepts one optional fixed field, `closure`, whose closed values
+declare the completion path: `full` (the default when absent), `planning-only`,
+`parked`, `interrupted`, `superseded`, or `abandoned`. Normal completion is
+proportional to that path: a `closure: full` normal record whose position has
+passed the review or retrospect responsibility must carry `review.md` and
+`retrospect.md`, while a declared exception (`planning-only`, `parked`,
+`interrupted`, `superseded`, `abandoned`) bounds the endpoint and does not
+require them. `parked` requires `status: waiting`; `interrupted` requires
+`waiting` or `abandoned`; `superseded` and `abandoned` require `abandoned`.
+Compact records bypass the closure contract. A missing
+responsibility is reported with a diagnostic naming it (for example, `normal
+completion requires review.md (the review responsibility) or a recorded closure
+exception`), so a historical complete record that omitted an artifact is flagged
+rather than silently passing; the migration is to add the artifact or record the
+applicable closure exception. The exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md), installed as
+`.sdw/agents/shared/workflow.md`.
 
 `reconcile WORK_DIR` is a read-only terminal-state check. It reports the
 reconciliation outcome (externally blocked, awaiting reconciliation, complete,

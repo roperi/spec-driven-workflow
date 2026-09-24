@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url'
 
 import {
   AGENT_FILES,
+  CLOSURE_KINDS,
+  NEXT_ALL_FIELDS,
   NEXT_FIELDS,
   NEXT_RESPONSIBILITIES,
   PENDING_RECORD_STATUSES,
@@ -51,6 +53,28 @@ const ACTIVITY_FILES = Object.freeze({
 const COMPACT_ARTIFACTS = Object.freeze(['work.md', 'next.md'])
 const CLOSURE_ACTIVITIES = new Set(['finalize', 'wrap'])
 
+// Normal completion is proportional to the declared lifecycle path. These are
+// the responsibilities whose artifacts a normal record must carry once it has
+// advanced past them (canonical lifecycle order = NEXT_RESPONSIBILITIES order).
+const REQUIRED_ARTIFACT_RESPONSIBILITIES = Object.freeze({
+  'sdw.review': 'review.md',
+  'sdw.retrospect': 'retrospect.md',
+})
+
+// A declared closure exception replaces the full finalize/wrap input set with
+// the bounded artifacts its endpoint genuinely produces; compact work never
+// reaches this table because it bypasses the closure contract.
+const CLOSURE_ACTIVITY_FILES = Object.freeze({
+  'planning-only': Object.freeze({
+    finalize: Object.freeze(['scope.md', 'spec.md', 'plan.md', 'next.md']),
+    wrap: Object.freeze(['scope.md', 'spec.md', 'plan.md', 'next.md']),
+  }),
+  parked: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
+  interrupted: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
+  superseded: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
+  abandoned: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
+})
+
 const AGENT_DIR = (() => {
   for (const candidate of [path.join(MODULE_DIR, 'agents'), path.resolve(MODULE_DIR, '..', 'agents')]) {
     try {
@@ -90,7 +114,8 @@ const usage = () => `Usage:
 Artifacts: ${Object.keys(ARTIFACTS).join(', ')}
 Activities: ${Object.keys(ACTIVITY_FILES).join(', ')}
 Record formats: normal (default), compact
-Record statuses: ${RECORD_STATUSES.join(', ')}`
+Record statuses: ${RECORD_STATUSES.join(', ')}
+Closure kinds: ${CLOSURE_KINDS.join(', ')}`
 
 const readStdin = () => fs.readFileSync(0, 'utf8')
 
@@ -195,7 +220,7 @@ const parseNextRecord = (content, workDir) => {
     }
     const key = match[1]
     const value = match[2].trim()
-    if (!NEXT_FIELDS.includes(key)) errors.push(`next.md: unknown frontmatter field '${key}'; allowed fields are ${NEXT_FIELDS.join(', ')}`)
+    if (!NEXT_ALL_FIELDS.includes(key)) errors.push(`next.md: unknown frontmatter field '${key}'; allowed fields are ${NEXT_ALL_FIELDS.join(', ')}`)
     else if (stored.has(key)) errors.push(`next.md: duplicate frontmatter field '${key}'`)
     else stored.set(key, value)
   }
@@ -203,7 +228,7 @@ const parseNextRecord = (content, workDir) => {
     if (!stored.has(key)) errors.push(`next.md: missing frontmatter field '${key}'`)
     else if (!stored.get(key)) errors.push(`next.md: frontmatter field '${key}' is empty`)
   }
-  const record = { workId: null, format: null, nextAgent: null, status: null }
+  const record = { workId: null, format: null, nextAgent: null, status: null, closure: 'full' }
   if (stored.has('work_id') && stored.get('work_id')) {
     record.workId = stored.get('work_id')
     const expected = path.basename(workDir)
@@ -234,6 +259,27 @@ const parseNextRecord = (content, workDir) => {
   }
   if (record.status === 'reconcile' && record.nextAgent === 'none') {
     errors.push(`next.md: status 'reconcile' requires a next responsibility; found 'none'`)
+  }
+  // The optional closure field declares the completion path for normal records;
+  // absent or empty it defaults to 'full' so records written before this field
+  // stay readable. Compact records bypass the closure contract entirely, so the
+  // field is neither validated nor applied to them.
+  if (record.format !== 'compact' && stored.has('closure') && stored.get('closure')) {
+    const value = stored.get('closure')
+    if (!CLOSURE_KINDS.includes(value)) errors.push(`next.md: closure '${value}' is not one of ${CLOSURE_KINDS.join(', ')}`)
+    else record.closure = value
+  }
+  // Closure/status coherence: an exception closure is a non-complete endpoint.
+  if (record.format !== 'compact') {
+    if (record.closure === 'parked' && record.status !== 'waiting') {
+      errors.push(`next.md: closure 'parked' requires status 'waiting'; found '${record.status ?? 'none'}'`)
+    }
+    if (record.closure === 'interrupted' && !['waiting', 'abandoned'].includes(record.status)) {
+      errors.push(`next.md: closure 'interrupted' requires status 'waiting' or 'abandoned'; found '${record.status ?? 'none'}'`)
+    }
+    if (['superseded', 'abandoned'].includes(record.closure) && record.status !== 'abandoned') {
+      errors.push(`next.md: closure '${record.closure}' requires status 'abandoned'; found '${record.status ?? 'none'}'`)
+    }
   }
   return { record, errors, detected: 'fixed' }
 }
@@ -300,6 +346,48 @@ const taskConsistency = (reports) => {
   return errors
 }
 
+const lifecycleIndex = (responsibility) => NEXT_RESPONSIBILITIES.indexOf(responsibility)
+
+const artifactPresent = (workDir, artifact) => {
+  try { return fs.lstatSync(artifactPath(workDir, artifact)).isFile() } catch { return false }
+}
+
+// The declared position of a normal record in the canonical lifecycle.
+// `next_agent` names the responsibility about to be performed, so its index is
+// the position *before* that responsibility; a required artifact R is demanded
+// only when position > index(R), i.e. R has already been passed. A complete
+// record has passed every responsibility, and anything else has no declared
+// position.
+const recordPosition = (record) => {
+  if (record.status === 'complete') return NEXT_RESPONSIBILITIES.length
+  if (record.nextAgent && record.nextAgent !== 'none') return lifecycleIndex(record.nextAgent)
+  return -1
+}
+
+// Normal completion is proportional to the declared lifecycle path. A `full`
+// record that has advanced past the review or retrospect responsibility must
+// carry that responsibility's artifact. A declared exception closure
+// (`planning-only`, `parked`, `interrupted`, `superseded`, `abandoned`) bounds
+// the endpoint, so its required set stays the closure-activity set rather than
+// the full path. Compact records bypass this contract entirely.
+const completionContract = (workDir, record) => {
+  const errors = []
+  if (record.format !== 'normal') return errors
+  if (record.closure !== 'full') return errors
+  const position = recordPosition(record)
+  if (position < 0) return errors
+  for (const [responsibility, artifact] of Object.entries(REQUIRED_ARTIFACT_RESPONSIBILITIES)) {
+    if (position <= lifecycleIndex(responsibility)) continue
+    if (artifactPresent(workDir, artifact)) continue
+    if (record.status === 'complete') {
+      errors.push(`next.md: status 'complete' requires ${artifact} (the ${responsibility} responsibility) or a recorded closure exception; add the artifact or set closure 'planning-only'`)
+    } else {
+      errors.push(`next.md: next_agent '${record.nextAgent}' is past the ${responsibility} responsibility, but ${artifact} is absent; add the artifact or record a closure exception`)
+    }
+  }
+  return errors
+}
+
 const recordConsistency = (reports) => {
   const errors = []
   const nextReport = reports.find((report) => report.artifact === 'next.md')
@@ -324,6 +412,7 @@ const recordConsistency = (reports) => {
       errors.push(`next.md: status is '${record.status}' but Waiting on claims nothing is pending; ${guidance}`)
     }
   }
+  errors.push(...completionContract(nextReport.workDir, record))
   return errors
 }
 
@@ -1204,7 +1293,7 @@ const initialScope = (objective) => `# Scope\n\n## Objective\n\n${objective}\n\n
 
 const initialNext = (workDir) => {
   const workId = path.basename(workDir)
-  return `---\nwork_id: ${workId}\nrecord_format: normal\nnext_agent: none\nstatus: waiting\n---\n\n# Next\n\n## Agreement\n\nThe invoking SDW workflow session owns this new work item within the user's request; no broader authority is recorded yet.\n\n## Next action\n\nRefine scope.md against the objective and the repository context, then save the record.\n\n## Waiting on\n\nThe invoking SDW workflow session continues this work item now.\n\n## Work context\n\nCreated from the objective by node .sdw/sdw.mjs start; records live in this work directory.\n`
+  return `---\nwork_id: ${workId}\nrecord_format: normal\nnext_agent: none\nstatus: waiting\nclosure: full\n---\n\n# Next\n\n## Agreement\n\nThe invoking SDW workflow session owns this new work item within the user's request; no broader authority is recorded yet.\n\n## Next action\n\nRefine scope.md against the objective and the repository context, then save the record.\n\n## Waiting on\n\nThe invoking SDW workflow session continues this work item now.\n\n## Work context\n\nCreated from the objective by node .sdw/sdw.mjs start; records live in this work directory.\n`
 }
 
 const initialWork = (objective) => `# Work\n\n## Purpose and Boundary\n\n${objective}\n\n## Intended Result\n\nThe smallest useful result for this bounded work.\n\n## Approach\n\nRecord the approach before acting.\n\n## Actions and Progress\n\nNo actions recorded yet.\n\n## Checks and Results\n\nNo checks run yet.\n\n## Outcome and Lessons\n\nPending.\n`
@@ -1346,6 +1435,10 @@ const check = (workDirValue, activity) => {
         }
       }
     }
+  }
+  const closure = row?.record?.closure ?? 'full'
+  if (format === 'normal' && CLOSURE_ACTIVITIES.has(activity) && closure !== 'full') {
+    required = [...(CLOSURE_ACTIVITY_FILES[closure]?.[activity] ?? required)]
   }
   const reports = required.map((artifact) => inspectArtifact(workDir, artifact))
   const errors = [

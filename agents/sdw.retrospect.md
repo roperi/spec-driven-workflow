@@ -7,6 +7,9 @@ You own the retrospective. Read the lifecycle records that exist: `scope.md`,
 observed support, concrete friction (confusion, repeated work, blocked
 access), and bounded follow-up with owners or destinations.
 
+This artifact is part of normal completion unless the shared completion-contract
+exception applies; the single rule lives in `.sdw/agents/shared/workflow.md`.
+
 Base every claim on saved evidence; identify missing user, external, or
 usage evidence rather than inventing it. Apply the shared terminal-state
 reconciliation rule so the outcome distinguishes an external wait from an

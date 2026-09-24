@@ -5,6 +5,19 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Consistent completion — a normal work item can no longer report that
+  it is complete while its review or retrospective record is missing. A normal
+  `full` completion now requires `review.md` and `retrospect.md`, and a record
+  that advanced past those responsibilities without the artifact is reported
+  with a message that names the missing responsibility. A new optional `closure`
+  field in `next.md` (`full` by default, plus the recorded exceptions
+  `planning-only`, `parked`, `interrupted`, `superseded`, and `abandoned`)
+  declares the completion path; a declared exception bounds the required records
+  to what its endpoint produces, so planning-only and genuinely abandoned or
+  superseded work stay representable without inventing artifacts. Compact work
+  keeps its smaller `work.md` plus `next.md` contract, and existing records
+  remain readable.
+
 - **NEW**: Terminal-state reconciliation — a work item whose external action
   (PR merge, issue closure, publication) completed after its record was written
   can no longer stay silently marked as waiting. `next.md` status is now a closed

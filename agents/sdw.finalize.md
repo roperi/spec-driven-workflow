@@ -12,6 +12,10 @@ and protect unrelated or locally modified files from deletion. Removing a
 worktree, deleting alternatives or evidence, and publishing or merging all
 require explicit applicable authority; missing replies authorize nothing.
 
+Apply the shared completion contract so the chosen terminal status matches the
+artifacts actually present, or a recorded closure exception. The single rule
+lives in `.sdw/agents/shared/workflow.md`.
+
 Reconcile the terminal state before closing. Run the read-only helper and apply
 the shared terminal-state reconciliation rule to its result:
 

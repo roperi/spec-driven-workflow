@@ -59,6 +59,9 @@ export const ENTRYPOINT_AGENTS = Object.freeze(
   Object.keys(AGENTS).filter((id) => AGENTS[id].entrypoint === true),
 )
 
+// Declaration order here is the canonical lifecycle order (scope through wrap);
+// the helper uses it to decide whether a record has advanced past a
+// responsibility whose artifact must exist at completion.
 export const NEXT_RESPONSIBILITIES = Object.freeze(
   Object.keys(AGENTS).filter((id) => AGENTS[id].entrypoint !== true),
 )
@@ -74,4 +77,20 @@ export const RECORD_STATUSES = Object.freeze(['ready', 'waiting', 'reconcile', '
 export const TERMINAL_RECORD_STATUSES = Object.freeze(['complete', 'abandoned'])
 export const PENDING_RECORD_STATUSES = Object.freeze(['waiting', 'reconcile', 'abandoned'])
 
+// Declared completion path for normal records. `full` (the default when the
+// field is absent) requires the review and retrospect artifacts at completion;
+// `planning-only` is bounded at planning; the remaining kinds are explicit
+// recorded exceptions that stay distinguishable from a completed item.
+// full          — the authorized full lifecycle endpoint.
+// planning-only — the authorized endpoint is planning; review/retrospect do not apply.
+// parked        — intentionally paused with a recorded condition/owner.
+// interrupted   — stopped before its endpoint by session loss or an internal blocker.
+// superseded    — replaced by another work item, with the reason recorded.
+// abandoned     — ended without completion, with the reason recorded.
+export const CLOSURE_KINDS = Object.freeze(['full', 'planning-only', 'parked', 'interrupted', 'superseded', 'abandoned'])
+
+// The four fixed record fields are required; `closure` is optional and defaults
+// to 'full', so records written before this field stay readable.
 export const NEXT_FIELDS = Object.freeze(['work_id', 'record_format', 'next_agent', 'status'])
+export const NEXT_OPTIONAL_FIELDS = Object.freeze(['closure'])
+export const NEXT_ALL_FIELDS = Object.freeze([...NEXT_FIELDS, ...NEXT_OPTIONAL_FIELDS])
