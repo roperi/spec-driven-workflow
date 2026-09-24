@@ -32,6 +32,13 @@ metadata is reported, never silently mapped to a different stage.
 Reconcile any interrupted external-finding dispositions in `review.md` under the
 shared external-review-consumption rule before re-invoking a reviewer.
 
+Apply the shared terminal-state reconciliation rule to the reported status. A
+`waiting` record is externally blocked only when reconciliation cannot observe
+the external action as complete; when the report shows it complete, move the
+record to `reconcile` and reconcile it to `complete` or `abandoned` with the
+observed evidence recorded. Never treat local ancestry as proof of a remote merge
+or issue closure, and never let reconciliation authorize a remote action.
+
 Then continue as the lifecycle agent: apply the recorded next responsibility
 in this same session within its agreement and stops. Existing valid
 authorization does not need routine reconfirmation; a newer explicit stop

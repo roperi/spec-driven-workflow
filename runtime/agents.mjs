@@ -64,6 +64,14 @@ export const NEXT_RESPONSIBILITIES = Object.freeze(
 )
 
 export const RECORD_FORMATS = Object.freeze(['normal', 'compact'])
-export const RECORD_STATUSES = Object.freeze(['ready', 'waiting', 'complete'])
+// ready     — a local next responsibility is pending; no external wait.
+// waiting   — externally blocked on a person, credential, service, or condition.
+// reconcile — an external action is observable as complete but the record has
+//             not been reconciled against it.
+// complete  — terminal: the authorized endpoint was reached.
+// abandoned — terminal: the work ended without completion or was superseded.
+export const RECORD_STATUSES = Object.freeze(['ready', 'waiting', 'reconcile', 'complete', 'abandoned'])
+export const TERMINAL_RECORD_STATUSES = Object.freeze(['complete', 'abandoned'])
+export const PENDING_RECORD_STATUSES = Object.freeze(['waiting', 'reconcile', 'abandoned'])
 
 export const NEXT_FIELDS = Object.freeze(['work_id', 'record_format', 'next_agent', 'status'])

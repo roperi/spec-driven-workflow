@@ -8,7 +8,10 @@ observed support, concrete friction (confusion, repeated work, blocked
 access), and bounded follow-up with owners or destinations.
 
 Base every claim on saved evidence; identify missing user, external, or
-usage evidence rather than inventing it. Whether the delivered result
+usage evidence rather than inventing it. Apply the shared terminal-state
+reconciliation rule so the outcome distinguishes an external wait from an
+external action observed complete but not yet reconciled; do not report an
+unreconciled record as complete. Whether the delivered result
 achieved the upstream product outcome is a separate evaluation — record the
 implication, not a validated market claim. Do not close external issues as a
 side effect. Save the retrospective, update `next.md` with the follow-up or

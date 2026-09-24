@@ -10,8 +10,10 @@ import {
   AGENT_FILES,
   NEXT_FIELDS,
   NEXT_RESPONSIBILITIES,
+  PENDING_RECORD_STATUSES,
   RECORD_FORMATS,
   RECORD_STATUSES,
+  TERMINAL_RECORD_STATUSES,
 } from './agents.mjs'
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url))
@@ -83,10 +85,12 @@ const usage = () => `Usage:
   node .sdw/sdw.mjs save WORK_DIR ARTIFACT < CONTENT
   node .sdw/sdw.mjs check WORK_DIR ACTIVITY
   node .sdw/sdw.mjs resume WORK_DIR
+  node .sdw/sdw.mjs reconcile WORK_DIR
 
 Artifacts: ${Object.keys(ARTIFACTS).join(', ')}
 Activities: ${Object.keys(ACTIVITY_FILES).join(', ')}
-Record formats: normal (default), compact`
+Record formats: normal (default), compact
+Record statuses: ${RECORD_STATUSES.join(', ')}`
 
 const readStdin = () => fs.readFileSync(0, 'utf8')
 
@@ -223,9 +227,13 @@ const parseNextRecord = (content, workDir) => {
     else if (!NEXT_RESPONSIBILITIES.includes(value)) errors.push(`next.md: next_agent '${value}' is not a canonical responsibility ('none' or one of ${NEXT_RESPONSIBILITIES.join(', ')})`)
     else record.nextAgent = value
   }
-  // Status/next-agent coherence: complete pairs with next_agent none.
-  if (record.status === 'complete' && record.nextAgent !== null && record.nextAgent !== 'none') {
-    errors.push(`next.md: status 'complete' requires next_agent 'none'; found '${record.nextAgent}'`)
+  // Status/next-agent coherence: terminal statuses pair with next_agent none;
+  // 'reconcile' is a pending responsibility and cannot pair with none.
+  if (TERMINAL_RECORD_STATUSES.includes(record.status) && record.nextAgent !== null && record.nextAgent !== 'none') {
+    errors.push(`next.md: status '${record.status}' requires next_agent 'none'; found '${record.nextAgent}'`)
+  }
+  if (record.status === 'reconcile' && record.nextAgent === 'none') {
+    errors.push(`next.md: status 'reconcile' requires a next responsibility; found 'none'`)
   }
   return { record, errors, detected: 'fixed' }
 }
@@ -305,10 +313,15 @@ const recordConsistency = (reports) => {
   const { record } = parsed
   if (!record.status) return errors
   if (record.nextAgent === null) return errors
-  if (record.status === 'waiting') {
+  if (PENDING_RECORD_STATUSES.includes(record.status)) {
     const waiting = meaningfulSection(nextReport.content, 'Waiting on') ?? ''
     if (/^\s*(?:nothing(?:\.| pending)?|none)\s*\.?\s*$/iu.test(waiting)) {
-      errors.push('next.md: status is waiting but Waiting on claims nothing is pending; record the condition and its owner')
+      const guidance = record.status === 'abandoned'
+        ? 'record why the work was abandoned or superseded'
+        : record.status === 'reconcile'
+          ? 'record the observed condition and its evidence source'
+          : 'record the condition and its owner'
+      errors.push(`next.md: status is '${record.status}' but Waiting on claims nothing is pending; ${guidance}`)
     }
   }
   return errors
@@ -331,6 +344,10 @@ const closureConsistency = (reports) => {
     errors.push(`next.md: status is 'complete' but Waiting on names an unresolved condition (${JSON.stringify(waitingOn.slice(0, 120))}); resolve it or record status 'waiting' with the condition and its owner`)
   }
   if (!tasksReport || tasksReport.errors.length) return errors
+  // An abandoned work item never completed its tasks; its recorded reason and
+  // terminal status are checked elsewhere. Every other closure still requires
+  // honest completion.
+  if (parsed.record?.status === 'abandoned') return errors
   const pending = taskDetails(tasksReport.content).entries.filter((entry) => !entry.complete)
   if (pending.length) {
     errors.push(`tasks.md: ${pending.length} unchecked task(s) remain; closure requires honest completion or an explicit recorded deferral destination in next.md — review them before claiming closure`)
@@ -1379,6 +1396,137 @@ const gitContext = (workDir) => {
 
 const execGit = (args) => execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
 
+// Read-only Git probes for terminal-state reconciliation. These never fetch,
+// mutate, or contact a remote; they inspect only local refs and ancestry.
+const gitProbe = (workDir, args) => {
+  try {
+    return execFileSync('git', ['-C', workDir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+  } catch {
+    return null
+  }
+}
+
+const gitExit = (workDir, args) => {
+  try {
+    execFileSync('git', ['-C', workDir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+    return 0
+  } catch (error) {
+    return typeof error.status === 'number' ? error.status : null
+  }
+}
+
+const defaultBranchRef = (workDir) => {
+  const symbolic = gitProbe(workDir, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD'])
+  if (symbolic && symbolic.startsWith('origin/')) return symbolic
+  for (const candidate of ['origin/main', 'origin/master']) {
+    if (gitExit(workDir, ['rev-parse', '--verify', '--quiet', `refs/remotes/${candidate}`]) === 0) return candidate
+  }
+  return null
+}
+
+const RECONCILE_DISCLAIMER = 'Local Git ancestry is local evidence only: it does not prove a remote PR merge or GitHub issue closure, and reconciliation grants no merge, closure, or publication authority.'
+
+const reconciliationOutcome = (record, observed) => {
+  if (!record) return 'no record'
+  if (record.status === 'complete') return 'complete'
+  if (record.status === 'abandoned') return 'abandoned'
+  if (record.status === 'reconcile') return 'awaiting reconciliation'
+  if (record.status === 'waiting') {
+    if (observed === 'integrated') return 'awaiting reconciliation'
+    if (observed === 'not-integrated') return 'externally blocked'
+    return 'external state unknown'
+  }
+  return 'not applicable'
+}
+
+// A read-only reconciliation of the record against visible local Git state.
+// It reports the observed condition, the evidence source, and the next
+// responsibility; it never mutates records, branches, remotes, or issues, and
+// it never converts local ancestry into a completion or authority claim.
+const reconcileState = (workDir, record) => {
+  const state = {
+    observed: 'unknown',
+    source: 'local Git ancestry',
+    detail: '',
+    outcome: reconciliationOutcome(record, 'unknown'),
+    nextResponsibility: null,
+  }
+  if (record?.nextAgent && record.nextAgent !== 'none') state.nextResponsibility = record.nextAgent
+  if (gitProbe(workDir, ['rev-parse', '--show-toplevel']) === null) {
+    state.detail = 'no Git repository for WORK_DIR; external state is unknown'
+    return state
+  }
+  const branch = gitProbe(workDir, ['branch', '--show-current']) || '(detached HEAD)'
+  const remotes = gitProbe(workDir, ['remote']) ?? ''
+  if (remotes.trim() === '') {
+    state.detail = 'no remote configured; local branch state cannot prove a remote merge or issue closure'
+    state.outcome = reconciliationOutcome(record, 'unknown')
+    return state
+  }
+  const baseRef = defaultBranchRef(workDir)
+  if (baseRef === null) {
+    state.detail = 'no remote default branch resolved; remote state is unknown'
+    state.outcome = reconciliationOutcome(record, 'unknown')
+    return state
+  }
+  const baseName = baseRef.replace(/^[^/]+\//u, '')
+  if (branch === baseName) {
+    state.detail = `current checkout is the integration branch '${branch}'; local ancestry cannot identify this work item's candidate`
+    state.outcome = reconciliationOutcome(record, 'unknown')
+    return state
+  }
+  const ancestry = gitExit(workDir, ['merge-base', '--is-ancestor', 'HEAD', baseRef])
+  if (ancestry === 0) {
+    state.observed = 'integrated'
+    state.source = `local Git ancestry vs ${baseRef}`
+    state.detail = `HEAD is contained in ${baseRef}; the external action may have completed, so reconcile the record`
+  } else if (ancestry === 1) {
+    state.observed = 'not-integrated'
+    state.source = `local Git ancestry vs ${baseRef}`
+    state.detail = `HEAD is not contained in ${baseRef}; no local completion evidence`
+  } else {
+    state.detail = `could not determine ancestry against ${baseRef}; external state is unknown`
+  }
+  state.outcome = reconciliationOutcome(record, state.observed)
+  if (!state.nextResponsibility && state.outcome === 'awaiting reconciliation') state.nextResponsibility = 'sdw.finalize'
+  return state
+}
+
+const reconciliationReport = (workDir, parsed, condition) => {
+  const state = reconcileState(workDir, parsed.record)
+  const responsibility = state.nextResponsibility ?? (parsed.record?.nextAgent === 'none' ? 'none' : '(not recorded)')
+  return [
+    `Reconciliation: ${state.outcome}`,
+    `External state: observed ${state.observed}; evidence source: ${state.source}${state.detail ? `; ${state.detail}` : ''}`,
+    `External condition: ${condition || '(none recorded)'}`,
+    `Next responsibility: ${responsibility}`,
+    RECONCILE_DISCLAIMER,
+  ]
+}
+
+const waitingCondition = (content) => (meaningfulSection(content, 'Waiting on') ?? '').split(/\r?\n/u)[0]?.trim() ?? ''
+
+const reconcile = (value) => {
+  const workDir = resolveWorkDir(value)
+  const nextProbe = readWorkFile(workDir, 'next.md')
+  if (nextProbe.error !== null) {
+    return [
+      `Reconciliation for ${workDir}`,
+      `Record status: (next.md ${nextProbe.error}); external state is unknown`,
+      RECONCILE_DISCLAIMER,
+      'Reconcile is read-only; it never modifies records or remote state.',
+    ].join('\n')
+  }
+  const parsed = parseNextRecord(nextProbe.content, workDir)
+  const statusLabel = parsed.record?.status ?? (parsed.detected === 'unstructured' ? '(unstructured next.md)' : '(unknown)')
+  return [
+    `Reconciliation for ${workDir}`,
+    `Record status: ${statusLabel}`,
+    ...reconciliationReport(workDir, parsed, waitingCondition(nextProbe.content)),
+    'Reconcile is read-only; it never modifies records or remote state.',
+  ].join('\n')
+}
+
 const resume = (value) => {
   const workDir = resolveWorkDir(value)
   const available = Object.keys(ARTIFACTS).filter((artifact) => {
@@ -1400,6 +1548,7 @@ const resume = (value) => {
 
   let recordNote = '(no next.md record)'
   let promptNote = ''
+  let reconciliationNote = ''
   const nextProbe = readWorkFile(workDir, 'next.md')
   if (nextProbe.error === null) {
     const parsed = parseNextRecord(nextProbe.content, workDir)
@@ -1415,6 +1564,7 @@ const resume = (value) => {
           ? `Next prompt: ${prompt.target}`
           : `Next prompt: missing for ${record.nextAgent}; expected at ${prompt.target}`
       }
+      reconciliationNote = reconciliationReport(workDir, parsed, waitingCondition(nextProbe.content)).join('\n')
     }
   }
   const taskLine = progress
@@ -1425,6 +1575,7 @@ const resume = (value) => {
     `Work directory: ${workDir}`,
     recordNote,
     promptNote,
+    reconciliationNote,
     `Artifacts: ${available.join(', ') || '(none)'}`,
     taskLine,
     assuranceLine,
@@ -1445,6 +1596,7 @@ const main = () => {
   else if (command === 'save' && args.length === 2) result = save(args[0], args[1])
   else if (command === 'check' && args.length === 2) result = check(args[0], args[1])
   else if (command === 'resume' && args.length === 1) result = resume(args[0])
+  else if (command === 'reconcile' && args.length === 1) result = reconcile(args[0])
   else fail('USAGE', `Invalid arguments.\n${usage()}`)
   process.stdout.write(`${result}\n`)
   if (command === 'check' && result.startsWith('Check failed')) process.exitCode = 1

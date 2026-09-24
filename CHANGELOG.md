@@ -5,6 +5,20 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Terminal-state reconciliation — a work item whose external action
+  (PR merge, issue closure, publication) completed after its record was written
+  can no longer stay silently marked as waiting. `next.md` status is now a closed
+  set (`ready`, `waiting`, `reconcile`, `complete`, `abandoned`) that separates an
+  external wait from an external action observed complete but not yet reconciled,
+  and from the terminal `complete` and `abandoned`/superseded states. A new
+  read-only `node .sdw/sdw.mjs reconcile <work-id>` command, also included in
+  `resume`, reports the observed condition, the evidence source, and the next
+  responsibility using visible local Git state without fetching or mutating
+  anything. Local Git ancestry is local evidence only and does not prove a remote
+  merge or issue closure; unknown or inaccessible remote state stays explicitly
+  unknown, and reconciliation never grants merge, closure, or publication
+  authority. Existing normal and compact records remain readable.
+
 - **DOCS**: Constitution guardrail — the constitution guidance now states that a
   constitution governs how specifications become code (development law), not
   operational procedure or product policy. Operational detail such as commands,

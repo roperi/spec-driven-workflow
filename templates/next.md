@@ -5,6 +5,8 @@ next_agent: TODO
 status: TODO
 ---
 
+Status values: `ready` (local next responsibility), `waiting` (externally blocked), `reconcile` (external action observable as complete, record not yet reconciled), `complete` (terminal), `abandoned` (terminal, not completed or superseded). Reconcile with `node .sdw/sdw.mjs reconcile <work-id>`; it is read-only and grants no merge, closure, or publication authority.
+
 # Next
 
 ## Agreement
@@ -17,7 +19,7 @@ TODO: identify the concrete next work and link the substantive records it depend
 
 ## Waiting on
 
-TODO: write `Nothing pending.` or the condition that must resolve and who owns it.
+TODO: write `Nothing pending.`, or the condition that must resolve and who owns it, or — for `reconcile` — the observed external condition and its evidence source, or — for `abandoned` — why the work ended without completion.
 
 ## Work context
 

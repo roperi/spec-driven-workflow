@@ -12,6 +12,19 @@ and protect unrelated or locally modified files from deletion. Removing a
 worktree, deleting alternatives or evidence, and publishing or merging all
 require explicit applicable authority; missing replies authorize nothing.
 
+Reconcile the terminal state before closing. Run the read-only helper and apply
+the shared terminal-state reconciliation rule to its result:
+
+```sh
+node .sdw/sdw.mjs reconcile .sdw/work/<work-id>
+```
+
+The report names the observed condition, the evidence source, and the next
+responsibility. A `waiting` record whose external action is observed complete
+becomes `reconcile`; reconcile it to `complete` or `abandoned` with the observed
+evidence recorded. Reconciliation is evidence, not authority: local ancestry is
+not proof of a remote merge or issue closure.
+
 Run the finalize check:
 
 ```sh

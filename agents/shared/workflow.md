@@ -73,6 +73,50 @@ session. A missing reply is never approval. Publication, merge, deletion of
 alternatives, and migration of another project require actual applicable
 authority beyond a generic request.
 
+## Terminal state and reconciliation
+
+`next.md` status is one of five closed values with distinct meaning:
+
+- `ready` — the next responsibility is a local lifecycle stage; nothing
+  external is awaited.
+- `waiting` — externally blocked on a person, credential, service, or other
+  condition outside the agent's authority. Record the condition and its owner in
+  Waiting on.
+- `reconcile` — an external action (merge, issue closure, publication) is
+  observable as complete but the record has not been reconciled against it.
+  Record the observed condition and its evidence source in Waiting on.
+- `complete` — the work item reached its authorized endpoint with
+  `next_agent: none`.
+- `abandoned` — the work item ended without completion or was superseded, with
+  `next_agent: none` and the reason recorded in Waiting on.
+
+`waiting`, `reconcile`, and `abandoned` require a recorded condition or reason
+in Waiting on. `complete` requires no unresolved Waiting on and no unchecked
+task. `reconcile` is not terminal and requires a canonical next responsibility.
+
+When a session resumes or finalizes a work item, reconcile the record against
+visible state before trusting a `waiting` status. Run the read-only helper:
+
+```sh
+node .sdw/sdw.mjs reconcile .sdw/work/<work-id>
+```
+
+`resume` reports the same reconciliation. The result names the observed
+condition, the evidence source, and the next responsibility. It is read-only: it
+never mutates records, branches, remotes, or issues, and it never fetches.
+
+Reconciliation is evidence, not authority. Local Git ancestry is local evidence
+only: it does not prove a remote PR merge or GitHub issue closure. Unknown,
+inaccessible, or absent remote state stays explicitly unknown and fails closed;
+never guess completion. A reconciliation result never grants merge, closure, or
+publication authority, and observing a changed external state never authorizes a
+remote action. A record written before an external action completed is handled
+explicitly: once the action is observed complete, move the record to `reconcile`,
+then reconcile it to `complete` or `abandoned` with the observed evidence
+recorded. A work item whose endpoint was a merge, issue closure, or publication
+is not `complete` until a human with that authority confirms it or the record
+carries the applicable external evidence.
+
 ## Saving checkpoints
 
 Save substantive artifacts before `next.md`; `next.md` is written last as the

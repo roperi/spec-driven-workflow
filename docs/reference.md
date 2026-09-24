@@ -8,6 +8,7 @@ node .sdw/sdw.mjs start WORK_DIR OBJECTIVE [--format normal|compact]
 node .sdw/sdw.mjs save WORK_DIR ARTIFACT < CONTENT
 node .sdw/sdw.mjs check WORK_DIR ACTIVITY
 node .sdw/sdw.mjs resume WORK_DIR
+node .sdw/sdw.mjs reconcile WORK_DIR
 ```
 
 `start` is the initialization primitive used by `sdw.workflow`: it creates a
@@ -46,11 +47,27 @@ The canonical stages and their helper checks:
 `next.md` records four fixed fields (`work_id`, `record_format`,
 `next_agent`, `status`) plus readable Agreement / Next action / Waiting on /
 Work context sections. `next_agent` is one of the eleven bounded
-responsibilities or `none`; `status` is `ready`, `waiting`, or `complete`.
-`waiting` records the condition and its owner. Unknown or contradictory
+responsibilities or `none`; `status` is one of `ready`, `waiting`, `reconcile`,
+`complete`, or `abandoned`. `ready` means a local next responsibility is pending;
+`waiting` records an external condition and its owner; `reconcile` records an
+external action observable as complete that the record has not been reconciled
+against, with its observed condition and evidence source; `complete` and
+`abandoned` are terminal with `next_agent: none`, and `abandoned` records why the
+work ended without completion or was superseded. Unknown or contradictory
 metadata is reported, never silently mapped, and nothing is inferred from
-approval-sounding prose; closure checks report unresolved blockers and
-pending tasks.
+approval-sounding prose; closure checks report unresolved blockers and pending
+tasks.
+
+`reconcile WORK_DIR` is a read-only terminal-state check. It reports the
+reconciliation outcome (externally blocked, awaiting reconciliation, complete,
+abandoned, or external state unknown), the observed local Git condition, the
+evidence source, and the next responsibility; `resume` reports the same. It
+never fetches, mutates records, branches, remotes, or issues. Local Git ancestry
+is local evidence only and does not prove a remote PR merge or GitHub issue
+closure; unknown, inaccessible, or absent remote state stays explicitly unknown
+and fails closed, and reconciliation never grants merge, closure, or publication
+authority. A record written before an external action completed moves from
+`waiting` to `reconcile` and then to `complete` or `abandoned` once reconciled.
 
 Compact work uses `work.md` (purpose/boundary, intended result, approach,
 actions/progress, checks/results, outcome/lessons) plus `next.md`; expand to

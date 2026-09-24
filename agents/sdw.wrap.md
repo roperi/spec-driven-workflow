@@ -24,3 +24,10 @@ including deferred work and its destination. If some bounded part still
 waits or the endpoint changed, record `status: waiting` with the condition
 and owner instead — a local, plan-only, operational, or PR-stop endpoint
 closes exactly as far as its agreement reached.
+
+Apply the shared terminal-state reconciliation rule before choosing the status.
+Do not close a stale `waiting` record as `complete`: if reconciliation observes
+the external action complete, move the record through `reconcile` to `complete`
+or `abandoned` with the observed evidence recorded. Use `status: abandoned` with
+`next_agent: none` and a recorded reason when the work ended without completion
+or was superseded.
