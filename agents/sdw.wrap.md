@@ -29,6 +29,11 @@ Apply the shared completion contract before choosing the status: a normal
 completion requires the review and retrospect artifacts, or a recorded closure
 exception. The single rule lives in `.sdw/agents/shared/workflow.md`.
 
+Apply the shared durability rule before closing: a record that would not survive
+a checkout switch is reported rather than closed silently, and the report names
+the owner and next responsibility. The single rule lives in
+`.sdw/agents/shared/workflow.md`.
+
 Apply the shared terminal-state reconciliation rule before choosing the status.
 Do not close a stale `waiting` record as `complete`: if reconciliation observes
 the external action complete, move the record through `reconcile` to `complete`

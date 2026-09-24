@@ -5,6 +5,22 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Durable continuity records — a work item's handoff no longer depends
+  silently on an untracked directory, an unmerged branch, or a dangling commit.
+  `next.md` gains three optional fields — `branch`, `candidate`, and
+  `durability` — that record where the work item is durable, and `resume` plus
+  the `handoff`, `finalize`, and `wrap` checks run a read-only durability
+  assessment against the repository. It reports an untracked or gitignored work
+  directory, a recorded candidate that is unreachable from every branch and
+  remote or absent, a recorded branch that this checkout cannot see, and a
+  recorded branch that does not contain the work item, naming the condition, the
+  evidence source, the owner, and the next responsibility. An untracked work
+  directory must now carry an explicit `durability` reason or a resolving
+  reference, so the default is not silently permissive; a work directory outside
+  Git control is reported as unknown and does not fail. The assessment is
+  read-only and grants no commit, merge, closure, or publication authority, and
+  existing records remain readable.
+
 - **NEW**: Consistent completion — a normal work item can no longer report that
   it is complete while its review or retrospective record is missing. A normal
   `full` completion now requires `review.md` and `retrospect.md`, and a record

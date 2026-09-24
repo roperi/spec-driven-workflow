@@ -39,6 +39,13 @@ record to `reconcile` and reconcile it to `complete` or `abandoned` with the
 observed evidence recorded. Never treat local ancestry as proof of a remote merge
 or issue closure, and never let reconciliation authorize a remote action.
 
+Apply the shared durability rule to the report's durability assessment before
+trusting the handoff: it names the condition, evidence source, owner, and next
+responsibility when the work directory is untracked, a recorded candidate is
+unreachable, or a recorded branch is absent or lacks the work item. The single
+rule lives in `.sdw/agents/shared/workflow.md`; committing records and
+re-pinning references remain owner actions.
+
 Then continue as the lifecycle agent: apply the recorded next responsibility
 in this same session within its agreement and stops. Existing valid
 authorization does not need routine reconfirmation; a newer explicit stop

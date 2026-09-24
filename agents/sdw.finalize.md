@@ -29,6 +29,11 @@ becomes `reconcile`; reconcile it to `complete` or `abandoned` with the observed
 evidence recorded. Reconciliation is evidence, not authority: local ancestry is
 not proof of a remote merge or issue closure.
 
+Apply the shared durability rule before recording terminal closure: the finalize
+check reports an untracked or branch-only record that would not survive a
+checkout switch, and names the owner and next responsibility. The single rule
+lives in `.sdw/agents/shared/workflow.md`.
+
 Run the finalize check:
 
 ```sh

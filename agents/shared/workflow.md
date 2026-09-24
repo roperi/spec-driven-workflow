@@ -146,6 +146,36 @@ defaults to `full`, so records written before it stay readable. The helper
 checks structure and declared coherence only; it never infers approval, review
 quality, or independence from prose.
 
+## Durable continuity and the durability assessment
+
+A handoff is durable only when another checkout can resolve it. `next.md` may
+record its durable location with three optional fixed fields: `branch` (the
+branch where the work item's copy lives), `candidate` (the exact candidate
+commit), and `durability` (an explicit reason that permits an intentionally
+untracked or branch-only record). They are optional and default to absent, so
+records written before them stay readable.
+
+`resume` and `check` for `handoff`, `finalize`, and `wrap` run a read-only
+durability assessment against the work directory's enclosing Git repository. It
+reports an untracked or gitignored work directory; a recorded candidate that is
+unreachable from every local branch and remote, or absent from the repository; a
+recorded branch the current checkout cannot see; and a recorded branch that does
+not contain the work item. Each report names the condition, the evidence source
+(the local Git index, refs, and objects), the owner — the work-item owner
+session — and the next responsibility: commit the records or record a
+`durability` reason, and restore or re-pin the missing reference.
+
+An untracked or gitignored work directory fails `check handoff`, `finalize`, or
+`wrap` unless it carries an explicit non-empty `durability` reason or a recorded
+reference resolves it. The default is therefore not silently permissive; the
+reason records the exception openly instead of hiding it. A work directory
+outside Git control is reported as unknown and does not fail.
+
+The assessment checks structure and declared coherence only. It is read-only: it
+never fetches, mutates records, refs, or remotes, and it never grants commit,
+push, merge, closure, or publication authority; committing records and
+re-pinning references are owner actions the report names but never performs.
+
 ## Saving checkpoints
 
 Save substantive artifacts before `next.md`; `next.md` is written last as the

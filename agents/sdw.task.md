@@ -27,6 +27,12 @@ production edits, and the implementation task's authority excludes the
 protected seed set. The complete grammar lives once in `.sdw/agents/shared/workflow.md`;
 standard tasks keep the current concise shape.
 
+Record the durable location early: when the work will live on a branch, set the
+optional `branch` and `candidate` references in `next.md` so a resume can
+resolve the handoff, and record a `durability` reason if the work item is
+intentionally untracked. The shared durability rule lives in
+`.sdw/agents/shared/workflow.md`.
+
 Save it, then run:
 
 ```sh

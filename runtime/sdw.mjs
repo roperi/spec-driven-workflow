@@ -228,7 +228,7 @@ const parseNextRecord = (content, workDir) => {
     if (!stored.has(key)) errors.push(`next.md: missing frontmatter field '${key}'`)
     else if (!stored.get(key)) errors.push(`next.md: frontmatter field '${key}' is empty`)
   }
-  const record = { workId: null, format: null, nextAgent: null, status: null, closure: 'full' }
+  const record = { workId: null, format: null, nextAgent: null, status: null, closure: 'full', branch: null, candidate: null, durability: null }
   if (stored.has('work_id') && stored.get('work_id')) {
     record.workId = stored.get('work_id')
     const expected = path.basename(workDir)
@@ -280,6 +280,12 @@ const parseNextRecord = (content, workDir) => {
     if (['superseded', 'abandoned'].includes(record.closure) && record.status !== 'abandoned') {
       errors.push(`next.md: closure '${record.closure}' requires status 'abandoned'; found '${record.status ?? 'none'}'`)
     }
+  }
+  // Optional durable-continuity references. They are recorded values only; the
+  // helper resolves them against live Git state in durabilityAssessment and
+  // never infers a durable location from prose.
+  for (const field of ['branch', 'candidate', 'durability']) {
+    if (stored.has(field) && stored.get(field)) record[field] = stored.get(field)
   }
   return { record, errors, detected: 'fixed' }
 }
@@ -1447,6 +1453,13 @@ const check = (workDirValue, activity) => {
     ...recordConsistency(reports),
     ...(CLOSURE_ACTIVITIES.has(activity) ? closureConsistency(reports) : []),
   ]
+  let durability = null
+  if (DURABILITY_ACTIVITIES.has(activity) && row?.detected === 'fixed' && row.record) {
+    durability = durabilityAssessment(workDir, row.record)
+    // A failing durability report carries the condition, evidence source,
+    // owner, and next responsibility, not the condition alone.
+    if (durability.conditions.length) errors.push(...durability.lines)
+  }
   if (row && CLOSURE_ACTIVITIES.has(activity) && row.record?.status === 'complete' && format === 'normal') {
     const tasksReport = reports.find((report) => report.artifact === 'tasks.md')
     if (tasksReport && !tasksReport.errors.length) {
@@ -1472,7 +1485,8 @@ const check = (workDirValue, activity) => {
   const assuranceNote = assurance.profile === 'hardened'
     ? `; ${HARDENED_STRUCTURAL_NOTE}`
     : assurance.profile === 'standard' ? '; assurance standard' : ''
-  return `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}`
+  const durabilityNote = durability ? `; durability ${durability.state}` : ''
+  return `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}${durabilityNote}`
 }
 
 const gitContext = (workDir) => {
@@ -1597,6 +1611,105 @@ const reconciliationReport = (workDir, parsed, condition) => {
   ]
 }
 
+// Durable-continuity assessment. It reads only the local Git index, refs, and
+// objects: it never fetches, never mutates records, refs, or remotes, and it
+// grants no commit, push, merge, closure, or publication authority. A work
+// directory outside Git control is reported as unknown, never as durable or
+// failed. The optional `branch`, `candidate`, and `durability` references carry
+// the declared durable location; the helper resolves them rather than judging
+// prose.
+const DURABILITY_ACTIVITIES = new Set(['handoff', 'finalize', 'wrap'])
+const DURABILITY_OWNER = 'the work-item owner session'
+
+// Recorded references are authored frontmatter values. Reject values that Git
+// could read as an option or that cannot be a real ref/object name, and pass the
+// survivors behind `--end-of-options`/`--contains=`, so a crafted value can never
+// change which object is inspected.
+const safeRefToken = (value) => typeof value === 'string' && value.trim() !== '' && !value.startsWith('-') && !/[\s\0]/u.test(value)
+
+const durabilityAssessment = (workDir, record) => {
+  if (gitProbe(workDir, ['rev-parse', '--show-toplevel']) === null) {
+    return {
+      state: 'unknown',
+      conditions: [],
+      lines: [
+        'Durability: unknown — no Git repository for WORK_DIR; durability is not assessable.',
+        'Durability evidence: the work directory is outside Git control.',
+      ],
+    }
+  }
+  const root = gitProbe(workDir, ['rev-parse', '--show-toplevel'])
+  const relative = path.relative(root, workDir).split(path.sep).join('/')
+  const declared = typeof record?.durability === 'string' && record.durability.trim() !== ''
+  const tracked = (gitProbe(workDir, ['ls-files', '--', '.']) ?? '').trim()
+  const ignored = gitExit(workDir, ['check-ignore', '-q', '.']) === 0
+  // A recorded branch may be local or fetched into any configured remote, not
+  // only 'origin'; enumerate every configured remote's tracking refs.
+  const remotes = (gitProbe(workDir, ['remote']) ?? '').split(/\s+/u).filter(Boolean)
+  const conditions = []
+  let resolved = null
+  if (record?.branch) {
+    const branch = record.branch
+    if (!safeRefToken(branch)) {
+      conditions.push(`the recorded branch '${branch}' is not a valid ref name; re-pin the reference`)
+    } else {
+      const local = gitExit(workDir, ['show-ref', '--verify', '--quiet', `refs/heads/${branch}`]) === 0
+      let remoteRef = null
+      for (const name of remotes) {
+        if (gitExit(workDir, ['show-ref', '--verify', '--quiet', `refs/remotes/${name}/${branch}`]) === 0) {
+          remoteRef = `${name}/${branch}`
+          break
+        }
+      }
+      if (!local && remoteRef === null) {
+        conditions.push(`the recorded branch '${branch}' is not present in this checkout; restore the branch or re-pin the reference`)
+      } else {
+        const ref = local ? branch : remoteRef
+        // workDir may be the repository root, where the relative path is empty.
+        const itemPath = relative ? `${relative}/next.md` : 'next.md'
+        if (gitExit(workDir, ['cat-file', '-e', '--end-of-options', `${ref}:${itemPath}`]) === 0) {
+          resolved = `the recorded branch '${branch}' contains this work item`
+        } else {
+          conditions.push(`the recorded branch '${branch}' does not contain this work item at ${itemPath}; it is absent from that checkout`)
+        }
+      }
+    }
+  }
+  if (record?.candidate) {
+    const candidate = record.candidate
+    if (!safeRefToken(candidate)) {
+      conditions.push(`the recorded candidate '${candidate}' is not a valid object name; re-pin the candidate`)
+    } else if (gitExit(workDir, ['cat-file', '-e', '--end-of-options', `${candidate}^{commit}`]) !== 0) {
+      conditions.push(`the recorded candidate '${candidate}' is not present in this repository; re-pin the candidate`)
+    } else if ((gitProbe(workDir, ['for-each-ref', `--contains=${candidate}`, '--format=%(refname)', 'refs/heads', 'refs/remotes']) ?? '').trim() === '') {
+      // Only branches and remote-tracking refs protect a candidate for
+      // continuity; a tag alone is one cleanup away from loss.
+      conditions.push(`the recorded candidate '${candidate}' is unreachable from every local branch and remote; it is one cleanup away from loss`)
+    } else {
+      resolved = resolved ?? `the recorded candidate '${candidate}' is reachable from a local or remote-tracking ref`
+    }
+  }
+  // A resolving branch or reachable candidate reference makes the work item
+  // durable even when this checkout's work directory is untracked, because the
+  // durable copy exists on that ref; only an unresolved untracked directory
+  // fails, and an explicit reason records the exception instead of hiding it.
+  let declaredException = false
+  if (tracked === '') {
+    if (declared) declaredException = true
+    else if (resolved === null) conditions.push(`the work directory is ${ignored ? 'gitignored' : 'untracked'} and would not survive a worktree removal or checkout switch; commit the records or record an explicit 'durability: <reason>' exception, or record a resolving 'branch'/'candidate' reference`)
+  }
+  const state = conditions.length ? 'not durable' : declaredException && resolved === null ? 'declared non-durable' : 'durable'
+  let summary = `Durability: ${state}`
+  if (state === 'declared non-durable') summary += ` — a recorded reason permits this non-durable record: '${record.durability}'`
+  else if (state === 'durable' && tracked === '' && resolved) summary += ` — ${resolved}`
+  const lines = [`${summary}.`]
+  for (const condition of conditions) lines.push(`Durability condition: ${condition}.`)
+  lines.push('Durability evidence: local Git index, refs, and objects.')
+  if (conditions.length || declaredException) lines.push(`Durability owner: ${DURABILITY_OWNER}.`)
+  if (conditions.length) lines.push('Durability next responsibility: commit the work directory or record a durability reason, and restore or re-pin the missing reference.')
+  return { state, conditions, lines }
+}
+
 const waitingCondition = (content) => (meaningfulSection(content, 'Waiting on') ?? '').split(/\r?\n/u)[0]?.trim() ?? ''
 
 const reconcile = (value) => {
@@ -1642,6 +1755,7 @@ const resume = (value) => {
   let recordNote = '(no next.md record)'
   let promptNote = ''
   let reconciliationNote = ''
+  let durabilityNote = ''
   const nextProbe = readWorkFile(workDir, 'next.md')
   if (nextProbe.error === null) {
     const parsed = parseNextRecord(nextProbe.content, workDir)
@@ -1658,6 +1772,11 @@ const resume = (value) => {
           : `Next prompt: missing for ${record.nextAgent}; expected at ${prompt.target}`
       }
       reconciliationNote = reconciliationReport(workDir, parsed, waitingCondition(nextProbe.content)).join('\n')
+      const durability = durabilityAssessment(workDir, record)
+      durabilityNote = durability.lines.join('\n')
+      for (const condition of durability.conditions) {
+        inconsistencies.push(`next.md: ${condition} (owner: ${DURABILITY_OWNER})`)
+      }
     }
   }
   const taskLine = progress
@@ -1669,6 +1788,7 @@ const resume = (value) => {
     recordNote,
     promptNote,
     reconciliationNote,
+    durabilityNote,
     `Artifacts: ${available.join(', ') || '(none)'}`,
     taskLine,
     assuranceLine,

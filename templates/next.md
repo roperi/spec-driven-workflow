@@ -10,6 +10,8 @@ Status values: `ready` (local next responsibility), `waiting` (externally blocke
 
 The optional `closure` field declares the completion path for normal records: `full` (default, requires the review and retrospect artifacts at completion), `planning-only` (bounded at planning), or a recorded exception — `parked`, `interrupted`, `superseded`, or `abandoned`. Compact records bypass the closure contract. The exact rule lives in `.sdw/agents/shared/workflow.md`.
 
+Three optional fixed fields record where the work item is durable: `branch` (the branch where its copy lives), `candidate` (the exact candidate commit), and `durability` (an explicit reason that permits an intentionally untracked or branch-only record). A read-only durability assessment in `resume` and in the `handoff`/`finalize`/`wrap` checks reports an untracked work directory, an unreachable candidate, or an absent branch; an untracked record fails closure unless a `durability` reason is recorded. The exact rule lives in `.sdw/agents/shared/workflow.md`.
+
 # Next
 
 ## Agreement
