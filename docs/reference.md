@@ -41,8 +41,15 @@ The canonical stages and their helper checks:
 | Review (`sdw.review`) | `review.md` plus evidence | ordinary vs independently requested review are distinct |
 | Publish (`sdw.publish`) | validation + review evidence | actual applicable authority required |
 | Finalize (`sdw.finalize`) | tasks, validation, `next.md` | actual delivery reconciliation |
-| Retrospect (`sdw.retrospect`) | all relevant records | evidence-based outcome and follow-up |
+| Retrospect (`sdw.retrospect`) | all relevant records | evidence-based process retrospective |
 | Wrap (`sdw.wrap`) | closure record | `check WORK_DIR wrap`; `next_agent: none` + `status: complete` for honest closure |
+
+The retrospective is a **process retrospective**: `Outcome`, `What Worked`,
+`Friction`, and a few bounded `Improvements` (each owned, with an explicit
+trigger). Deferred product or technical work is out of it: route those items to
+the issue tracker and/or `next.md`, which closure names as their destination.
+Older records that still carry `## Follow-up` remain readable; the helper accepts
+either `## Follow-up` or `## Improvements` and still requires one of them.
 
 `next.md` records four required fixed fields (`work_id`, `record_format`,
 `next_agent`, `status`) plus readable Agreement / Next action / Waiting on /

@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "d6fe9385ba14d677d0a3e1a65196df0a6d22a13a0571b766c00b656188cb8a11",
+  "export_tree_sha256": "6813a638c4008056c81483c226f12a828b8ba4230f67dfe905680daa63a786dd",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "167ee93a422f5599f136204f7dee173d809f7f642462abd407965e456260b680"
+      "sha256": "8846694eb89f999dae8cd6479ac92527eb7d70c5e65cc9660d9500d1755d7bf9"
     },
     {
       "mode": "0644",
@@ -59,7 +59,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.retrospect.md",
-      "sha256": "77953f0c6e0939ac1c5919f9416c2e0d368a27ed4cc6ccb85db815f948cecf1d"
+      "sha256": "358ad10899e223ec3422a61f9f2a4fbdc4b2136a2f581a114ff85fbf17cac0ff"
     },
     {
       "mode": "0644",
@@ -94,7 +94,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.wrap.md",
-      "sha256": "d255419f3a5f9d6cf47e5d115f5e71b448e7fad6f91e9d93408b799a5499e44e"
+      "sha256": "b6e235101574b9a9960b5ba0411cda9369228eaa744b5a96a196decbd0e15b75"
     },
     {
       "mode": "0644",
@@ -129,7 +129,7 @@
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "e595f6df9b0e833d59a70cbdab8c2d9c76f2ff33f8327fc96f53ef85e664ee53"
+      "sha256": "de3a4f9dd25f847a6822e86e81ae7fc72333edaf8831dad183867fb87355f539"
     },
     {
       "mode": "0644",
@@ -144,7 +144,7 @@
     {
       "mode": "0644",
       "path": "runtime/agents.mjs",
-      "sha256": "8e5b530021b4ab36ea3ec50f4849d2a2dd0d9252b27a4a5368921c443c756039"
+      "sha256": "3737d4333d6f56407f26d52865c105eb15539cf68ebf8e7492e8291bba8dff20"
     },
     {
       "mode": "0755",
@@ -159,7 +159,7 @@
     {
       "mode": "0644",
       "path": "runtime/sdw.mjs",
-      "sha256": "8dca5f809266fc536fdb5630ed5513872f952ce6ac1563a4cabb3c9da61c70ea"
+      "sha256": "b37be72bc9d392eec30333329cd54b51ede4df6dcec9abcaf1c72c0247f29c2b"
     },
     {
       "mode": "0755",
@@ -184,7 +184,7 @@
     {
       "mode": "0644",
       "path": "templates/retrospect.md",
-      "sha256": "a35e273333b8dedb213099ba014d6900e5716326eb2b4c31fd9cd37b864ae424"
+      "sha256": "22a291073d43a5a7526c5389938356965bea13085813f00e63233ad4c5fac64b"
     },
     {
       "mode": "0644",

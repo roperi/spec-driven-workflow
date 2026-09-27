@@ -5,6 +5,16 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: Retrospective scope — a retrospective is now a process
+  retrospective only. It records the outcome, what worked, friction, and a few
+  bounded improvements that each name an owner and a trigger. Deferred product or
+  technical work no longer belongs in the retrospective; it routes to your issue
+  tracker and the work item's `next.md` handoff, which closure now names as its
+  destination. The shipped retrospective template and the `sdw.retrospect` and
+  `sdw.wrap` prompts are consistent with that scope, and older records that still
+  use a `## Follow-up` section remain readable: the helper accepts either
+  `## Follow-up` or `## Improvements` and still requires one of them.
+
 - **NEW**: Durable continuity records — a work item's handoff no longer depends
   silently on an untracked directory, an unmerged branch, or a dangling commit.
   `next.md` gains three optional fields — `branch`, `candidate`, and

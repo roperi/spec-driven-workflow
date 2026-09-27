@@ -26,7 +26,7 @@ const ARTIFACTS = Object.freeze({
   'plan.md': ['Approach', 'Verification Approach', 'Responsibilities and Stops', 'Risks'],
   'tasks.md': ['Stable Task IDs', 'Actionable Steps', 'Completion Evidence', 'Tasks'],
   'validation.md': ['Checks Run', 'Results', 'Limitations'],
-  'retrospect.md': ['Outcome', 'What Worked', 'Friction', 'Follow-up'],
+  'retrospect.md': ['Outcome', 'What Worked', 'Friction', ['Follow-up', 'Improvements']],
   'next.md': ['Agreement', 'Next action', 'Waiting on', 'Work context'],
   'review.md': ['Candidate', 'Findings', 'Checks', 'Conclusion'],
   'work.md': ['Purpose and Boundary', 'Intended Result', 'Approach', 'Actions and Progress', 'Checks and Results', 'Outcome and Lessons'],
@@ -192,6 +192,16 @@ const unresolvedSections = (content, heading) => {
   if (!body) return false
   return body.split(/\r?\n/u).filter((line) => line.trim() !== '').every((line) => UNRESOLVED_LINE.test(line))
 }
+
+// A required section is normally one heading. A required slot may instead be an
+// array of acceptable headings, when a canonical section is renamed and older
+// records must stay readable (retrospect.md: Follow-up -> Improvements). One of
+// the alternatives must still be present; tolerance never makes the slot
+// optional.
+const sectionAlternatives = (requirement) => (Array.isArray(requirement) ? requirement : [requirement])
+const requirementLabel = (requirement) => sectionAlternatives(requirement).map((heading) => `'## ${heading}'`).join(' or ')
+const presentHeading = (content, requirement) => sectionAlternatives(requirement)
+  .find((heading) => content.split(/\r?\n/u).some((line) => line.trim() === `## ${heading}`)) ?? null
 
 // Parse the fixed S04 frontmatter of next.md. Deliberately small: plain
 // key/value lines between --- markers, no YAML engine, no command evaluation.
@@ -1254,9 +1264,10 @@ const inspectArtifact = (workDir, artifact) => {
     return { artifact, target: artifactPath(workDir, artifact), content: '', errors }
   }
   if (content.trim() === '') errors.push(`${artifact}: content is empty; provide the required artifact content`)
-  for (const heading of ARTIFACTS[artifact]) {
-    if (!content.split(/\r?\n/u).some((line) => line.trim() === `## ${heading}`)) {
-      errors.push(`${artifact}: missing required section '## ${heading}'`)
+  for (const requirement of ARTIFACTS[artifact]) {
+    const heading = presentHeading(content, requirement)
+    if (heading === null) {
+      errors.push(`${artifact}: missing required section ${requirementLabel(requirement)}`)
     } else if (!meaningfulSection(content, heading)) {
       errors.push(`${artifact}: section '## ${heading}' is empty; add meaningful content`)
     } else if (artifact !== 'next.md' && unresolvedSections(content, heading)) {
@@ -1268,8 +1279,9 @@ const inspectArtifact = (workDir, artifact) => {
 
 const validateContent = (workDir, artifact, content) => {
   if (typeof content !== 'string' || content.trim() === '') fail('CONTENT_REQUIRED', `${artifact}: content is required and cannot be empty`)
-  for (const heading of ARTIFACTS[artifact]) {
-    if (!content.split(/\r?\n/u).some((line) => line.trim() === `## ${heading}`)) fail('CONTENT_INVALID', `${artifact}: missing required section '## ${heading}'`)
+  for (const requirement of ARTIFACTS[artifact]) {
+    const heading = presentHeading(content, requirement)
+    if (heading === null) fail('CONTENT_INVALID', `${artifact}: missing required section ${requirementLabel(requirement)}`)
     if (!meaningfulSection(content, heading)) fail('CONTENT_INVALID', `${artifact}: section '## ${heading}' is empty`)
     if (unresolvedSections(content, heading)) fail('CONTENT_INVALID', `${artifact}: section '## ${heading}' still contains only unfinished template placeholders; refine it before saving`)
   }

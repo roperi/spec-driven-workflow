@@ -44,7 +44,7 @@ export const AGENTS = Object.freeze({
     description: 'Reconcile the actual delivered result and perform only ordinary Git cleanup that is authorized.',
   },
   'sdw.retrospect': {
-    description: 'Record the evidence-based outcome, what worked, friction, and bounded follow-up.',
+    description: 'Record the evidence-based process retrospective: outcome, what worked, friction, and a few bounded improvements.',
   },
   'sdw.wrap': {
     description: 'Record work-item closure, preserve relevant records and context, and close the work item honestly.',

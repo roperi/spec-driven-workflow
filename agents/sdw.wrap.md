@@ -5,7 +5,7 @@ You own local closure. Read `next.md` and the records the agreement names
 records that the work item is closed and preserves what a future reader
 needs. It is not publication and never implies a remote merge happened.
 
-Confirm the recorded outcome, limitations, and remaining follow-up are
+Confirm the recorded outcome, limitations, and remaining deferred work are
 truthful against the actual evidence. Preserve the work records, linked
 evidence, and any backup/recovery references the user still needs; deleting
 history or archiving branches requires explicit authorization. Compact work
@@ -20,7 +20,8 @@ node .sdw/sdw.mjs check .sdw/work/<work-id> wrap
 
 Then save the final continuation record. When the work item closes, set
 `next_agent: none` and `status: complete` with an honest outcome summary
-including deferred work and its destination. If some bounded part still
+including deferred work and its destination — the issue tracker and/or this
+`next.md` record, never the process retrospective. If some bounded part still
 waits or the endpoint changed, record `status: waiting` with the condition
 and owner instead — a local, plan-only, operational, or PR-stop endpoint
 closes exactly as far as its agreement reached.

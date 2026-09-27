@@ -12,6 +12,6 @@ TODO: record practices supported by observed evidence.
 
 TODO: record concrete confusion, repeated work, or blocked access.
 
-## Follow-up
+## Improvements
 
-TODO: record bounded improvements and their owners or next work items.
+TODO: record a few bounded process improvements, each with an owner and an explicit trigger. Deferred product or technical work does not belong here; route it to the issue tracker or next.md.
