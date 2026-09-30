@@ -5,6 +5,18 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: The two kinds of review are now clearly separate. `sdw.review` is
+  the review that happens **before** publication: it records whether it was your
+  own context, a fresh one, or a truly independent one, and its `review.md` is
+  frozen once the work item is published. Review that happens **after** the pull
+  request is published is a separate activity that you drive: the pull request
+  itself is its record, and the workflow no longer copies every external comment
+  into `review.md`. A deferred, declined, or escalated finding is recorded once in
+  the work item's handoff (`next.md`) with an owner and a trigger, and is never
+  turned into a per-finding tracker issue automatically. Project context (a
+  `constitution.md` and `technical-context.md`) is now requested on the first
+  non-trivial work item, and installing or updating never creates or modifies it.
+
 - **CHANGE**: Retrospective scope — a retrospective is now a process
   retrospective only. It records the outcome, what worked, friction, and a few
   bounded improvements that each name an owner and a trigger. Deferred product or

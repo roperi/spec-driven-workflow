@@ -38,11 +38,21 @@ The canonical stages and their helper checks:
 | Tasks (`sdw.task`) | plan files + `tasks.md` | `check WORK_DIR task` |
 | Execute (`sdw.execute`) | planning files, `next.md` | one authorized unit, then checkpoint evidence |
 | Validate (`sdw.validate`) | planning files, `validation.md`, `next.md` | `check WORK_DIR validate` |
-| Review (`sdw.review`) | `review.md` plus evidence | ordinary vs independently requested review are distinct |
+| Review (`sdw.review`) | `review.md` plus evidence | pre-publication review; records context `self`/`fresh`/`independent` |
 | Publish (`sdw.publish`) | validation + review evidence | actual applicable authority required |
 | Finalize (`sdw.finalize`) | tasks, validation, `next.md` | actual delivery reconciliation |
 | Retrospect (`sdw.retrospect`) | all relevant records | evidence-based process retrospective |
 | Wrap (`sdw.wrap`) | closure record | `check WORK_DIR wrap`; `next_agent: none` + `status: complete` for honest closure |
+
+`sdw.review` is the **pre-publication** review: it records the review context
+(`self`, `fresh`, or `independent`) and a ready/not-ready conclusion, and its
+`review.md` is frozen once the work item is published, so later external findings
+never append to it. External review of a published candidate is a separate, later
+activity: the pull request is its system of record, the primary lifecycle session
+owns requesting and addressing it under the user's direction, and a deferred,
+declined, or escalated finding is recorded at item level (owner and trigger) and
+is never auto-filed as a per-finding tracker issue. The exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md).
 
 The retrospective is a **process retrospective**: `Outcome`, `What Worked`,
 `Friction`, and a few bounded `Improvements` (each owned, with an explicit
@@ -145,7 +155,7 @@ and product direction to the roadmap or product docs. The technical-context
 template carries a greenfield note so a brand-new project records what is
 decided and marks the rest open rather than inventing commands. Both require
 every placeholder and guidance comment to be replaced with project-specific
-content. When useful context is absent for greenfield/first, hardened, or
+content. When useful context is absent for first non-trivial work, hardened, or
 cross-cutting work, `sdw.workflow`/`sdw.scope`
 elicit the minimum and record it here; trivial bounded changes are exempt. When
 the user defers, the assumed conventions and invariants are recorded as a context

@@ -35,7 +35,7 @@ export const AGENTS = Object.freeze({
     description: 'Run the checks appropriate to the changed surface and record exact commands, results, and limitations.',
   },
   'sdw.review': {
-    description: 'Review a candidate and report findings, distinguishing ordinary code review from independently requested review.',
+    description: 'Review a candidate before publication and record the review context and findings.',
   },
   'sdw.publish': {
     description: 'Publish an accepted candidate through authorized channels with truthful source and publication evidence.',

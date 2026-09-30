@@ -29,8 +29,11 @@ authority is missing, record the blocker and give the smallest concrete
 decision the user must make — do not guess. Known/contradictory next
 metadata is reported, never silently mapped to a different stage.
 
-Reconcile any interrupted external-finding dispositions in `review.md` under the
-shared external-review-consumption rule before re-invoking a reviewer.
+When a published candidate is awaiting or has received external review, reconcile
+the external cycle at item level — the pull request as the system of record and
+`next.md` for any deferred or escalated item — under the shared external-review
+rule in `.sdw/agents/shared/workflow.md`; do not mirror per-finding dispositions
+into `review.md` and do not re-invoke a reviewer automatically.
 
 Apply the shared terminal-state reconciliation rule to the reported status. A
 `waiting` record is externally blocked only when reconciliation cannot observe

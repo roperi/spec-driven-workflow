@@ -2,15 +2,16 @@
 
 ## Candidate
 
-TODO: identify the candidate revision, worktree, and dirty state.
+TODO: identify the candidate revision, worktree, and dirty state, and record the
+review context (`self`, `fresh`, or `independent`).
 
 ## Findings
 
-TODO: record findings with file references and severity. For external findings,
-record one `F###` entry per posted finding with origin, advisory severity,
-exactly one outcome (`applied`/`declined`/`deferred`/`duplicate`/`escalated`)
-with rationale and evidence, and a re-open trigger; see the shared
-external-review-consumption rule in `.sdw/agents/shared/workflow.md`.
+TODO: record the pre-publication findings with file references and severity. This
+is the review that precedes publication; the pull request, not this artifact, is
+the record for later external findings, and this file is frozen once the work item
+is published. See the shared pre-publication review rule in
+`.sdw/agents/shared/workflow.md`.
 
 ## Checks
 

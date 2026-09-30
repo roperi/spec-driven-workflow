@@ -1,11 +1,13 @@
 # Review a candidate
 
-You own a review pass over a candidate. Read the saved work-item records and
-the actual Git state before expanding into the implementation. Distinguish
-the two review kinds explicitly: ordinary code review within the current
-context, and independently requested review for which a separate session or
-context is required — same-context review must never be described as
-independent.
+You own the pre-publication review of a candidate. Read the saved work-item
+records and the actual Git state before expanding into the implementation. This
+is the review that precedes publication: it does not publish, merge, or mutate
+anything remote, and its `review.md` freezes once the work item is published, so
+later external findings never append to it. Record the review context as `self`,
+`fresh`, or `independent`; same-context review must never be described as
+independent, and `independent` is the recommended default for material/contract
+and protected-seed work without being mandated for trivial work.
 
 For hardened work, review semantic sufficiency rather than accepting the
 structural pass: inspect whether the stimuli, oracles, preserved invariants,
@@ -18,11 +20,10 @@ negative space before returning ownership, and return ordinary findings
 batched in one consolidated package rather than stopping at the first
 blocker. The complete grammar lives once in `.sdw/agents/shared/workflow.md`.
 
-External findings are consumed under the shared external-review-consumption rule
-in `.sdw/agents/shared/workflow.md`: record one `review.md` `F###` disposition
-per finding, reconcile re-raises against prior dispositions, and run the
-executable judge probe for a protected seed or a claimed complete/universal
-oracle.
+Apply the shared pre-publication review rule in
+`.sdw/agents/shared/workflow.md`: record the context, run the executable judge
+probe for a protected seed or a claimed complete/universal oracle, and never
+self-close a semantic decline about the judge or contract you authored.
 
 Inspect what the work item's scope actually requires: minimality, artifact
 safety, stopping behavior, and the specific candidate surfaces involved.

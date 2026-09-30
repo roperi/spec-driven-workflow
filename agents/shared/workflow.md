@@ -209,7 +209,7 @@ new documents.
 
 If useful context is absent:
 
-- For greenfield or first work, hardened work, or cross-cutting work, elicit the
+- For first non-trivial work, hardened work, or cross-cutting work, elicit the
   minimum in plain language and record `.sdw/project-context/constitution.md`
   and/or `.sdw/project-context/technical-context.md`, using
   `.sdw/templates/constitution.md` and `.sdw/templates/technical-context.md` as
@@ -238,48 +238,57 @@ by itself an error once the posture is recorded.
 `.sdw/project-context/` is user-owned: SDW reads it and may create it
 deliberately, but install and update never modify it.
 
-## External review consumption
+## Review context and pre-publication review
 
-When a published candidate receives findings from an external reviewer (human or
-automated), consume them in the cumulative `review.md` before any re-invocation.
-Record one `F###` entry per finding with origin, path/lines, claim, and the
-reviewer's severity when supplied (advisory only). Give each exactly one outcome
-with rationale and evidence: `applied`; `declined` with reproduced evidence and a
-re-open trigger; `deferred` with owner and trigger; `duplicate of F###`; or
-`escalated`. No finding is deleted and every outcome is re-openable.
+`sdw.review` is the single review that precedes publication. It reviews the
+candidate against the work item's scope, specification, and evidence and records
+a ready or not-ready conclusion; it does not publish, merge, or mutate anything
+remote. Return ordinary findings batched in one consolidated pass rather than
+stopping at the first blocker.
 
-Classify each finding material or immaterial. Material means it implicates an
-`AC###`/`V###` route, the protected seed set, a safety, authority, or containment
-boundary, a default-path regression, or a claim the contract makes; everything
-else is immaterial. Only material repairs require a protected-byte re-freeze and
-fresh re-verification; immaterial findings are batched. Reconcile new findings
-against prior dispositions before repairing or re-invoking: a re-raise cites the
-prior `F###` id and is `duplicate` unless it brings new evidence, which re-opens
-the prior disposition without consuming a repair round.
+Record the review context as one of `self`, `fresh`, or `independent`: `self` is
+same-context implementer review, `fresh` is a separate session or context of the
+same kind, and `independent` is a different harness, model, or vendor.
+Same-context review must never be described as independent. `independent` is the
+recommended default for material/contract and protected-seed work, but the choice
+is recorded, not mandated; trivial work may be `self`.
 
-A factual decline requires reproduced evidence. A semantic or design decline
-about the judge or contract the implementing context authored is never
-self-closed: leave it `open` (blocking the stop) or record it `escalated` to the
-planning owner. No decline is permanent; re-opening needs no new authority.
-
-A cycle stops when every posted finding has exactly one disposition, no material
-finding is open, the latest completed full-surface pass added no new material
-finding, and no protected or judge path has changed since that pass — or when the
-authorized owner records a stop with rationale. Record the stop in `next.md` and
-the `review.md` conclusion; it is never silent and is not a dismissal. After the
-recorded pass budget with continuing new material findings, stop and escalate any
-open material finding to the planning owner with a convergence assessment
-instead of re-invoking again. The budget is a guidance value set with the
-agreement.
+`review.md` is the pre-publication artifact. Once the work item is published it is
+frozen: later external findings do not append to it, and a later phase reads it
+rather than mutating it.
 
 For a work item carrying a protected verification seed or a claimed complete or
-universal observation or comparison oracle, the fresh review names the judge's
-central claim, exercises the observable (removing a claimed dimension makes the
-oracle fail, or the claimed operations execute), records claim, method, observed
-result, and verdict, and reports a claim establishable only declaratively as a
-blocking finding or an explicit recorded limitation — never as accepted.
+universal observation or comparison oracle, this review names the judge's central
+claim, exercises the observable (removing a claimed dimension makes the oracle
+fail, or the claimed operations execute), records claim, method, observed result,
+and verdict, and reports a claim establishable only declaratively as a blocking
+finding or an explicit recorded limitation — never as accepted. A factual decline
+requires reproduced evidence; a semantic or design decline about the judge or
+contract the implementing context authored is never self-closed: it stays open or
+is escalated to the planning owner, and no decline is permanent.
 
-This convention uses existing Markdown, Git, and test facilities; it adds no
+## External review
+
+External review of a published candidate is a separate, later activity. The
+primary lifecycle session (`sdw.workflow`/`sdw.resume`) owns requesting it,
+waiting for it, and addressing it, under explicit user direction; it is not a
+lifecycle stage and adds no agent. The pull request is its system of record:
+findings, responses, and resolution live in the pull request thread, and SDW
+does not mirror that thread into a per-finding `review.md` ledger.
+
+The session addresses the findings the user directs it to address with ordinary
+bounded implementation, re-validating material repairs, then stops. It does not
+re-invoke a reviewer automatically, and it does not merge, close, or publish
+without explicit applicable authority; a human merge bounds the loop.
+
+A deferred finding, and a material decline or escalation, is recorded exactly
+once at item level — in `next.md` with an owner and an explicit trigger, and/or
+in the issue tracker — and is never converted by the review into a per-finding
+tracker issue. Promotion to tracked work is a deliberate owner decision; review
+findings never auto-file issues. Existing records that carry an external
+disposition ledger remain readable; nothing forces a rewrite.
+
+This rule uses existing Markdown, Git, and platform review facilities; it adds no
 command, stage, artifact, required section, parser field, or default-path
 requirement, treats human and automated reviewers alike, and names no provider.
 
