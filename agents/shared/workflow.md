@@ -73,6 +73,52 @@ session. A missing reply is never approval. Publication, merge, deletion of
 alternatives, and migration of another project require actual applicable
 authority beyond a generic request.
 
+## Default change flow
+
+An agent must never push the default branch directly. This prohibition is
+unconditional: no project policy overrides it, and it applies to every change
+class below.
+
+**Project changes.** This rule governs project changes: changes to the project's
+tracked product, content, tooling, or shipped surfaces. A tooling or installation
+change is a project change. Unless the project declares a different change flow,
+an authorized project change lands through a feature branch and a pull request:
+commit the work to a branch and stop at the pull request for the human to merge.
+
+**SDW bookkeeping records.** The session's own SDW bookkeeping records — the
+work-item and continuation records SDW writes under its work directory — are not
+project changes. They are exempt from the required feature-branch and
+pull-request route above, and the project's own bookkeeping or change-flow policy
+governs how they land. The unconditional prohibition on pushing the default
+branch directly still applies to them. The separate bookkeeping-exemption
+discussion owns how those records are stored and retained; this rule only draws
+the boundary.
+
+**Default branch and edge cases.** Identify the default branch by resolving
+`origin/HEAD`, falling back to a local `main` or `master`. If it cannot be
+determined, do not guess: record the uncertainty and act conservatively under the
+project's change-flow policy. A brand-new remote with no default branch yet is
+the initial-seed case. The agent may follow a documented bootstrap path only when
+that path does not require it to push the default branch directly. When the
+documented bootstrap path would require that push, the agent stops and requests
+the project- or human-owned initialization, then resolves the established default
+branch before continuing. No bootstrap path authorizes a direct push to the
+default branch; the unconditional prohibition applies to the initial-seed case
+too.
+
+**Override.** A documented project change-flow policy may replace the default
+feature-branch and pull-request landing route with a different landing process,
+and the session follows that policy instead. To count, the policy must live in a
+project-owned document the session reads before acting: project context
+(`.sdw/project-context/`), the repository's contribution guidance, or an
+equivalent project-owned document. A policy cannot authorize a direct push to the
+default branch.
+
+**Scope of responsibility.** This rule binds every responsibility that commits,
+pushes, or opens a pull request, not only `sdw.execute`. It is product-neutral.
+It adds no lifecycle stage: merge and publication remain explicit, separately
+authorized human actions, and a pull-request stop is a stop, not an approval.
+
 ## Terminal state and reconciliation
 
 `next.md` status is one of five closed values with distinct meaning:

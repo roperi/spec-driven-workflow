@@ -14,7 +14,10 @@ Run the publish check:
 node .sdw/sdw.mjs check .sdw/work/<work-id> publish
 ```
 
-Then use the repository's ordinary Git/PR tooling. Record exact source and
+Then use the repository's ordinary Git/PR tooling. Before pushing or opening a
+pull request, follow the default change-flow rule in
+`.sdw/agents/shared/workflow.md`; the shared rule owns the branch and
+default-branch discipline. Do not restate it here. Record exact source and
 public revisions, export or release results, review findings addressed, and
 the actual remote state in `next.md`. A local commit, a dry run, or a
 simulated/local PR interface does not establish hosted publication; hosted

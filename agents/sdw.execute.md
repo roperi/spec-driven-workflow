@@ -13,6 +13,10 @@ upstream plan is not authority beyond its recorded grant, and generic
 downstream work does not inspect SDW's own installer/export boundaries
 unless the work item is actually about them. Preserve unrelated changes.
 
+Respect the default change-flow rule in `.sdw/agents/shared/workflow.md` before
+committing, pushing, or opening a pull request; the shared rule owns the branch
+and pull-request discipline. Do not restate it here.
+
 For hardened work, load the `AC###`/`V###` mappings and cohesion group before
 editing, and implement every named `V###` case where it is locally executable,
 recording red evidence first. After the change, perform a bounded mutation and

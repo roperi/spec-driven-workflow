@@ -44,6 +44,30 @@ The canonical stages and their helper checks:
 | Retrospect (`sdw.retrospect`) | all relevant records | evidence-based process retrospective |
 | Wrap (`sdw.wrap`) | closure record | `check WORK_DIR wrap`; `next_agent: none` + `status: complete` for honest closure |
 
+SDW follows a **default change flow**: an agent must never push the default branch
+directly — an unconditional prohibition that no project policy overrides. Unless
+the project declares a different change flow, a **project change** (a change to
+the project's tracked product, content, tooling, or shipped surfaces) lands on a
+feature branch and stops at a pull request for the human to merge. The session's
+own SDW **bookkeeping records** are not project changes and are exempt from that
+required route; the project's bookkeeping/change-flow policy governs how they
+land, and they still may never be pushed directly to the default branch. The
+default branch is resolved from `origin/HEAD`, falling back to a local `main` or
+`master`; if it cannot be determined the session does not guess and acts
+conservatively. A brand-new remote with no default branch yet is the initial-seed
+case: the agent follows a documented bootstrap path only when it does not require
+a direct default-branch push, and otherwise stops and requests the project- or
+human-owned initialization before resolving the established default branch and
+continuing. No bootstrap path authorizes a direct push to the default branch. A
+documented project change-flow policy — in project context
+(`.sdw/project-context/`), the repository's contribution guidance, or an
+equivalent project-owned document the session reads before acting — may replace
+the default landing route, but it cannot authorize a direct push to the default
+branch. The rule binds every responsibility that commits, pushes, or opens a pull
+request. Merge and publication remain explicit, separately authorized human
+actions. The exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md).
+
 `sdw.review` is the **pre-publication** review: it records the review context
 (`self`, `fresh`, or `independent`) and a ready/not-ready conclusion, and its
 `review.md` is frozen once the work item is published, so later external findings

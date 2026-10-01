@@ -5,6 +5,24 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: SDW now has a default change flow. An agent must never push a
+  project's default branch directly — an unconditional rule. Unless the project
+  declares a different change flow, project changes (its tracked product,
+  content, tooling, or shipped surfaces) land on a feature branch and stop at a
+  pull request for you to merge. The workflow's own bookkeeping records are not
+  project changes and do not have to go through that feature-branch and
+  pull-request route, but they still may never be pushed directly to the default
+  branch; how they land follows your project's own bookkeeping or change-flow
+  policy. The default branch is found by resolving `origin/HEAD`, falling back to
+  a local `main` or `master`, and is never guessed when it cannot be determined. A
+  brand-new remote with no default branch follows your documented bootstrap path
+  only when that path avoids a direct default-branch push; otherwise the agent
+  stops and asks you to initialize the repository. A documented project
+  change-flow policy — in project context, your contribution guidance, or an
+  equivalent project-owned document — may replace the default landing route, but
+  it can never authorize a direct push to the default branch. The rule binds every
+  stage that commits, pushes, or opens a pull request.
+
 - **CHANGE**: The two kinds of review are now clearly separate. `sdw.review` is
   the review that happens **before** publication: it records whether it was your
   own context, a fresh one, or a truly independent one, and its `review.md` is
