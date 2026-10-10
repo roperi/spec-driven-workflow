@@ -95,9 +95,10 @@ export const CLOSURE_KINDS = Object.freeze(['full', 'planning-only', 'parked', '
 // Durable-continuity references are also optional and default to absent:
 //   branch     — the branch where the durable copy of this work item lives.
 //   candidate  — the exact candidate commit the record names.
-//   durability — an explicit recorded reason that permits an intentionally
-//                untracked or branch-only record; without it an untracked work
-//                directory is reported as not durable.
+//   durability — an optional reason documenting a work directory that is
+//                intentionally untracked under a committed repository
+//                `.gitignore`; it is shown as documentation and no longer
+//                permits a merely-untracked directory.
 // The read-only assessment reads live Git state; these fields carry the
 // reference, not a claim the helper can infer.
 export const NEXT_FIELDS = Object.freeze(['work_id', 'record_format', 'next_agent', 'status'])

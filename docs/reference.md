@@ -117,26 +117,31 @@ applicable closure exception. The exact rule lives in the
 [shared workflow instructions](../agents/shared/workflow.md), installed as
 `.sdw/agents/shared/workflow.md`.
 
-Records under `.sdw/work/` are expected to be committed so their handoff
-survives checkout, branch, and worktree changes; an intentionally untracked or
-branch-only record must record an explicit `durability` reason, so the default is
-not silently permissive. `next.md` accepts three optional durable-continuity
-references: `branch` (the branch where the work item's copy lives), `candidate`
-(the exact candidate commit), and `durability` (that recorded reason). A
+Records under `.sdw/work/` are committed on the work item's own branch and pull
+request by default, so their handoff survives checkout, branch, and worktree
+changes. Intentional untracking is a committed repository `.gitignore` decision,
+not a per-record reason and not a checkout-local, global, or uncommitted exclude:
+an untracked work directory that a committed repository `.gitignore` does not
+ignore fails closure regardless of any `durability` reason, while a directory
+ignored by a committed repository `.gitignore` is reported as intentionally
+untracked and does not fail. The default is therefore not silently permissive.
+`next.md` accepts three optional durable-continuity references: `branch` (the
+branch where the work item's copy lives), `candidate` (the exact candidate
+commit), and `durability` (an optional reason documenting a work directory
+intentionally untracked under a committed repository `.gitignore`). A
 read-only durability assessment in `resume` and in the `handoff`, `finalize`, and
 `wrap` checks inspects the work directory's
-enclosing Git repository and reports an untracked or gitignored work directory, a
+enclosing Git repository and reports an untracked work directory, a
 recorded candidate that is unreachable from every local branch and remote (or
 absent from the repository), a recorded branch the current checkout cannot see,
 and a recorded branch that does not contain the work item, naming the condition,
-the evidence source, the owner, and the next responsibility. An untracked work
-directory fails closure unless a non-empty `durability` reason or a resolving
-reference is recorded; a work directory outside Git control is reported as
-unknown and does not fail. The assessment is read-only: it never fetches and
-never mutates records, refs, or remotes, and it never grants commit, push, merge,
-closure, or publication authority. The fields are optional, so existing records
-remain readable, and the exact rule lives in the
-[shared workflow instructions](../agents/shared/workflow.md).
+the evidence source, the owner, and the next responsibility. A resolving
+reference still makes an untracked work directory durable; a work directory
+outside Git control is reported as unknown and does not fail. The assessment is
+read-only: it never fetches and never mutates records, refs, or remotes, and it
+never grants commit, push, merge, closure, or publication authority. The fields
+are optional, so existing records remain readable, and the exact rule lives in
+the [shared workflow instructions](../agents/shared/workflow.md).
 
 `reconcile WORK_DIR` is a read-only terminal-state check. It reports the
 reconciliation outcome (externally blocked, awaiting reconciliation, complete,
