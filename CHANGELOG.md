@@ -5,6 +5,15 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: Record durability enforcement — a `durability:` prose reason no
+  longer lets untracked work records pass `handoff`, `finalize`, or `wrap`.
+  Intentional untracking requires a repository `.gitignore` file committed at
+  HEAD and unchanged in the working tree. Local/global excludes and uncommitted
+  ignore rules do not qualify. A qualifying directory is reported as
+  "intentionally untracked"; resolving continuity references and tracked records
+  still pass. Records are committed with the work item's branch and pull request
+  by default. The helper remains read-only and never stages, commits, or pushes.
+
 - **CHANGE**: SDW now has a default change flow. An agent must never push a
   project's default branch directly — an unconditional rule. Unless the project
   declares a different change flow, project changes (its tracked product,

@@ -1639,6 +1639,25 @@ const DURABILITY_OWNER = 'the work-item owner session'
 // change which object is inspected.
 const safeRefToken = (value) => typeof value === 'string' && value.trim() !== '' && !value.startsWith('-') && !/[\s\0]/u.test(value)
 
+// Intentional untracking must rest on a durable, reviewable repository decision,
+// not a checkout-local, global, or uncommitted ignore. `check-ignore -v` reports
+// the decisive ignore source (Git evaluates every source and every pattern,
+// preserving ordering and negation); accept it only when that source is a
+// `.gitignore` file committed at HEAD and unchanged in the working tree. Other
+// sources — `.git/info/exclude`, `core.excludesFile`, an untracked `.gitignore`,
+// or an uncommitted edit to a committed one — do not qualify.
+const committedIgnore = (workDir) => {
+  const report = gitProbe(workDir, ['check-ignore', '-v', '--', '.'])
+  if (report === null) return false
+  const header = report.split('\t', 1)[0]
+  const colon = header.indexOf(':')
+  const source = colon === -1 ? header : header.slice(0, colon)
+  if (!/(^|\/)\.gitignore$/u.test(source)) return false
+  if (gitExit(workDir, ['cat-file', '-e', `HEAD:${source}`]) !== 0) return false
+  if (gitExit(workDir, ['diff', '--quiet', 'HEAD', '--', `:(top,literal)${source}`]) !== 0) return false
+  return true
+}
+
 const durabilityAssessment = (workDir, record) => {
   if (gitProbe(workDir, ['rev-parse', '--show-toplevel']) === null) {
     return {
@@ -1654,7 +1673,7 @@ const durabilityAssessment = (workDir, record) => {
   const relative = path.relative(root, workDir).split(path.sep).join('/')
   const declared = typeof record?.durability === 'string' && record.durability.trim() !== ''
   const tracked = (gitProbe(workDir, ['ls-files', '--', '.']) ?? '').trim()
-  const ignored = gitExit(workDir, ['check-ignore', '-q', '.']) === 0
+  const ignored = committedIgnore(workDir)
   // A recorded branch may be local or fetched into any configured remote, not
   // only 'origin'; enumerate every configured remote's tracking refs.
   const remotes = (gitProbe(workDir, ['remote']) ?? '').split(/\s+/u).filter(Boolean)
@@ -1703,22 +1722,26 @@ const durabilityAssessment = (workDir, record) => {
   }
   // A resolving branch or reachable candidate reference makes the work item
   // durable even when this checkout's work directory is untracked, because the
-  // durable copy exists on that ref; only an unresolved untracked directory
-  // fails, and an explicit reason records the exception instead of hiding it.
-  let declaredException = false
-  if (tracked === '') {
-    if (declared) declaredException = true
-    else if (resolved === null) conditions.push(`the work directory is ${ignored ? 'gitignored' : 'untracked'} and would not survive a worktree removal or checkout switch; commit the records or record an explicit 'durability: <reason>' exception, or record a resolving 'branch'/'candidate' reference`)
+  // durable copy exists on that ref. Intentional untracking is a repository
+  // `.gitignore` decision, not a per-record reason: a merely-untracked directory
+  // fails regardless of a `durability` reason, while a gitignored directory is
+  // reported as intentionally untracked and does not fail.
+  let intentionallyUntracked = false
+  if (tracked === '' && resolved === null) {
+    if (ignored) intentionallyUntracked = true
+    else conditions.push(`the work directory is untracked and would not survive a worktree removal or checkout switch; commit the records (or commit a repository '.gitignore' entry to mark it intentionally untracked), or record a resolving 'branch'/'candidate' reference`)
   }
-  const state = conditions.length ? 'not durable' : declaredException && resolved === null ? 'declared non-durable' : 'durable'
+  const state = conditions.length ? 'not durable' : intentionallyUntracked ? 'intentionally untracked' : 'durable'
   let summary = `Durability: ${state}`
-  if (state === 'declared non-durable') summary += ` — a recorded reason permits this non-durable record: '${record.durability}'`
-  else if (state === 'durable' && tracked === '' && resolved) summary += ` — ${resolved}`
+  if (state === 'intentionally untracked') {
+    summary += ' — the work directory is ignored by a committed repository .gitignore and intentionally untracked'
+    if (declared) summary += `; recorded reason: '${record.durability}'`
+  } else if (state === 'durable' && tracked === '' && resolved) summary += ` — ${resolved}`
   const lines = [`${summary}.`]
   for (const condition of conditions) lines.push(`Durability condition: ${condition}.`)
   lines.push('Durability evidence: local Git index, refs, and objects.')
-  if (conditions.length || declaredException) lines.push(`Durability owner: ${DURABILITY_OWNER}.`)
-  if (conditions.length) lines.push('Durability next responsibility: commit the work directory or record a durability reason, and restore or re-pin the missing reference.')
+  if (conditions.length || intentionallyUntracked) lines.push(`Durability owner: ${DURABILITY_OWNER}.`)
+  if (conditions.length) lines.push('Durability next responsibility: commit the work directory or commit a repository .gitignore entry, and restore or re-pin the missing reference.')
   return { state, conditions, lines }
 }
 

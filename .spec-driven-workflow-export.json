@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "ab23420c30424840fef9d46a25278558776c2f77d00aaa9cb8bd54bd1c26193e",
+  "export_tree_sha256": "1a5ee485669d2fce181e02740259401850c9227b7d209b01f2b88f99bcef49dc",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "1786e88021b3003ee297c58769809495b9ee1a19a7bd5e1e59deb24c2375c2d8"
+      "sha256": "f91a0708009a06a1127270649944229e932d1a6c677a427ef58fe8873e329627"
     },
     {
       "mode": "0644",
@@ -39,7 +39,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.finalize.md",
-      "sha256": "857270bd5c14eeb6c1b7b530d7d704da86c6628992b476cedff6d0c1cfcd6a69"
+      "sha256": "19c293a82eb98c2c929efb65ea9063fe532cffad7294ed3ba919d1988e13ab7e"
     },
     {
       "mode": "0644",
@@ -49,7 +49,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.publish.md",
-      "sha256": "b27973e4b1f8ad9ecc689bcdfb6d8d98d93d87f77b49ee58aac26d9a4057f10e"
+      "sha256": "28a5da9004118dbda6fa1bc5871559cab94d900fa4357cba8fd1ba3f5d9639a8"
     },
     {
       "mode": "0644",
@@ -79,7 +79,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.task.md",
-      "sha256": "9bb13ba67b56a84a22092c27665ec23b63dcd798b0b8fbf50ce4bd88e07a64bb"
+      "sha256": "5dd14568bf916dd7733f45a168ee53b99d73669723f5a1fd94b2fd9c2c45561f"
     },
     {
       "mode": "0644",
@@ -99,7 +99,7 @@
     {
       "mode": "0644",
       "path": "agents/shared/workflow.md",
-      "sha256": "c4974afef1763ab4f17cb930d50b2cac9cb54960ab5d02b00ecb2362df2ff0d5"
+      "sha256": "260ed010a7f6230f1b848bd002d5baca2e9500b7fc62f2ce1562bfb5edf42e85"
     },
     {
       "mode": "0644",
@@ -129,7 +129,7 @@
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "73b82680611c0b3027c99bd388aa8a334b37cc9f9d1413b54902a954ae78bece"
+      "sha256": "b1e4e0d1b51f82f30204d68e6c72921551b99f5e15f2721157db27ffb0bdbd3c"
     },
     {
       "mode": "0644",
@@ -144,7 +144,7 @@
     {
       "mode": "0644",
       "path": "runtime/agents.mjs",
-      "sha256": "1f4c2787c6953a7219c95e1fa740a1bb01baf8148c23f7c7d88edf7fa17e053d"
+      "sha256": "dea68b1c2909bedb71f8eba31775926c3113b4a79aa4319444106eff1310aff3"
     },
     {
       "mode": "0755",
@@ -159,7 +159,7 @@
     {
       "mode": "0644",
       "path": "runtime/sdw.mjs",
-      "sha256": "b37be72bc9d392eec30333329cd54b51ede4df6dcec9abcaf1c72c0247f29c2b"
+      "sha256": "e7ccd27e6cbeabc5616ec1c87beec327affdf91cc3feaf7211ae8f9340210f34"
     },
     {
       "mode": "0755",
@@ -174,7 +174,7 @@
     {
       "mode": "0644",
       "path": "templates/next.md",
-      "sha256": "3a89206ee058e7b9a1733e61049b466179f639d675e7fc8c8639e751a84172a2"
+      "sha256": "32d926e895925c296d3507c3d77e19eac69974b993f1e338382d0387a036aafd"
     },
     {
       "mode": "0644",

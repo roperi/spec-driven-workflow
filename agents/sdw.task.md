@@ -29,8 +29,9 @@ standard tasks keep the current concise shape.
 
 Record the durable location early: when the work will live on a branch, set the
 optional `branch` and `candidate` references in `next.md` so a resume can
-resolve the handoff, and record a `durability` reason if the work item is
-intentionally untracked. The shared durability rule lives in
+resolve the handoff; records are committed on the work item's branch by default,
+and intentional untracking is a repository `.gitignore` entry, not a
+`durability` reason. The shared durability rule lives in
 `.sdw/agents/shared/workflow.md`.
 
 Save it, then run:
