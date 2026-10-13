@@ -25,10 +25,13 @@ cases. The complete grammar lives once in `.sdw/agents/shared/workflow.md`; do
 not restate it.
 
 If a check fails: diagnose within the authorized scope, repair, and rerun the
-affected checks. Do not weaken requirements, retry indefinitely, or
-turn unavailable access into a passing claim. Save the evidence before the
-continuation record, then update `next.md` with the candidate state and any
-failed or blocked checks, then run:
+affected checks. Diagnose and classify the strength of each observation, and
+route a failed obligation to its cause owner before another unchanged repair.
+Apply the delegation and repair handoff rule in
+`.sdw/agents/shared/workflow.md`. Do not weaken requirements, retry
+indefinitely, or turn unavailable access into a passing claim. Save the evidence
+before the continuation record, then update `next.md` with the candidate state
+and any failed or blocked checks, then run:
 
 ```sh
 node .sdw/sdw.mjs check .sdw/work/<work-id> validate

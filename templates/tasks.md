@@ -9,6 +9,7 @@ TODO: give each task a stable ID and mark it `[ ]` pending or `[x]` complete.
 ## Actionable Steps
 
 TODO: describe the steps and completion check for each task.
+Assess the actual delegated unit rather than the task count, and give each unit finite completion evidence and a decision owner for any material gap; apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` before handoff.
 
 ## Completion Evidence
 

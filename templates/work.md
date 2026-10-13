@@ -19,6 +19,7 @@ TODO: record actions as they occur, including partial and interrupted states.
 ## Checks and Results
 
 TODO: record checks run and their actual results; leave honestly pending.
+Apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` before another repair handoff.
 
 ## Outcome and Lessons
 

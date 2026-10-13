@@ -25,6 +25,12 @@ Apply the shared pre-publication review rule in
 probe for a protected seed or a claimed complete/universal oracle, and never
 self-close a semantic decline about the judge or contract you authored.
 
+Return actionable, consolidated findings with cause, owner, and evidence, and
+return lifecycle-owner reassessment when recurrence or a material decision
+requires it instead of inventing the decision or automatically invoking another
+reviewer. Apply the delegation and repair handoff rule in
+`.sdw/agents/shared/workflow.md`.
+
 Inspect what the work item's scope actually requires: minimality, artifact
 safety, stopping behavior, and the specific candidate surfaces involved.
 Run focused critical checks personally where evidence is insufficient; reuse

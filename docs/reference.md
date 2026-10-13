@@ -159,6 +159,34 @@ actions/progress, checks/results, outcome/lessons) plus `next.md`; expand to
 normal records only through an explicit superseding decision, keeping one
 mutable authority.
 
+## Delegation and repair handoffs
+
+Before releasing delegated implementation, the planning/task owner assesses the
+material decisions and coupled reasoning still left to the executor and either
+resolves them, bounds a smaller coherent vertical unit, or records why ordinary
+implementation discretion suffices; a task ID, cohesion group, file count, or
+many AC/V references is not by itself delegation fitness. A blocking finding or
+failed validation states the original obligation, the reproduced failure, the
+expected result, and the finite completion evidence. Route by cause: an ordinary
+concrete defect against an unchanged contract returns to execution; a missing
+design or delegation decision returns to the planning/task owner; a
+contradictory, stale, or infeasible verification returns to its author or the
+planning owner; a new requirement returns to scope/spec. Preserve observation
+strength — an invalid invocation, a missing capability, or an unrelated error
+does not establish intended rejection or positive success. Before another repair
+handoff, compare the evidence for the same underlying obligation; recurring
+absence, an adjacent invariant escape, or an apparent resolution resting on
+invalid evidence triggers lifecycle-owner reassessment and a changed handoff,
+while a genuinely new bounded defect may still return directly to execution.
+Existing records carry the requirement and rationale, prior attempts and
+evidence with their limits, unresolved decisions and owners, the candidate,
+authority, and the exact next action so a fresh model or harness can continue;
+`next.md` points to those records rather than duplicating them. The rule is
+proportional and adds no required field, schema, ledger, stage, or automatic
+reviewer. The exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md), installed as
+`.sdw/agents/shared/workflow.md`.
+
 ## Project context
 
 Project-owned context lives in `.sdw/project-context/` and is reused across work

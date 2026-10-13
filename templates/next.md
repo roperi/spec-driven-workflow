@@ -20,7 +20,7 @@ TODO: state the authorized activity and its endpoint, any explicit local handoff
 
 ## Next action
 
-TODO: identify the concrete next work and link the substantive records it depends on.
+TODO: identify the concrete next work and link the substantive records it depends on. Apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` to name the current responsibility and its authority.
 
 ## Waiting on
 

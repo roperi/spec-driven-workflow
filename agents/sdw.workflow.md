@@ -58,5 +58,11 @@ Things reaching publication, review, merge, finalization, retrospective, and
 wrap have distinct meanings; a requested PR stop preserves the remaining
 merge/finalization work. Do not change unrelated files.
 
+When a failed check, review finding, or repair return is not resolving an agreed
+obligation, own the cause and convergence disposition within your authority:
+execute the recorded action, or preserve the user-directed handoff or stop.
+Apply the delegation and repair handoff rule in
+`.sdw/agents/shared/workflow.md`.
+
 Report the work directory, Git context, artifacts saved, check results, and
 the next exact action.

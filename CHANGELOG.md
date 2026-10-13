@@ -5,6 +5,32 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: Delegation readiness and cause-aware repair handoffs — the shared
+  lifecycle instructions now own one delegation and repair handoff rule. Before
+  handing delegated implementation to another session or model, the planning or
+  task owner assesses the material decisions and coupled reasoning still left to
+  the executor and resolves them with the decision owner, bounds a smaller
+  coherent vertical unit with its own observable check, or records why ordinary
+  implementation discretion is enough. A task ID, cohesion group, or long list of
+  assurance references does not by itself mean a unit fits its executor. A
+  blocking finding or failed validation states the original obligation, the
+  reproduced failure, the expected result, and the finite evidence that would
+  complete it; cause then routes the next responsibility — an ordinary concrete
+  defect returns to execution, a missing design or delegation decision returns to
+  the planning or task owner, a contradictory, stale, or infeasible check returns
+  to the verification author or planning owner, and a genuinely new requirement
+  returns to scope and specification. An invalid call, a missing capability, or
+  an unrelated error never establishes intended rejection or positive success.
+  Recurring failure of the same underlying obligation triggers a lifecycle-owner
+  reassessment and a changed handoff rather than an unchanged larger patch list,
+  while a genuinely new bounded defect may still return directly to execution;
+  there is no universal round count or model-selection rule. Existing records
+  carry the requirement, rationale, prior attempts and evidence, unresolved
+  decisions with owners, authority, and the exact next action so a fresh model or
+  harness can continue, and the handoff stays a pointer rather than a duplicate.
+  The rule is proportional and adds no required field, schema, ledger, stage,
+  automatic reviewer, or subagent.
+
 - **CHANGE**: Record durability enforcement — a `durability:` prose reason no
   longer lets untracked work records pass `handoff`, `finalize`, or `wrap`.
   Intentional untracking requires a repository `.gitignore` file committed at

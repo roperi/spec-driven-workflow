@@ -73,6 +73,75 @@ session. A missing reply is never approval. Publication, merge, deletion of
 alternatives, and migration of another project require actual applicable
 authority beyond a generic request.
 
+## Delegation and repair handoffs
+
+Delegated work and repair loops converge when the outgoing owner decides what
+the next participant must actually resolve. This shared delegation and repair
+handoff rule owns the readiness and cause-aware routing decision once; the stage
+prompts that consume it point here instead of restating it.
+
+Before releasing delegated implementation, planning/task ownership assesses the
+material decisions and coupled reasoning still left to execution. It resolves
+them with the decision owner, defines a smaller coherent vertical checkpoint
+with its own observable oracle, or records an evidenced reason that ordinary
+implementation discretion genuinely suffices. A task ID, cohesion group, file
+count, or many AC/V references does not by itself certify that a unit fits its
+intended executor. Established assurance, invariant, readiness, and seed
+requirements are reused, not rewritten.
+
+A blocking finding or failed validation states the original obligation (or an
+explicitly proposed new requirement), the reproduced failure, the expected
+result, the affected paths or invariant, and the finite evidence that would
+complete it. Batch the complete findings, but the next execution unit need not
+combine every distinct repair boundary. Missing architectural or product
+decisions belong with their owner before execution is asked to infer them.
+
+Preserve observation strength. Distinguish an example corrected, a requirement
+verified, an intentional rejection, an invalid invocation, an unrelated
+failure, an incomplete implementation, and a blocked prerequisite. An invalid
+call, a missing capability, or an unrelated error does not establish intended
+rejection or positive success. Where disappearance of a negative assertion is
+insufficient, require the positive intended behavior, and rerun the relevant
+invariant, group, and end-to-end cases under the existing assurance rules.
+Protected-judge ownership is unchanged.
+
+Route by cause. An ordinary concrete defect against a resolved, unchanged
+contract returns to execution. A missing design or delegation decision returns
+to the planning/task owner. A verification contradiction, or a stale or
+infeasible check, returns to the verification author or planning owner. A new
+requirement returns to scope/spec. Preserve conflicting evidence and protected
+bytes; an affected obligation stays incomplete while independent authorized
+work continues, and mixed causes may have separate next actions.
+
+Before another repair handoff, compare prior evidence for the same underlying
+obligation. Recurring absence, an adjacent path escaping the same invariant, an
+apparent resolution resting on invalid evidence, or a persistent interpretation
+dispute triggers lifecycle-owner reassessment of the approach, decomposition,
+verification, or participant recommendation within authority, followed by a
+changed handoff or specific evidence explaining why the current arrangement
+still fits. Do not send an unchanged larger patch list without that decision. A
+genuinely new bounded defect may still return directly to execution, and no
+universal round count or model-selection rule applies.
+
+A fresh planning, execution, review, or repair session may use a different
+model or harness. Preserve the material reasoning outcome in existing records:
+the requirement and rationale, rejected alternatives and assumptions, prior
+attempts and evidence with their limits, retained requirements, unresolved
+decisions with their owners, the candidate, authority, the exact next action,
+and the stop. `next.md` is a pointer to the authoritative records, not their
+duplicate. Before release, read the records as a fresh receiver would; on entry,
+reconcile the actual state and recover the relevant attempt history, and return
+missing material context to its owner rather than guessing decisions or
+requesting routine reapproval. No internal reasoning transcript is required.
+
+The rule is proportional. Compact work uses `work.md` and the existing `next.md`
+sections; simple ordinary work needs only the explanation it warrants; the same
+participant may hold several responsibilities. Only the user chooses
+participants and authority, so no forced restart, automatic reviewer, subagent,
+issue filing, new ledger, state machine, or required schema/field is introduced.
+Pre-publication `review.md` still freezes at publication, and external findings
+remain pull-request-owned under the shared external-review rule.
+
 ## Default change flow
 
 An agent must never push the default branch directly. This prohibition is

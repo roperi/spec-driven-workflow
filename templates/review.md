@@ -11,7 +11,9 @@ TODO: record the pre-publication findings with file references and severity. Thi
 is the review that precedes publication; the pull request, not this artifact, is
 the record for later external findings, and this file is frozen once the work item
 is published. See the shared pre-publication review rule in
-`.sdw/agents/shared/workflow.md`.
+`.sdw/agents/shared/workflow.md`. Return actionable consolidated findings with
+cause, owner, and evidence, and apply the shared delegation and repair handoff
+rule in `.sdw/agents/shared/workflow.md`.
 
 ## Checks
 

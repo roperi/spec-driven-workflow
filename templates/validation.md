@@ -9,6 +9,7 @@ TODO: record exact commands, working directories, and versions.
 ## Results
 
 TODO: record exit status and what each check establishes.
+Classify observation strength and route a failed obligation by cause before another unchanged repair; apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md`.
 
 ## Limitations
 

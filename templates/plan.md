@@ -11,6 +11,7 @@ TODO: describe how the plan's results will be verified without yet breaking them
 ## Responsibilities and Stops
 
 TODO: state who acts next, which actions are authorized, and where to stop.
+Before releasing the approach, resolve material decisions or bound a smaller coherent vertical unit; apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md`.
 
 ## Risks
 

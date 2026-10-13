@@ -32,6 +32,12 @@ unsatisfied. Report an infeasible or conflicting verification case back to the
 planning owner instead of weakening it. The complete grammar lives once in
 `.sdw/agents/shared/workflow.md`; do not restate it.
 
+Consume the bounded contract and read the relevant prior attempt history before
+editing; preserve honest observations, and return missing decisions or
+contradictory checks to their owner without editing the agreed judge or
+requirements. Apply the delegation and repair handoff rule in
+`.sdw/agents/shared/workflow.md`.
+
 After each meaningful unit: update the task checkbox and evidence in
 `tasks.md`, update `next.md` while pointing to the following responsibility,
 and run:

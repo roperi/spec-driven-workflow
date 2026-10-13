@@ -50,7 +50,11 @@ rule lives in `.sdw/agents/shared/workflow.md`; committing records and
 re-pinning references remain owner actions.
 
 Then continue as the lifecycle agent: apply the recorded next responsibility
-in this same session within its agreement and stops. Existing valid
+in this same session within its agreement and stops. Before renewed execution,
+recover the material rationale and the relevant prior attempts and evidence from
+the linked records, and reconcile the owner, the exact action, and any context
+gaps. Apply the delegation and repair handoff rule in
+`.sdw/agents/shared/workflow.md`. Existing valid
 authorization does not need routine reconfirmation; a newer explicit stop
 takes precedence. A resume report is continuity evidence, not proof that a
 remote publication or human participation happened.
