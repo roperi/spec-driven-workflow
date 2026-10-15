@@ -181,7 +181,12 @@ while a genuinely new bounded defect may still return directly to execution.
 Existing records carry the requirement and rationale, prior attempts and
 evidence with their limits, unresolved decisions and owners, the candidate,
 authority, and the exact next action so a fresh model or harness can continue;
-`next.md` points to those records rather than duplicating them. The rule is
+`next.md` points to those records rather than duplicating them. The same owner
+may resolve implementation, planning and verification responsibilities: a role
+name is not a requirement to restart or ask again, and a user-chosen stage stop
+or harness/model change is a supported continuation from the durable records. No
+command, retry, or execution allowance is invented, and an evidence-driven rerun
+needs no budget-extension request. The rule is
 proportional and adds no required field, schema, ledger, stage, or automatic
 reviewer. The exact rule lives in the
 [shared workflow instructions](../agents/shared/workflow.md), installed as
@@ -261,13 +266,15 @@ commands. The installed [shared workflow
 instructions](../agents/shared/workflow.md) own the exact grammar; this page
 does not restate it.
 
-For hardened cross-context work that introduces a new executable oracle, the
+For hardened cross-context work whose agreed assurance approach explicitly
+chooses a protected verification seed, the
 [shared workflow instructions](../agents/shared/workflow.md) additionally own a
 verification seed convention: the seed is authored and observed red against the
 exact production candidate before production edits, its paths and SHA-256
 hashes are protected and verified read-only by each implementing context, and
-review performs one bounded full-surface pass. This stays transparent for
-ordinary and compact work.
+review performs one bounded full-surface pass. A new test, hardened assurance,
+or cross-context work alone does not require a separate author. This stays
+transparent for ordinary and compact work.
 
 Isolated parallel work uses separate Git worktrees with distinct work IDs and
 their own mutable records; comparison and integration are separate
@@ -279,14 +286,68 @@ The helper reports what it can observe. The primary session supplies the
 substantive content, user authority, external publication evidence, and
 decision to continue.
 
-To continue elsewhere:
+## Resuming a work item
+
+To continue elsewhere, resolve the work item before reading records. Given a
+short identity — an explicit work directory, a work ID, or an issue reference —
+consider only the direct work-item directories under `.sdw/work/` in the
+checkout you are operating in (direct children such as `.sdw/work/<work-id>/`);
+a direct-child listing or glob is an example, not a required platform API. An
+explicit directory takes precedence but still has to reconcile. Discover them
+with a single bounded listing or glob; do not run a recursive `find` or `grep`
+for `next.md` across the checkout, and do not enumerate archive or evidence
+trees or any retired layout to find candidates. Match by
+evidence: the directory name, the direct `next.md` identity and context when
+present, and then the actual Git/worktree. Records outside the direct work-item
+directories — nested evidence copies, archived handoffs, and any retired layout
+— are never candidate handoffs. Exactly one match is the work item; a matching
+directory with no `next.md` is a missing-handoff blocker; no candidate, or more
+than one plausible candidate, is an explicit identity question for the user —
+never a guessed selection or an archive-wide search.
 
 ```bash
 node .sdw/sdw.mjs resume .sdw/work/fix-login-timeout
+node .sdw/sdw.mjs reads .sdw/work/fix-login-timeout
 node .sdw/sdw.mjs check .sdw/work/fix-login-timeout handoff
 ```
 
+Bounded recovery is an instruction to the agent, not an enforced read sandbox.
+The native resume pilot still observed extra probing after an identity question,
+framework inspection beyond the saved responsibility, and recursive work/evidence
+enumeration. The helper's inventory does not prevent these actions, and the
+observation does not establish reliable model compliance or improved efficiency.
+
 The resume command is read-only. It reports Git context, record fields, the
 named next prompt path, artifact availability, task progress, stop conditions,
-and detectable inconsistencies; agents repair knowable record gaps through
-explicit saves and continue within the recorded agreement.
+detectable inconsistencies, and the authorized read set. The `reads` command
+prints only that set: the current records plus the explicit paths those records
+name, the next stage prompt, and the shared lifecycle instructions. A named
+locator resolves against the work directory and the actual Git checkout root: an
+explicit `./` locator is work-relative only, one distinct safe file resolves, two
+distinct matches are an ambiguity diagnostic, and a symlinked path component or
+no match is reported rather than silently dropped. The inventory is a positive
+list, not an exhaustive grant of authority, so an explicit pointer a current
+record names may be followed when the saved responsibility requires it without a
+stop-and-ask gate. After
+selecting the exact directory, read the current `next.md` and the records the
+saved responsibility needs — current decisions, blockers, material rationale,
+relevant prior failed attempts, and explicit source/evidence locators — and read
+only those records and the paths they name: do not recursively enumerate the
+selected work-item directory or its `evidence/` tree, and do not read archived
+`next.md` copies (for example under `evidence/`) or any retired layout. Expand
+into historical records only when a current pointer or an unresolved obligation
+requires them. The recorded
+`next_agent`, Agreement, Next action, Waiting on and Work context govern; a task
+or validate handoff does not become execute, and agents repair knowable record
+gaps through explicit saves and continue within the recorded agreement. A work
+item may resume under a different harness or model than the one that recorded it.
+A user-chosen stage boundary does not by itself withdraw authority from an
+incoming session the agreement already authorizes to proceed, so the recorded
+next responsibility is recovered from the records alone without the previous chat
+or routine reapproval. The boundary cannot grant a stage the agreement has not
+authorized: when the agreement ends at a stage whose next step awaits a decision,
+that pending decision is recovered and waited on rather than treated as
+authorized. The
+exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md), installed as
+`.sdw/agents/shared/workflow.md`.

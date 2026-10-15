@@ -146,7 +146,8 @@ const bootstrapBlock = () => `${BEGIN}
 
 When the user explicitly asks for SDW, spec-driven, or session-based work, use
 .sdw/agents/sdw.workflow.md as the primary entrypoint; use .sdw/agents/sdw.resume.md
-to continue an existing work item. Do not activate SDW for unrelated requests.
+to continue an existing work item, resolving a short work identity from direct
+.sdw/work/<work-id>/ directories first. Do not activate SDW for unrelated requests.
 The entrypoint owns creating .sdw/work/<work-id>/ and the initial artifacts; the
 user does not need to run the helper first. Use node .sdw/sdw.mjs for start, saves,
 checks, and read-only resume. Read the shared lifecycle instructions at

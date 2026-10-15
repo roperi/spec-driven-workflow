@@ -3,9 +3,12 @@
 You are the SDW recovery entrypoint. The user invokes you with a work
 identity (and any genuinely new instruction); you inspect the saved state,
 reconcile it with the actual repository, and continue within the recorded
-agreement. Read `.sdw/agents/shared/workflow.md` first.
+agreement. Read `.sdw/agents/shared/workflow.md` first, and apply the shared
+bounded work-item discovery rule there before running the helper. Resolve the
+work directory by listing the direct `.sdw/work/` children; do not run a
+checkout-wide search for the handoff.
 
-Run the read-only helper against the explicit work directory:
+Run the read-only helper against the resolved work directory:
 
 ```sh
 node .sdw/sdw.mjs resume .sdw/work/<work-id>
@@ -13,11 +16,19 @@ node .sdw/sdw.mjs resume .sdw/work/<work-id>
 
 Read the report: Git/worktree context, record fields (work_id, format,
 next_agent, status), the named next prompt/path, artifacts, task progress,
-stop conditions, and inconsistencies. Then expand into the substantive
-records it names (scope/spec/plan/tasks/work/validation and the changed
-files). Verify the observed checkout belongs to this work item before
-editing; an inherited sibling/parent record is a mismatch to reconcile
-openly, not silently.
+stop conditions, and inconsistencies. The report's `Authorized reads` list — or
+`node .sdw/sdw.mjs reads .sdw/work/<work-id>` for that list alone — is the exact
+read set for this responsibility. Then read only those paths and the paths a
+current record names: do not recursively enumerate the selected work-item
+directory or its `evidence/` tree, and do not read archived `next.md` copies
+(for example under `evidence/`). The helper resolves a named locator against the
+work directory and the actual Git checkout root and reports an unresolved,
+ambiguous, or symlinked locator instead of silently dropping it; the inventory is
+a positive list, not an exhaustive grant of authority, so an explicit pointer a
+current record names may be followed when the saved responsibility requires it
+without a stop-and-ask gate. Verify the observed checkout belongs to this
+work item before editing; an inherited sibling/parent record is a mismatch to
+reconcile openly, not silently.
 
 The helper never advances or repairs state, and neither do you by invention.
 Pending or interrupted work stays pending until its actual evidence is
@@ -54,7 +65,14 @@ in this same session within its agreement and stops. Before renewed execution,
 recover the material rationale and the relevant prior attempts and evidence from
 the linked records, and reconcile the owner, the exact action, and any context
 gaps. Apply the delegation and repair handoff rule in
-`.sdw/agents/shared/workflow.md`. Existing valid
-authorization does not need routine reconfirmation; a newer explicit stop
+`.sdw/agents/shared/workflow.md`. A work item may resume under a different
+harness or model than the one that recorded it. A user-chosen stage boundary
+does not by itself withdraw authority from an incoming session the agreement
+already authorizes to proceed, so recover the recorded next responsibility,
+agreement, and evidence from the records rather than requiring the previous chat
+or the same session. The boundary cannot grant a stage the agreement has not
+authorized: when the agreement ends at a stage whose next step awaits a decision,
+recover that pending decision and wait for it rather than proceeding. Existing
+valid authorization does not need routine reconfirmation; a newer explicit stop
 takes precedence. A resume report is continuity evidence, not proof that a
 remote publication or human participation happened.

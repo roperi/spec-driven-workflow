@@ -16,11 +16,11 @@ Three optional fixed fields record where the work item is durable: `branch` (the
 
 ## Agreement
 
-TODO: state the authorized activity and its endpoint, any explicit local handoff, and the recorded approval or request basis (embedded or a resolvable reference).
+TODO: state the authorized activity and its endpoint, any explicit local handoff, and the recorded approval or request basis (embedded or a resolvable reference). A user-chosen stage stop and a harness/model change are supported handoffs when recorded here; the next responsibility resumes from the records without the previous chat or routine reapproval.
 
 ## Next action
 
-TODO: identify the concrete next work and link the substantive records it depends on. Apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` to name the current responsibility and its authority.
+TODO: identify the concrete next work and link the substantive records it depends on. Apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` to name the current responsibility and its authority. Keep one current pointer: update the owner, candidate, action, and authority in place and link superseded history in the existing evidence rather than appending another contradictory current-owner section.
 
 ## Waiting on
 
@@ -28,4 +28,4 @@ TODO: write `Nothing pending.`, or the condition that must resolve and who owns 
 
 ## Work context
 
-TODO: record branch/worktree/candidate identity and relevant partial changes sufficiently to resolve the intended work; do not permanently bind to an absolute path.
+TODO: record branch/worktree/candidate identity and relevant partial changes sufficiently to resolve the intended work; link the current records the next session needs and any historical evidence by explicit path so a fresh session can recover context without an archive-wide search; do not permanently bind to an absolute path.

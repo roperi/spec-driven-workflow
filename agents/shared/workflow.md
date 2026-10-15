@@ -53,7 +53,57 @@ sdw.retrospect, sdw.wrap):
    completed, and do not spawn a new agent for the next stage.
 5. Stop only for a user-requested boundary or handoff, a material decision or
    missing prerequisite outside the agreement, or completed work. Failed
-   checks prompt bounded repair inside the authorized scope.
+   checks prompt bounded repair inside the authorized scope. Continue the
+   authorized work by evidence rather than ending the session because a stage
+   or attempt ended; apply the continuing-by-evidence rule below.
+
+## Resuming and bounded work-item discovery
+
+A fresh session resumes from files, not chat. Given a short identity — an
+explicit work directory, a work ID, or an issue reference — resolve the work
+item before reading records or acting:
+
+1. Consider only the direct work-item directories under `.sdw/work/` in the
+   checkout you are operating in (direct children such as
+   `.sdw/work/<work-id>/`; a direct-child listing or glob is an example, not a
+   required platform API). An explicit work directory takes precedence, but it
+   still has to reconcile. Discover them with a single bounded listing or glob;
+   do not run a recursive `find` or `grep` for `next.md` across the checkout,
+   and do not enumerate archive or evidence trees or any retired layout to find
+   candidates.
+2. Match by evidence: the directory name, the direct `next.md` identity and
+   context when present, and then the actual Git/worktree. Records outside the
+   direct work-item directories — nested evidence copies, archived handoffs, and
+   any retired layout — are never candidate handoffs; reach them only from a
+   current pointer or an unresolved obligation.
+3. Inspect only the candidate handoffs until the identity is resolved. Exactly
+   one match is the work item. A matching directory with no `next.md` is a
+   missing-handoff blocker. No candidate, or more than one plausible candidate,
+   is an explicit identity question for the user — never a guessed selection and
+   never a wider archive search.
+
+Once selected, run the read-only helper on that exact directory
+(`node .sdw/sdw.mjs resume .sdw/work/<work-id>`), then read the current handoff
+and reconcile its identity and Git/worktree context before acting. The recorded
+`next_agent`, Agreement, Next action, Waiting on and Work context govern the
+saved responsibility and its stop and authority boundary; a task or validate
+handoff never silently becomes execute.
+
+Recover the context that responsibility needs — current decisions, blockers,
+material rationale, relevant prior failed attempts, and explicit
+source/evidence locators — from the current records and the paths they name.
+The read-only helper reports that bounded set (`node .sdw/sdw.mjs reads
+.sdw/work/<work-id>`); read only those paths: do not recursively enumerate the
+selected work-item directory or its `evidence/` tree, and do not read archived
+`next.md` copies (for example under `evidence/`) or any retired layout. The
+helper resolves a named locator against the work directory and the actual Git
+checkout root and reports an unresolved, ambiguous, or symlinked locator rather
+than silently dropping it; that inventory is a positive list, not an exhaustive
+grant of authority, so an explicit pointer a current record names may be followed
+when the saved responsibility requires it without a stop-and-ask gate. Expand
+into historical records only when a current pointer or an unresolved obligation
+requires them. No reading or token budget applies, and no required record is
+skipped; durable history stays discoverable by explicit path.
 
 ## Direct bounded-stage invocation
 
@@ -72,6 +122,35 @@ review-only, plan-only, or other bounded instruction constrains only its own
 session. A missing reply is never approval. Publication, merge, deletion of
 alternatives, and migration of another project require actual applicable
 authority beyond a generic request.
+
+Keep exactly one current handoff pointer. Update the owner, candidate, action,
+and authority in place, and link superseded history in the existing evidence and
+review records; do not append another contradictory "current owner" section at
+each checkpoint. A user-chosen stop at any stage boundary, and a harness or model
+change between stages, are supported continuations: record the durable agreement,
+decisions, progress, evidence, authority, and next action so the next
+responsibility resumes from records without the previous chat or routine
+reapproval. An outgoing-session stop does not by itself withdraw authority from
+an incoming session the agreement already authorizes to proceed.
+
+## Continuing by evidence
+
+An authorized lifecycle continues to the agreed observable outcome or a real
+stop, not because a stage, role label, or attempt boundary changed. Do not invent
+command, retry, model-call, or execution allowances, and do not ask for a budget
+or permission increase to continue ordinary authorized work. A repeated failure
+requires comparing the prior evidence and changing the diagnosis or approach
+before another repair; each further iteration needs a distinct hypothesis, a new
+finding, or an identified correction. Once the agreed evidence is sufficient,
+stop repeating checks. If no justified next action remains, report the concrete
+blocker, the evidence, and a recommended decision instead of asking merely to
+try again.
+
+Explicit user limits and actual service or resource limits remain binding: record
+unfinished work honestly, continue unaffected authorized work, and do not
+automatically request an increase. Context resets, model changes, and harness
+changes remain deliberate user choices covered by the delegation and repair
+handoff rule.
 
 ## Delegation and repair handoffs
 
@@ -103,15 +182,25 @@ call, a missing capability, or an unrelated error does not establish intended
 rejection or positive success. Where disappearance of a negative assertion is
 insufficient, require the positive intended behavior, and rerun the relevant
 invariant, group, and end-to-end cases under the existing assurance rules.
-Protected-judge ownership is unchanged.
+Protected-judge ownership is unchanged. An ordinary unprotected test or fixture
+whose expectation demonstrably contradicts the agreed requirement may be
+corrected against that unchanged requirement, retaining the contradiction and
+both observations; never rewrite acceptance to fit the implementation, and a
+protected judge or an independent-oracle promise is not the implementer's to
+edit.
 
-Route by cause. An ordinary concrete defect against a resolved, unchanged
-contract returns to execution. A missing design or delegation decision returns
-to the planning/task owner. A verification contradiction, or a stale or
-infeasible check, returns to the verification author or planning owner. A new
-requirement returns to scope/spec. Preserve conflicting evidence and protected
-bytes; an affected obligation stays incomplete while independent authorized
-work continues, and mixed causes may have separate next actions.
+Route by cause within the authorized lifecycle. An ordinary concrete defect
+against a resolved, unchanged contract returns to execution. A missing design or
+delegation decision returns to the planning/task owner. A verification
+contradiction, or a stale or infeasible check, returns to the
+verification author or planning owner. A new requirement returns to scope/spec.
+The same owner may resolve implementation, planning and verification
+responsibilities; a role name is not a requirement to restart, delegate, or ask
+again. Return to another owner only when an actual decision, a protected
+artifact, requested independence, or an explicit stop belongs there, and
+continue unaffected authorized work. Preserve conflicting evidence and protected
+bytes; an affected obligation stays incomplete while independent authorized work
+continues, and mixed causes may have separate next actions.
 
 Before another repair handoff, compare prior evidence for the same underlying
 obligation. Recurring absence, an adjacent path escaping the same invariant, an
@@ -119,7 +208,12 @@ apparent resolution resting on invalid evidence, or a persistent interpretation
 dispute triggers lifecycle-owner reassessment of the approach, decomposition,
 verification, or participant recommendation within authority, followed by a
 changed handoff or specific evidence explaining why the current arrangement
-still fits. Do not send an unchanged larger patch list without that decision. A
+still fits. Inspect the complete relevant call paths and the shared invariant,
+reassess feasibility and verification cost, and choose a coherent repair or
+alternative in the existing records and the same session when authorized. Do not
+send an unchanged larger patch list without that decision, and do not make a new
+verification project the default repair. A cause classification changes what the
+owner does next; it does not alone create a handoff or permission request. A
 genuinely new bounded defect may still return directly to execution, and no
 universal round count or model-selection rule applies.
 
@@ -369,6 +463,17 @@ a ready or not-ready conclusion; it does not publish, merge, or mutate anything
 remote. Return ordinary findings batched in one consolidated pass rather than
 stopping at the first blocker.
 
+Review is a bounded responsibility. Ordinary findings return to the accountable
+implementer for targeted repair and revalidation without a mandatory new full
+planning or review cycle; a material contract or safety change, invalidated
+evidence, or an explicit independent-review commitment requires the affected
+review again, scoped to the changed boundary rather than an invented complete
+restart. A reviewer ties a blocker to an agreed requirement and evidence, or
+explicitly proposes a new requirement. Explaining an old intermittent event
+whose cause is unobservable is not automatically a completion prerequisite, but
+uncertainty that prevents establishing a required guarantee keeps that guarantee
+blocked with its owner, and an unproven guarantee is never called satisfied.
+
 Record the review context as one of `self`, `fresh`, or `independent`: `self` is
 same-context implementer review, `fresh` is a separate session or context of the
 same kind, and `independent` is a different harness, model, or vendor.
@@ -558,11 +663,20 @@ cases plus their cohesion-group, shared-invariant, and end-to-end cases.
 
 ### Hardened verification seeding (cross-context)
 
-When hardened cross-context work needs a new executable oracle for
+Test-first verification does not require a separate author. Use a protected
+verification seed and its separate-context handoff when the agreed assurance
+approach explicitly chooses that independence for an oracle covering
 transactions, recovery, filesystem safety, authentication or private data,
-external mutation, concurrency, or multiple persisted projections, task
-preparation separates verification seeding from production implementation as
-two ordinary tasks on the existing checklist.
+external mutation, concurrency, or multiple persisted projections. Explain why
+the identified risk warrants the separated context and stop before introducing
+it; hardened assurance, cross-context work, or a new test alone does not mandate
+a separate author session. When a seed is explicitly chosen, task preparation
+separates verification seeding from production implementation as two ordinary
+tasks on the existing checklist. Preserve existing protected-seed ownership and
+any explicit protection or independence agreement until its authorized owner
+changes it; implementation may not edit its protected judge or waive required
+evidence. Ordinary test-first work may continue into production changes in the
+same authorized context.
 
 Before the seed is authored, the planning/verification owner performs a
 reconciliation of the intended state and operation model against retained

@@ -51,4 +51,7 @@ good result, and the exact restart action. Operational and diagnosis work
 ends at its authorized result: record batches, validated outputs, and
 rejections honestly without a forced PR lifecycle. Execution does not imply
 validation, publication, or merge authority; failed checks prompt bounded
-repair within scope.
+repair within scope. The same authorized owner may continue into validation and
+ordinary repair of the same obligation: a failed check, cause classification, or
+role label is not by itself a reason to end the session, restart, or request a
+new allowance or budget increase.

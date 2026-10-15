@@ -38,5 +38,8 @@ node .sdw/sdw.mjs check .sdw/work/<work-id> validate
 ```
 
 Report honestly whether validation passed on the current candidate and what
-remains unverifiable. Stop at the recorded validation handoff or an explicit
-user stop; validation does not itself authorize publication or merge.
+remains unverifiable. Ordinary repair and revalidation of the same obligation
+may continue in this authorized context: a stage or attempt boundary is not by
+itself a reason to stop or request permission, and an evidence-driven rerun needs
+no budget-extension request. Stop at the recorded validation handoff or an
+explicit user stop; validation does not itself authorize publication or merge.

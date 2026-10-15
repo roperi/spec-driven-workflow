@@ -5,6 +5,44 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: Continuous SDW delivery — the shared lifecycle instructions now
+  route a cause within the authorized lifecycle and let one accountable owner
+  resolve implementation, planning, and verification responsibilities without a
+  forced restart, delegate, or re-ask; a role name alone is not a handoff, and a
+  cause classification changes what the owner does next rather than creating a
+  session. Protected verification seeding becomes an explicit, justified choice
+  instead of an automatic hardened/cross-context trigger, while the existing
+  protected-seed protocol and SHA-256 protection stay binding when chosen.
+  Ordinary local defects, fixture contradictions, and repair/reruns stay in the
+  same authorized session; a repeated failure changes the diagnosis or approach
+  rather than opening a new verification project. Routine command, retry,
+  model-call, and execution allowances and budget-extension gates are removed,
+  while explicit user limits, actual resource limits, protected artifacts,
+  requested independence, and independent-review commitments remain binding.
+  Review is bounded — ordinary findings return to the accountable implementer for
+  targeted repair and revalidation without a mandatory full planning/review
+  cycle, and a material change requires only the affected review scoped to the
+  changed boundary. One current handoff is updated in place, and user-chosen
+  stage stops plus harness/model changes remain first-class continuations
+  recovered from durable records: a session boundary preserves authority the
+  agreement already granted to the incoming session but cannot authorize a stage
+  the agreement has not granted. The rule is owned once by the shared workflow
+  instructions with bounded pointers from the affected stage prompts and matching
+  reference guidance; no new stage, agent, record field, parser, ledger, runtime
+  mechanism, profile, or model policy is added, and compact/standard/default
+  workflows are unaffected.
+
+- **CHANGE**: Fresh-resume guidance now directs agents to discover direct work
+  items and recover context for their saved responsibility. The read-only helper
+  reports current records and named locators, resolves them against the work
+  directory and actual checkout, and diagnoses ambiguity, missing paths and
+  symlink components. Explicit necessary pointers remain available without an
+  unconditional approval gate. These instructions and inventories do not enforce
+  a read sandbox: native observations still showed extra identity probing,
+  framework inspection and recursive work/evidence enumeration. This limitation
+  is accepted; reliable bounded model reading and efficiency improvements have
+  not been demonstrated.
+
 - **CHANGE**: Delegation readiness and cause-aware repair handoffs — the shared
   lifecycle instructions now own one delegation and repair handoff rule. Before
   handing delegated implementation to another session or model, the planning or

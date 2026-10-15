@@ -109,6 +109,7 @@ const usage = () => `Usage:
   node .sdw/sdw.mjs save WORK_DIR ARTIFACT < CONTENT
   node .sdw/sdw.mjs check WORK_DIR ACTIVITY
   node .sdw/sdw.mjs resume WORK_DIR
+  node .sdw/sdw.mjs reads WORK_DIR
   node .sdw/sdw.mjs reconcile WORK_DIR
 
 Artifacts: ${Object.keys(ARTIFACTS).join(', ')}
@@ -415,7 +416,7 @@ const recordConsistency = (reports) => {
   }
   for (const error of parsed.errors) errors.push(error)
   const { record } = parsed
-  if (!record.status) return errors
+  if (!record || !record.status) return errors
   if (record.nextAgent === null) return errors
   if (PENDING_RECORD_STATUSES.includes(record.status)) {
     const waiting = meaningfulSection(nextReport.content, 'Waiting on') ?? ''
@@ -1747,6 +1748,182 @@ const durabilityAssessment = (workDir, record) => {
 
 const waitingCondition = (content) => (meaningfulSection(content, 'Waiting on') ?? '').split(/\r?\n/u)[0]?.trim() ?? ''
 
+// Read-only "authorized reads" inventory (issue #387). The resume flow is
+// bounded to the current records and the explicit paths those records name. The
+// helper computes that positive set so a session does not have to enumerate the
+// work-item tree or rediscover locations itself. It is read-only: it never
+// modifies records and never walks archives.
+const READ_ORDER = Object.freeze([
+  'next.md',
+  'work.md',
+  'scope.md',
+  'spec.md',
+  'plan.md',
+  'tasks.md',
+  'validation.md',
+  'review.md',
+  'retrospect.md',
+])
+
+// Path-like tokens a record names: backticked tokens, slash paths with a file
+// extension, and bare filenames with a known extension. Deliberately
+// conservative; anything that does not resolve to a regular non-symlink file is
+// dropped.
+const READ_TOKEN = /`([^`\n]+)`|((?:\.?[A-Za-z0-9_.-]+\/)+[A-Za-z0-9_.-]+|[A-Za-z0-9_.-]+\.(?:md|txt|json|mjs|cjs|js|ts|sh|py|ya?ml|toml|svg|png))/gu
+
+const namedReadPaths = (content) => {
+  const tokens = []
+  for (const match of content.matchAll(READ_TOKEN)) {
+    const raw = (match[1] ?? match[2] ?? '').trim().replace(/[.,;:]+$/u, '')
+    if (raw === '' || /\s/u.test(raw) || raw.startsWith('/')) continue
+    tokens.push(raw)
+  }
+  return [...new Set(tokens)]
+}
+
+const regularFile = (target) => {
+  try {
+    const stat = fs.lstatSync(target)
+    return stat.isFile() && !stat.isSymbolicLink()
+  } catch {
+    return false
+  }
+}
+
+// A record-named token is a locator only when it looks like one named file;
+// arbitrary backticked prose, absolute paths, and directory/glob references
+// (a trailing slash or a `*`) are not file locators and are never reported.
+const LOCATOR_EXTENSIONS = /\.(?:md|txt|json|mjs|cjs|js|ts|sh|py|ya?ml|toml|svg|png)$/iu
+const isLocator = (token) =>
+  !token.startsWith('/') &&
+  !token.includes('*') &&
+  !token.endsWith('/') &&
+  (token.includes('/') || LOCATOR_EXTENSIONS.test(token))
+
+// The first symlinked component of a candidate path, or null when every existing
+// component is a real directory/file. A missing component ends the walk: an
+// unresolved locator is diagnosed separately from an unsafe one.
+const symlinkComponent = (target) => {
+  const parsed = path.parse(target)
+  let cursor = parsed.root
+  for (const component of target.slice(parsed.root.length).split(path.sep).filter(Boolean)) {
+    cursor = path.join(cursor, component)
+    let stat
+    try {
+      stat = fs.lstatSync(cursor)
+    } catch (error) {
+      if (error.code === 'ENOENT') return null
+      return cursor
+    }
+    if (stat.isSymbolicLink()) return cursor
+  }
+  return null
+}
+
+// Resolve one record-named locator against the work directory and the actual Git
+// checkout root (the current worktree, never its sibling/main checkout). An
+// explicit `./` locator is work-relative only; any other relative locator probes
+// both bases. Exactly one distinct safe regular file resolves; two distinct
+// matches are an ambiguity diagnostic; a symlink in any component is unsafe; no
+// match is unresolved. This is a filesystem diagnostic, not inferred intent.
+const resolveNamedLocator = (token, workDir, checkoutRoot) => {
+  const bases = token.startsWith('./')
+    ? [workDir]
+    : [workDir, ...(checkoutRoot && checkoutRoot !== workDir ? [checkoutRoot] : [])]
+  const matches = []
+  for (const base of bases) {
+    const absolute = path.resolve(base, token)
+    if (symlinkComponent(absolute) !== null) return { status: 'unsafe', absolute: null }
+    if (regularFile(absolute)) matches.push(absolute)
+  }
+  const distinct = [...new Set(matches)]
+  if (distinct.length > 1) return { status: 'ambiguous', absolute: null }
+  if (distinct.length === 1) return { status: 'resolved', absolute: distinct[0] }
+  return { status: 'unresolved', absolute: null }
+}
+
+// Explicit-pointer expansion continues from an authorized locator when the saved
+// responsibility requires it; the inventory is a positive list, not an
+// exhaustive grant of authority and not an unconditional stop-and-ask gate.
+const READ_EXPANSION_GUIDANCE = 'Follow explicit pointers named by a current record when the saved responsibility requires them; do not enumerate the work-item directory or read archived handoffs.'
+
+// The authorized read set for a work directory: the current records, the
+// explicit paths those records name, the next stage prompt, and the shared
+// lifecycle instructions. Paths are reported relative to the work directory;
+// unresolved, ambiguous and symlinked locators are returned as diagnostics.
+const authorizedReads = (workDir) => {
+  const checkoutRoot = gitProbe(workDir, ['rev-parse', '--show-toplevel'])
+  const lines = []
+  const diagnostics = []
+  const seen = new Set()
+  const add = (absolute) => {
+    if (!regularFile(absolute)) return
+    const relative = path.relative(workDir, absolute) || path.basename(absolute)
+    if (seen.has(relative)) return
+    seen.add(relative)
+    lines.push(relative)
+  }
+
+  for (const artifact of READ_ORDER) {
+    if (Object.hasOwn(ARTIFACTS, artifact)) add(artifactPath(workDir, artifact))
+  }
+
+  const tokens = []
+  for (const artifact of READ_ORDER) {
+    if (!Object.hasOwn(ARTIFACTS, artifact)) continue
+    const probe = readWorkFile(workDir, artifact)
+    if (probe.error === null) tokens.push(...namedReadPaths(probe.content))
+  }
+  for (const token of [...new Set(tokens)]) {
+    if (!isLocator(token)) continue
+    const resolution = resolveNamedLocator(token, workDir, checkoutRoot)
+    if (resolution.status === 'resolved') {
+      add(resolution.absolute)
+    } else if (resolution.status === 'unsafe') {
+      diagnostics.push(`Unsafe locator: ${token} (a path component is a symlink; not authorized)`)
+    } else if (resolution.status === 'ambiguous') {
+      diagnostics.push(`Ambiguous locator: ${token} (two distinct files match; work-relative and checkout-root bases conflict)`)
+    } else {
+      diagnostics.push(`Unresolved locator: ${token} (not found under the work directory or the checkout root)`)
+    }
+  }
+
+  const nextProbe = readWorkFile(workDir, 'next.md')
+  if (nextProbe.error === null) {
+    const agent = parseNextRecord(nextProbe.content, workDir).record?.nextAgent
+    if (agent && agent !== 'none') {
+      const prompt = promptAvailability(agent)
+      if (prompt.available) add(prompt.target)
+    }
+  }
+
+  // Shared and stage instructions live in the installed agent directory
+  // (module-relative), not under the work directory or a `.sdw/.sdw` probe.
+  add(path.join(AGENT_DIR, 'shared', 'workflow.md'))
+
+  return { lines, diagnostics }
+}
+
+const readsReport = (workDir) => {
+  const { lines, diagnostics } = authorizedReads(workDir)
+  if (lines.length === 0) {
+    return [
+      `Authorized reads for ${workDir}`,
+      '(no current records or named paths found; resolve the missing handoff before continuing)',
+      ...diagnostics,
+      READ_EXPANSION_GUIDANCE,
+      'Reads is read-only; it does not modify records.',
+    ].join('\n')
+  }
+  return [
+    `Authorized reads for ${workDir}`,
+    ...lines.map((line) => `- ${line}`),
+    ...diagnostics,
+    READ_EXPANSION_GUIDANCE,
+    'Reads is read-only; it does not modify records.',
+  ].join('\n')
+}
+
 const reconcile = (value) => {
   const workDir = resolveWorkDir(value)
   const nextProbe = readWorkFile(workDir, 'next.md')
@@ -1817,6 +1994,7 @@ const resume = (value) => {
   const taskLine = progress
     ? `Tasks: ${progress.complete}/${progress.total} complete; ${progress.pending} pending${progress.malformed || progress.duplicates.length ? ' (malformed/duplicate entries detected)' : ''}`
     : 'Tasks: no tasks.md record'
+  const { lines: readsLines, diagnostics: readDiagnostics } = authorizedReads(workDir)
   return [
     gitContext(workDir),
     `Work directory: ${workDir}`,
@@ -1828,9 +2006,16 @@ const resume = (value) => {
     taskLine,
     assuranceLine,
     `Inconsistencies: ${inconsistencies.length ? inconsistencies.join(' | ') : '(none detected)'}`,
+    ...(readsLines.length
+      ? ['Authorized reads (read only these):', ...readsLines.map((line) => `- ${line}`)]
+      : ['Authorized reads: (no current records or named paths found)']),
+    ...readDiagnostics,
+    READ_EXPANSION_GUIDANCE,
     'Resume is read-only; inspect and repair artifacts with explicit saves before continuing.',
   ].filter(Boolean).join('\n')
 }
+
+const reads = (value) => readsReport(resolveWorkDir(value))
 
 const main = () => {
   const [command, ...args] = process.argv.slice(2)
@@ -1844,6 +2029,7 @@ const main = () => {
   else if (command === 'save' && args.length === 2) result = save(args[0], args[1])
   else if (command === 'check' && args.length === 2) result = check(args[0], args[1])
   else if (command === 'resume' && args.length === 1) result = resume(args[0])
+  else if (command === 'reads' && args.length === 1) result = reads(args[0])
   else if (command === 'reconcile' && args.length === 1) result = reconcile(args[0])
   else fail('USAGE', `Invalid arguments.\n${usage()}`)
   process.stdout.write(`${result}\n`)

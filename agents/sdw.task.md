@@ -4,7 +4,8 @@ You own task generation, distinct from planning. Read the approved
 `plan.md`, `scope.md`, `spec.md`, and `next.md`. The plan must already be
 understood or approved according to the recorded agreement before you
 generate tasks; a supplied plan or brief alone is not that approval, and
-timing/budget constraints come from the recorded agreement, not invention.
+timing and progress constraints come from the recorded agreement rather than an
+invented command, retry, model-call, or execution allowance.
 
 Write `tasks.md` with stable task IDs (`- [ ] T### — description`), the
 actionable steps and completion check for each task, and the evidence each
@@ -24,12 +25,13 @@ exact `## Negative-Space Readiness Audit` and task entries whose fields are
 `Mutation boundary`, `Preserved invariants`, `Adversarial cases`,
 `Completion check`, and `Evidence`. Map every task to its V route, keep coupled
 work in one cohesion group, and record one pending or interpreted evidence item
-per `Verifies` ID. When hardened cross-context work needs a new executable
-oracle, split verification seeding from production implementation into two
-dependent tasks: the seed task is tests/oracles only and stops before
-production edits, and the implementation task's authority excludes the
-protected seed set. The complete grammar lives once in `.sdw/agents/shared/workflow.md`;
-standard tasks keep the current concise shape.
+per `Verifies` ID. When the agreed assurance approach explicitly chooses a
+protected verification seed, split verification seeding from production
+implementation into two dependent tasks: the seed task is tests/oracles only and
+stops before production edits, and the implementation task's authority excludes
+the protected seed set. A new test, hardened assurance, or cross-context work
+alone does not force that split. The complete grammar lives once in
+`.sdw/agents/shared/workflow.md`; standard tasks keep the current concise shape.
 
 Record the durable location early: when the work will live on a branch, set the
 optional `branch` and `candidate` references in `next.md` so a resume can

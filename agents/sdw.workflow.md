@@ -10,9 +10,12 @@ prompt. Read `.sdw/agents/shared/workflow.md` first.
 Read the relevant project guidance and confirm the repository and Git context,
 applying the project-context rule in `.sdw/agents/shared/workflow.md`: discover
 existing project context first, establish the minimum when it is absent for
-non-trivial work, and record the posture when the user defers. Use an explicitly supplied work ID; otherwise list existing candidates under
-`.sdw/work/` and choose only when the objective identifies one unambiguously.
-Ask for the smallest missing decision when it does not.
+non-trivial work, and record the posture when the user defers. Use an
+explicitly supplied work ID or work directory; otherwise apply the shared
+bounded work-item discovery rule in `.sdw/agents/shared/workflow.md` to list
+direct work-item candidates under `.sdw/work/` and choose only when the
+objective identifies one unambiguously. Ask for the smallest missing decision
+when it does not.
 
 For a new work item, create the directory and meaningful initial artifacts —
 with `--format compact` for genuinely small, precisely authorized work (a
@@ -50,7 +53,11 @@ a stage finished. Stages stop only for: a user-requested boundary or handoff,
 a material decision missing from the agreement, an unavailable prerequisite,
 or completed work. Failed checks prompt bounded repair inside the authorized
 scope. Existing authorization survives routine progression; a missing reply
-never approves anything new.
+never approves anything new. A responsibility or cause classification is not by
+itself a reason to restart, delegate, or ask again: the same accountable owner
+may resolve implementation, planning and verification responsibilities within
+its authorized context, and a user-chosen stage stop or harness/model change is
+a supported continuation recorded in `next.md`, not a forced restart.
 
 Separate planning (`sdw.plan`) from task generation (`sdw.task`); if the user
 requested understanding before task breakdown, stop there and record it.

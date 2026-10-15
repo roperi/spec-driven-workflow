@@ -31,6 +31,12 @@ requires it instead of inventing the decision or automatically invoking another
 reviewer. Apply the delegation and repair handoff rule in
 `.sdw/agents/shared/workflow.md`.
 
+Review is bounded: ordinary findings return to the accountable implementer for
+targeted repair and revalidation without a mandatory new full planning or review
+cycle, while a material contract or safety change, invalidated evidence, or an
+explicit independent-review commitment requires the affected review again,
+scoped to the changed boundary rather than an invented complete restart.
+
 Inspect what the work item's scope actually requires: minimality, artifact
 safety, stopping behavior, and the specific candidate surfaces involved.
 Run focused critical checks personally where evidence is insufficient; reuse
