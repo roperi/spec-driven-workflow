@@ -11,7 +11,10 @@ Write `tasks.md` with stable task IDs (`- [ ] T### — description`), the
 actionable steps and completion check for each task, and the evidence each
 task is expected to produce. Keep tasks proportional to the plan: small
 repairs do not need invented multi-step scaffolding, but every task needs a
-concrete completion check. Before handing off a task, assess the actual
+concrete completion check. Order a small complete path to the first useful
+demonstration before independent breadth, with each completion check naming its
+observable checkpoint, per the shared guidance in
+`.sdw/agents/shared/workflow.md`. Before handing off a task, assess the actual
 delegated unit rather than the task count, and give each actionable unit finite
 completion evidence and a decision owner for any material gap. Apply the
 delegation and repair handoff rule in `.sdw/agents/shared/workflow.md`. Update

@@ -22,3 +22,25 @@ environment, and boundaries. Keep both concise, reuse
 existing project documents instead of duplicating them, and replace all template
 guidance and placeholders with real content. SDW reads them across work items;
 their guidance templates live in `.sdw/templates/`.
+
+## Adopting updated guidance
+
+Updating SDW refreshes the managed prompts and templates under `.sdw/agents/`
+and `.sdw/templates/`; it never creates or modifies `.sdw/project-context/` or
+`.sdw/work/`. Treat these as three separate actions, in plain language:
+
+1. **Updating managed guidance.** Run `update.sh` as usual; this is what changes
+   the instructions and templates.
+2. **Changing project-owned context.** Your constitution is your own durable
+   law. The shipped `.sdw/templates/constitution.md` is an authoring worksheet,
+   not adopted law. If the new guidance suggests an article your project does not
+   have, decide deliberately whether to adopt it through your project's
+   amendment route; SDW does not silently overwrite, migrate, or override an
+   existing constitution.
+3. **Re-assessing an existing plan.** New guidance does not by itself rewrite
+   approval or restart unaffected work. Apply it to new planning, or to affected
+   boundaries with the recorded owner; an existing approved plan continues until
+   the owner decides otherwise.
+
+See the early-demonstrable-value and material-decision rule in
+`.sdw/agents/shared/workflow.md`.

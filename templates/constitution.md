@@ -129,7 +129,22 @@ exceptions are justified.
 TODO: the interfaces that must stay explicit, how they are described, and how
 they are verified.
 
-## Article VI — Canonical Ownership and Boundaries
+## Article VI — Early Vertical Delivery
+
+<!-- Concern: a plan or a green check is not a demonstrated result.
+     Making it checkable: require the earliest safe useful observable outcome to
+     be delivered and inspected before dependent breadth, name what that first
+     result exercises and what it defers, and require prerequisite complexity
+     (including bespoke infrastructure) to be justified by that result.
+     Proportional complexity is a rule, not a slogan: adding a service,
+     supervisor, or storage layer needs evidence that the first result requires
+     it, and reality-based feedback — an inspected real result, not only mocks or
+     a task count — gates dependent breadth. -->
+
+TODO: the binding rule for delivering and inspecting the earliest useful
+observable result before broader coverage, and how a reviewer checks it.
+
+## Article VII — Canonical Ownership and Boundaries
 
 <!-- Concern: each fact, asset, or decision has one owner and a known boundary.
      Making it checkable: name the source of truth for each important kind of
@@ -139,17 +154,20 @@ they are verified.
 
 TODO: canonical owners, hard boundaries, and what must never change or be exposed.
 
-## Article VII — Human Authority and Review Gates
+## Article VIII — Human Authority and Review Gates
 
 <!-- Concern: naming a desired end state is not authorization to ship it.
      Making it checkable: identify which actions require explicit human
      approval (scope, merge, release, publication, destructive or irreversible
      operations) and state that an agent may propose but not silently close a
-     human gate. -->
+     human gate. A material decision requires informed human decisions: explain
+     the operational cost and the rejected alternative in plain language, and
+     treat an earlier blanket approval as neither comprehension of later
+     material expansion nor authority for unagreed scope. -->
 
 TODO: who approves what, and which actions must never be taken silently.
 
-## Article VIII — Decision Traceability
+## Article IX — Decision Traceability
 
 <!-- Concern: material decisions must be reconstructable later.
      Making it checkable: require material product, architecture, and design
@@ -158,7 +176,7 @@ TODO: who approves what, and which actions must never be taken silently.
 
 TODO: what counts as a material decision, what is recorded, and where.
 
-## Article IX — [Project-Defined Principle]
+## Article X — [Project-Defined Principle]
 
 <!-- Add, remove, or rename articles so the set fits this project. Domain rules
      (security, compliance, privacy, accessibility, performance, licensing,

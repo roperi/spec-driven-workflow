@@ -11,10 +11,15 @@ TODO: describe the useful result this work should produce.
 ## Approach
 
 TODO: describe how the work will be done, in as few words as the work allows.
+Keep the treatment proportionate: a trivial change's first result may be its
+final result, and no separate demonstration milestone is forced. See the shared
+guidance on the first useful demonstration and proportionality in
+`.sdw/agents/shared/workflow.md`.
 
 ## Actions and Progress
 
-TODO: record actions as they occur, including partial and interrupted states.
+TODO: record actions as they occur, including partial and interrupted states, and
+track progress against the next observable checkpoint.
 
 ## Checks and Results
 

@@ -14,3 +14,7 @@ Classify observation strength and route a failed obligation by cause before anot
 ## Limitations
 
 TODO: separate deterministic checks, native runs, publication, adoption, and user experience.
+Assess the demonstrated behavior and the delivery sequencing, not only article
+references or test counts, and keep simulations, automated checks, real service
+acceptance, and human demonstrations distinct per the shared review guidance in
+`.sdw/agents/shared/workflow.md`.

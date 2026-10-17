@@ -192,6 +192,36 @@ reviewer. The exact rule lives in the
 [shared workflow instructions](../agents/shared/workflow.md), installed as
 `.sdw/agents/shared/workflow.md`.
 
+## Early demonstrable value and material decisions
+
+SDW keeps the whole intended outcome explicit while choosing the earliest safe
+useful observable checkpoint within it. That first useful demonstration — a small
+working path, a necessary safety proof, an exercised infrastructure boundary, or
+an inspectable documentation result — is not automatically final acceptance.
+Scope and plan state the first observable result and its recipient, the important
+real dependency or uncertainty it exercises, the prerequisites required with
+their evidence, and the breadth deliberately deferred; a small complete path is
+ordered before independent breadth, and early delivery never waives a safety
+prerequisite. Execution compares evidence with the next observable checkpoint and
+changes the diagnosis, decomposition, or approach under the existing recurrence
+rules rather than repeating the same repair. Validation and review assess the
+actually demonstrated behavior, the necessity of the prerequisites, and the
+unresolved real boundaries, keeping simulations, automated checks, real service
+acceptance, and human demonstrations distinct.
+
+Before a material decision — one that changes material cost, deployment, safety,
+scope, or ongoing operational burden — the user receives a plain-language
+explanation of the outcome, exclusions, operational prerequisites and their
+ongoing burden, the simplest credible alternative, the risks and effort
+uncertainty, and the effect on time to first value. The rationale and the trigger
+that would reopen the decision are recorded in the existing records, and an
+earlier blanket approval is neither evidence of comprehension nor authority for
+unagreed expansion. Human-facing reports, `next.md`, and handoffs name the
+user's exact next action — or that no action is needed — in plain language. The
+exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md), installed as
+`.sdw/agents/shared/workflow.md`.
+
 ## Project context
 
 Project-owned context lives in `.sdw/project-context/` and is reused across work

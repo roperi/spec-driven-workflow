@@ -24,6 +24,17 @@ plain language:
   rejected;
 - known risks, limitations, or open questions that could affect the user later.
 
+The plain summary always says what the user should do next. At a stop, a
+handoff, or completion it names the exact next action, or states plainly that no
+action is needed; a stage label, a task ID, a file link, or “ready for review”
+alone is not enough. When a decision is needed it gives the recommendation and
+its consequence. When the agreement requires another session it gives a usable
+invocation naming the work item, where to use it, and the actual stop, without
+inventing user work, a new approval, a model choice, or a reviewer session.
+During authorized continuation the agent proceeds and says so instead of asking
+for routine approval, and at the authorized endpoint it does not invent another
+task.
+
 The technical detail keeps the full precision the artifacts and downstream
 agents need. The plain layer is added to the report; it never replaces a
 technical record, and it never hides, softens, or omits a material decision,
@@ -32,6 +43,17 @@ overview, answer with the plain summary first and add the technical detail only
 as needed. Where an artifact is itself the thing the user must read or approve,
 its plain statement accompanies it in the report rather than weakening the
 artifact's required content.
+
+Before a material decision — one that changes material cost, deployment,
+safety, scope, or ongoing operational burden — the plain summary explains the
+outcome, what is excluded, the operational prerequisites and the burden of
+keeping them, the simplest credible alternative, the risks and effort
+uncertainty, and the effect on time to first value. Record the rationale and the
+trigger that would reopen the decision in the existing records. A new material
+cost, deployment, safety, scope, or operational burden reopens the affected
+decision: earlier blanket approval is neither evidence of comprehension nor
+authority for unagreed expansion, while routine implementation choices remain
+autonomous.
 
 ## Progression loop
 
@@ -133,6 +155,13 @@ responsibility resumes from records without the previous chat or routine
 reapproval. An outgoing-session stop does not by itself withdraw authority from
 an incoming session the agreement already authorizes to proceed.
 
+A handoff that needs another session gives the user a usable continuation
+instruction in plain language: the work identity, where to use it, and the
+actual stop, under the authority the agreement already records. Do not invent
+user work, a new approval, a model choice, or a reviewer session, and do not ask
+for routine reapproval of an authorized continuation. At the authorized
+endpoint, say the work is complete and do not invent another task.
+
 ## Continuing by evidence
 
 An authorized lifecycle continues to the agreed observable outcome or a real
@@ -145,6 +174,16 @@ finding, or an identified correction. Once the agreed evidence is sufficient,
 stop repeating checks. If no justified next action remains, report the concrete
 blocker, the evidence, and a recommended decision instead of asking merely to
 try again.
+
+Compare the evidence with the next observable checkpoint rather than only with
+the last attempt. Notice substantial work that has not moved the outcome and
+recurring repairs of the same obligation, and use the existing cause-routing and
+recurrence rules to change the diagnosis, decomposition, or approach instead of
+repeating the same repair. Explain the next useful checkpoint or the concrete
+blocker in plain language. Measured elapsed time and estimated remaining effort
+stay distinct: no universal duration, retry count, wall-clock deadline, or budget
+gate is invented, and a changed approach still respects the actual user and
+service limits.
 
 Explicit user limits and actual service or resource limits remain binding: record
 unfinished work honestly, continue unaffected authorized work, and do not
@@ -227,6 +266,27 @@ duplicate. Before release, read the records as a fresh receiver would; on entry,
 reconcile the actual state and recover the relevant attempt history, and return
 missing material context to its owner rather than guessing decisions or
 requesting routine reapproval. No internal reasoning transcript is required.
+
+**Whole outcome and the first useful demonstration.** Keep the whole intended
+outcome explicit while choosing the earliest safe useful observable checkpoint
+within it. A checkpoint may be a small working path, a necessary safety proof,
+an infrastructure boundary exercised end to end, or an inspectable documentation
+result; it is not automatically final acceptance. Distinguish the whole outcome
+from the first useful demonstration, its observable result and recipient, the
+important real dependency or uncertainty it exercises, the prerequisites
+required with their evidence, and the breadth deliberately deferred. Order a
+small complete path before independent breadth, and do not let a whole-issue
+plan by itself justify postponing every useful demonstration.
+
+A prerequisite is required only when its evidence ties it to the first
+checkpoint; early delivery never waives a safety prerequisite, protected
+evidence, an explicit user limit, or an authority boundary. Where a real
+dependency is unavailable or unauthorized, name the owner and the smallest safe
+useful checkpoint, and keep the outstanding live or human acceptance explicit
+rather than substituting a simulation for it. Prefer the smallest coherent
+vertical delivery unit over speculative horizontal construction, and let these
+existing shared sections stay the single owner of each rule rather than
+repeating the policy in every stage.
 
 The rule is proportional. Compact work uses `work.md` and the existing `next.md`
 sections; simple ordinary work needs only the explanation it warrants; the same
@@ -462,6 +522,14 @@ candidate against the work item's scope, specification, and evidence and records
 a ready or not-ready conclusion; it does not publish, merge, or mutate anything
 remote. Return ordinary findings batched in one consolidated pass rather than
 stopping at the first blocker.
+
+Review assesses the actual demonstrated behavior and the delivery strategy
+around it: whether the first useful checkpoint was reached, whether the
+prerequisites were necessary for it, which real boundaries remain unresolved,
+and how strong the evidence is. Simulations, automated checks, real service
+acceptance, and human demonstrations stay distinct; a requested human
+demonstration is never silently replaced, and an early success does not satisfy
+unrelated final acceptance or a safety guarantee.
 
 Review is a bounded responsibility. Ordinary findings return to the accountable
 implementer for targeted repair and revalidation without a mandatory new full

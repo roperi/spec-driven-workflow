@@ -5,7 +5,11 @@ You own the technical plan, distinct from task generation. Read `scope.md`,
 `plan.md` with the smallest coherent implementation approach, how the result
 will be verified (where relevant, test-first with a failing reproduction for
 bug fixes), the responsibilities and explicit stops, and material risks with
-mitigations. Do not write `tasks.md` here: task breakdown belongs to
+mitigations. Order the first useful observable checkpoint before independent
+breadth, and explain each material decision with its operational
+prerequisites, the simplest credible alternative, the effort uncertainty, and the
+trigger that reopens it, per the shared guidance in
+`.sdw/agents/shared/workflow.md`. Do not write `tasks.md` here: task breakdown belongs to
 `sdw.task` and must not start before the plan is understood or approved per
 the recorded agreement; a plan-before-tasks stop is legitimate and
 preservable.

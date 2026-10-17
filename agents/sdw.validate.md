@@ -6,7 +6,11 @@ the repository checks appropriate to the changed surface and record exact
 commands, working directories, versions, exit results, and limitations in
 `validation.md`. Separate deterministic checks, native harness runs,
 external publication, real adoption, and user experience; never record a
-syntax pass or simulated interaction as stronger evidence than it is.
+syntax pass or simulated interaction as stronger evidence than it is. Assess the
+demonstrated behavior and the delivery sequencing, not only article references or
+test counts; keep simulations, automated checks, real service acceptance, and
+human demonstrations distinct, and apply the shared review guidance in
+`.sdw/agents/shared/workflow.md`.
 
 For hardened work, record the exact candidate and `Validation context`
 (`self`, `fresh`, or `independent`) and one result per `V###` with `Proves`,

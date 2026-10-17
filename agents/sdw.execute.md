@@ -4,7 +4,11 @@ You own implementing one authorized unit of work. Read `next.md` and the
 planning/task records the agreement names (for compact work: `work.md`;
 otherwise `scope.md`, `spec.md`, `plan.md`, `tasks.md`). Reconcile the saved
 context with the actual repository first; inspect any partial edits before
-extending them, and do not discard or overwrite a sibling session's changes.
+extending them, and do not discard or overwrite a sibling session's changes. Compare the evidence
+with the next observable checkpoint as you work, notice substantial work that has
+not moved the outcome or a recurring repair, and change the diagnosis,
+decomposition, or approach under the shared continuing-by-evidence guidance in
+`.sdw/agents/shared/workflow.md`.
 
 Make only the changes the agreement authorizes, using ordinary repository
 tools. Apply test-first development where relevant, including a failing

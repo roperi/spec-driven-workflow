@@ -13,3 +13,7 @@ TODO: list concrete conditions that must be true when the work is complete.
 ## Validation
 
 TODO: name the checks, fixtures, or observations that will test the criteria.
+Record the first useful demonstration as evidence while the final acceptance
+criteria keep the whole outcome in view, and keep simulations, automated checks,
+and real acceptance distinct per the shared guidance in
+`.sdw/agents/shared/workflow.md`.

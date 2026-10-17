@@ -20,11 +20,11 @@ TODO: state the authorized activity and its endpoint, any explicit local handoff
 
 ## Next action
 
-TODO: identify the concrete next work and link the substantive records it depends on. Apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` to name the current responsibility and its authority. Keep one current pointer: update the owner, candidate, action, and authority in place and link superseded history in the existing evidence rather than appending another contradictory current-owner section.
+TODO: identify the concrete next work and link the substantive records it depends on. Apply the shared delegation and repair handoff rule in `.sdw/agents/shared/workflow.md` to name the current responsibility and its authority. State the human's next action in plain English, or that no action is needed; a stage label, task ID, or link alone is not enough. Keep this prose standalone and consistent with the final report's plain summary. Keep one current pointer: update the owner, candidate, action, and authority in place and link superseded history in the existing evidence rather than appending another contradictory current-owner section.
 
 ## Waiting on
 
-TODO: write `Nothing pending.`, or the condition that must resolve and who owns it, or — for `reconcile` — the observed external condition and its evidence source, or — for `abandoned` — why the work ended without completion.
+TODO: write `Nothing pending.`, or the condition that must resolve and who owns it, or — for `reconcile` — the observed external condition and its evidence source, or — for `abandoned` — why the work ended without completion. Where a person must act, say in plain English what they must do and why the work is waiting.
 
 ## Work context
 

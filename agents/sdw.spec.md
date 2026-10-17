@@ -9,7 +9,9 @@ a prose correction does not need an invented test suite; a bug fix needs a
 failing reproduction. If the specification refines an upstream brief, reuse
 its detail; do not mechanically rewrite detailed upstream requirements, and
 flag inconsistencies with the actual repository rather than silently
-hiding them.
+hiding them. Record the first useful demonstration as evidence while the final
+acceptance criteria keep the whole outcome in view, and apply the shared
+review guidance in `.sdw/agents/shared/workflow.md` on demonstrated behavior.
 
 For hardened work (an exact `Assurance profile: hardened` in `plan.md`), write
 stable `AC###` acceptance criteria and `V###` verification cases with

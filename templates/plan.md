@@ -2,7 +2,10 @@
 
 ## Approach
 
-TODO: describe the smallest coherent implementation approach.
+TODO: describe the smallest coherent implementation approach, ordering the
+earliest safe useful observable checkpoint before independent breadth. See the
+shared guidance on the first useful demonstration in
+`.sdw/agents/shared/workflow.md`.
 
 ## Verification Approach
 
@@ -15,7 +18,11 @@ Before releasing the approach, resolve material decisions or bound a smaller coh
 
 ## Risks
 
-TODO: record material risks, mitigations, and unresolved decisions.
+TODO: record material risks, mitigations, and unresolved decisions. For each
+material decision (cost, deployment, safety, scope, or ongoing operational
+burden), record its operational prerequisites and ongoing burden, the simplest
+credible alternative, the effort uncertainty, and the trigger that reopens it,
+per the shared material-decision guidance in `.sdw/agents/shared/workflow.md`.
 
 ## Assurance
 

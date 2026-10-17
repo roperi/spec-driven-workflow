@@ -22,4 +22,9 @@ TODO: repository, tool, access, compatibility, and safety constraints.
 
 ## Success
 
-TODO: the observable conditions that establish a useful result.
+TODO: the observable conditions that establish a useful result. State the whole
+outcome separately from the first useful demonstration, including its observable
+result and recipient, the important real dependency or uncertainty it exercises,
+the prerequisites required with their evidence, and the breadth deliberately
+deferred. See the shared guidance on the whole outcome and the first useful
+demonstration in `.sdw/agents/shared/workflow.md`.

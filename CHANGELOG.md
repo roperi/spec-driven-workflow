@@ -5,6 +5,34 @@ file.
 
 ## [Unreleased]
 
+- **CHANGE**: Early demonstrable value and understandable design trade-offs — the
+  shared lifecycle instructions now make the earliest safe useful observable
+  checkpoint explicit without weakening the whole-outcome contract. Every stop,
+  handoff, and completion states a plain-language next action (or a clear
+  no-action state, with a usable continuation invocation when another session is
+  required), and a material decision is explained in plain language: outcome,
+  exclusions, operational prerequisites and ongoing burden, simplest credible
+  alternative, risks and effort uncertainty, and effect on time to first value.
+  The delegation and repair handoff rule separates the whole intended outcome from
+  the first useful demonstration, ties each prerequisite to evidence for that
+  checkpoint, keeps a safety prerequisite from being waived for early delivery,
+  and orders a small complete path before independent breadth. Continuing by
+  evidence compares evidence with the next observable checkpoint and changes
+  diagnosis, decomposition, or approach under the existing recurrence rules
+  without an invented duration, retry count, or budget gate. Stopping and handoff
+  owns plain-language continuation, and review context assesses demonstrated
+  behavior, prerequisite necessity, and unresolved real boundaries while keeping
+  simulations, automated checks, real acceptance, and human demonstrations
+  distinct. The scope/spec/plan/task/execute/validate/review prompts carry narrow
+  pointers, the artifact templates (including compact `work.md` and `next.md`)
+  carry the information in their existing sections, and the constitution worksheet
+  gains a checkable Early Vertical Delivery article plus proportional-complexity,
+  reality-based-feedback, and informed-decision guidance. Reference and
+  customization docs describe the behavior and the deliberate, authorized route
+  for a project-specific constitutional amendment and for re-assessing an existing
+  plan. No runtime, renderer, installer, record-schema, required-field, stage, or
+  model-policy change is introduced.
+
 - **CHANGE**: Continuous SDW delivery — the shared lifecycle instructions now
   route a cause within the authorized lifecycle and let one accountable owner
   resolve implementation, planning, and verification responsibilities without a

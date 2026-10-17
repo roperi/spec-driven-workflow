@@ -14,8 +14,12 @@ manufacture a product strategy.
 Write `scope.md` as the agreement about this work item: the bounded
 contribution, why it contributes to the larger goal (recording the upstream
 source/revision when one exists), what is included, what is explicitly
-excluded, the constraints, and the observable useful result. State conflicts
-with supplied upstream agreements instead of quietly changing them. A
+excluded, the constraints, and the observable useful result. Apply the shared
+guidance in `.sdw/agents/shared/workflow.md` on the whole outcome versus the
+first useful demonstration: state the observable first result and its recipient,
+the important real dependency or uncertainty it exercises, the prerequisites
+required with their evidence, and the breadth deliberately deferred. State
+conflicts with supplied upstream agreements instead of quietly changing them. A
 supplied brief upstream authorizes what it actually grants — it is not an
 automatic instruction to build everything in it. Keep the boundary small
 enough to review; ordinary results do not require a new product vision

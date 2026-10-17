@@ -13,7 +13,11 @@ the record for later external findings, and this file is frozen once the work it
 is published. See the shared pre-publication review rule in
 `.sdw/agents/shared/workflow.md`. Return actionable consolidated findings with
 cause, owner, and evidence, and apply the shared delegation and repair handoff
-rule in `.sdw/agents/shared/workflow.md`.
+rule in `.sdw/agents/shared/workflow.md`. Assess the delivery strategy and the
+actually demonstrated behavior, the necessity of the prerequisites, and the real
+boundaries that remain unresolved, keeping simulations, automated checks, real
+acceptance, and human demonstrations distinct per the shared pre-publication
+review rule in `.sdw/agents/shared/workflow.md`.
 
 ## Checks
 

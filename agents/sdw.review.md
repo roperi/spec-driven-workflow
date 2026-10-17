@@ -7,7 +7,11 @@ anything remote, and its `review.md` freezes once the work item is published, so
 later external findings never append to it. Record the review context as `self`,
 `fresh`, or `independent`; same-context review must never be described as
 independent, and `independent` is the recommended default for material/contract
-and protected-seed work without being mandated for trivial work.
+and protected-seed work without being mandated for trivial work. Assess the
+actual demonstrated behavior and the delivery strategy around it — whether the
+first useful checkpoint was reached, whether the prerequisites were necessary,
+and which real boundaries remain unresolved — and keep simulations, automated
+checks, real acceptance, and human demonstrations distinct.
 
 For hardened work, review semantic sufficiency rather than accepting the
 structural pass: inspect whether the stimuli, oracles, preserved invariants,
