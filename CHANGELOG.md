@@ -5,6 +5,12 @@ file.
 
 ## [Unreleased]
 
+- **FIX**: The installed Claude discovery rule (`.claude/rules/sdw.md`) now ends
+  with a trailing newline. Repositories whose formatter enforces a final newline
+  no longer rewrite the generated file, so Claude support installs and updates
+  cleanly through pre-commit hooks. The rule content and all other behavior are
+  unchanged.
+
 - **NEW**: Claude Code is now a native integration. `install.sh --tools claude`
   projects all thirteen canonical prompts to `.claude/agents/sdw.*.md` with only
   `name` and `description` frontmatter, and installs `.claude/rules/sdw.md` as

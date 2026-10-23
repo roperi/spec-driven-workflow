@@ -280,7 +280,9 @@ const main = async (values) => {
   if (tools.includes('claude')) {
     const destination = '.claude/rules/sdw.md'
     desiredPaths.add(destination)
-    prepareFile(plans, targetRoot, destination, bootstrapBlock(), manifest)
+    // The rule is a standalone generated file, so it carries the final newline
+    // that the managed-block path adds for AGENTS.md.
+    prepareFile(plans, targetRoot, destination, `${bootstrapBlock()}\n`, manifest)
   }
   prepareBlock(plans, targetRoot, 'AGENTS.md', bootstrapBlock(), manifest)
 
