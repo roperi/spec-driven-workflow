@@ -35,8 +35,20 @@ const renderOpenCode = (source) => {
   return `---\ndescription: ${quoteYaml(description)}\nmode: primary\n---\n\n${body}\n`
 }
 
+const renderClaude = (source) => {
+  const { id, body, description } = readCanonical(source)
+  return `---\nname: ${quoteYaml(id)}\ndescription: ${quoteYaml(description)}\n---\n\n${body}\n`
+}
+
+const RENDERERS = Object.freeze({
+  codex: { extension: 'toml', render: renderCodex },
+  opencode: { extension: 'md', render: renderOpenCode },
+  claude: { extension: 'md', render: renderClaude },
+})
+
 const renderDirectory = ({ tool, inputDir, outputDir }) => {
-  if (!['codex', 'opencode'].includes(tool)) throw new Error(`unsupported renderer tool: ${tool}`)
+  const renderer = RENDERERS[tool]
+  if (!renderer) throw new Error(`unsupported renderer tool: ${tool}`)
   // Only the thirteen canonical sdw.* agent files are projected. Shared
   // instruction content such as agents/shared/workflow.md is never counted
   // or rendered as a native agent.
@@ -52,15 +64,15 @@ const renderDirectory = ({ tool, inputDir, outputDir }) => {
   for (const name of files) {
     const source = path.join(inputDir, name)
     const id = canonicalId(source)
-    const destination = path.join(outputDir, `${id}.${tool === 'codex' ? 'toml' : 'md'}`)
-    const content = tool === 'codex' ? renderCodex(source) : renderOpenCode(source)
+    const destination = path.join(outputDir, `${id}.${renderer.extension}`)
+    const content = renderer.render(source)
     fs.writeFileSync(destination, content, 'utf8')
     rendered.push(destination)
   }
   return rendered
 }
 
-const usage = () => `Usage: node runtime/render.mjs --tool codex|opencode --input-dir DIR --output-dir DIR`
+const usage = () => `Usage: node runtime/render.mjs --tool codex|opencode|claude --input-dir DIR --output-dir DIR`
 
 const main = () => {
   const values = {}
@@ -87,4 +99,4 @@ if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   }
 }
 
-export { AGENTS, renderCodex, renderDirectory, renderOpenCode, readCanonical }
+export { AGENTS, renderClaude, renderCodex, renderDirectory, renderOpenCode, readCanonical }

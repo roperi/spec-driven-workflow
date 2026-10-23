@@ -471,6 +471,16 @@ expand explicitly if the work grows, keeping one mutable authority. Do not
 manufacture completed work to fill a template; honest pending or unresolved
 sections are correct when they are true.
 
+**Layout.** The top level of a work directory holds only the canonical
+artifacts in use, plus an optional `README.md`. Every other supporting record
+the work produces — decision memos, findings, change tables, superseded
+handoffs, raw logs — lives under `evidence/`, and the canonical records link to
+it by that `evidence/` path. `evidence/decisions/`, `evidence/findings/`, and
+`evidence/history/` are a suggested, non-mandatory sub-layout. At wrap, durable
+knowledge that outlives the work item — facts, decisions, or references a
+future unrelated task would need — is promoted to project-owned documents and
+linked from `validation.md` or `retrospect.md`.
+
 ## Project context
 
 SDW keeps project context reusable across work items rather than inside one:

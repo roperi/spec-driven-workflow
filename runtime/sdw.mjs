@@ -1427,6 +1427,32 @@ const save = (workDirValue, artifactValue) => {
   return `Saved ${artifact} in ${workDir}`
 }
 
+const LAYOUT_WARNING_LIMIT = 10
+
+// Non-blocking observation of supporting records left at the top level of a
+// work directory. It names files only: it never reads them, never changes the
+// authorized read set, and never affects a check's exit status.
+const layoutWarning = (workDir) => {
+  let entries
+  try {
+    entries = fs.readdirSync(workDir, { withFileTypes: true })
+  } catch {
+    return null
+  }
+  // `ARTIFACTS` owns the canonical names: add any new top-level artifact there.
+  const strays = entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((name) => !name.startsWith('.') && name !== 'README.md' && !Object.hasOwn(ARTIFACTS, name))
+    .sort()
+  if (strays.length === 0) return null
+  const shown = strays.slice(0, LAYOUT_WARNING_LIMIT)
+  const remaining = strays.length - shown.length
+  const count = strays.length === 1 ? '1 supporting file' : `${strays.length} supporting files`
+  const list = remaining > 0 ? `${shown.join(', ')}, … and ${remaining} more` : shown.join(', ')
+  return `Layout warning: ${count} at the top level of the work directory (${list}); move them under evidence/ and link them from the canonical records.`
+}
+
 const check = (workDirValue, activity) => {
   const workDir = resolveWorkDir(workDirValue)
   if (!Object.hasOwn(ACTIVITY_FILES, activity)) fail('ACTIVITY_INVALID', `Unsupported activity '${activity}'; choose one of ${Object.keys(ACTIVITY_FILES).join(', ')}`)
@@ -1482,8 +1508,9 @@ const check = (workDirValue, activity) => {
   }
   const assurance = format === 'compact' ? { errors: [], profile: null } : hardenedConsistency(workDir, activity, reports)
   errors.push(...assurance.errors)
+  const layout = layoutWarning(workDir)
   if (errors.length) {
-    return [`Check failed for ${activity}:`, ...errors.map((error) => `- ${error}`)].join('\n')
+    return [`Check failed for ${activity}:`, ...errors.map((error) => `- ${error}`), ...(layout ? [layout] : [])].join('\n')
   }
   const progressReport = reports.find((report) => report.artifact === 'tasks.md')
   const progress = progressReport ? taskProgress(progressReport.content) : null
@@ -1499,7 +1526,10 @@ const check = (workDirValue, activity) => {
     ? `; ${HARDENED_STRUCTURAL_NOTE}`
     : assurance.profile === 'standard' ? '; assurance standard' : ''
   const durabilityNote = durability ? `; durability ${durability.state}` : ''
-  return `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}${durabilityNote}`
+  return [
+    `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}${durabilityNote}`,
+    ...(layout ? [layout] : []),
+  ].join('\n')
 }
 
 const gitContext = (workDir) => {
@@ -2011,6 +2041,7 @@ const resume = (value) => {
       : ['Authorized reads: (no current records or named paths found)']),
     ...readDiagnostics,
     READ_EXPANSION_GUIDANCE,
+    layoutWarning(workDir),
     'Resume is read-only; inspect and repair artifacts with explicit saves before continuing.',
   ].filter(Boolean).join('\n')
 }

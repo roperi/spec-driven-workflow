@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "7e98ad70c5861a95c4373922e674ad7d0801454d60b0c8597beb15661556d96f",
+  "export_tree_sha256": "9bbe7678b0dd1e7d327f1b63b52c7e4354d2bd9b43691e15a944a1d9fa929145",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "c951c5edcfc0b1ed9db68114116045d570cdb220a7ef3116d02d8b759a483c44"
+      "sha256": "0a1c0ca0552921b370ebd25b1aedac459921abcd4ca2a13adea371fd0ad2b31b"
     },
     {
       "mode": "0644",
@@ -29,7 +29,7 @@
     {
       "mode": "0644",
       "path": "README.md",
-      "sha256": "17eb94f3a6878a7982aa4ecc81903b45579d34b601e7b4f6a58d5eba158720c8"
+      "sha256": "1c2f2b743325df5946f3c75351422b6f52d768df58463efa918cd90ac9d693c8"
     },
     {
       "mode": "0644",
@@ -59,7 +59,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.retrospect.md",
-      "sha256": "358ad10899e223ec3422a61f9f2a4fbdc4b2136a2f581a114ff85fbf17cac0ff"
+      "sha256": "e4c5356ed18cee12d8b2861bd6e78180a9f13038d08ced789b20c1b0049fb0a7"
     },
     {
       "mode": "0644",
@@ -94,47 +94,47 @@
     {
       "mode": "0644",
       "path": "agents/sdw.wrap.md",
-      "sha256": "b6e235101574b9a9960b5ba0411cda9369228eaa744b5a96a196decbd0e15b75"
+      "sha256": "6a82a010b1c3991166bfb4b414a548db6f7e4f74be9ce22ec46a6d0fdf006b1d"
     },
     {
       "mode": "0644",
       "path": "agents/shared/workflow.md",
-      "sha256": "a443e8bac168f6c7f19b9493c9da0fcb44a1524f2ca7a68b7932f31796614557"
+      "sha256": "556ac04d7db4165505f7a8c6d380d3494f5a30ac52636f3554190226bd9a10e0"
     },
     {
       "mode": "0644",
       "path": "docs/README.md",
-      "sha256": "e2213af7754cb8cc14a459dd17c81711c391611ca4e97c4e1eb0663b87ed2a10"
+      "sha256": "53671a22b465ade9c440432850b89572da8cedf0a2eb5462858d02999516e30e"
     },
     {
       "mode": "0644",
       "path": "docs/contributing.md",
-      "sha256": "ebd7d89fb92c24593d7380a9bcc9750f41c020336d8b0c4de619029e2c4c9c72"
+      "sha256": "d4353eba1cfe0b5469c5d19545bef8024452914fccdc44cfa00c8c7ca2b776af"
     },
     {
       "mode": "0644",
       "path": "docs/customization.md",
-      "sha256": "60763b59eecbbf154c24739354d88373cc17170cbd84c512a780dec4909f5832"
+      "sha256": "219a4faa6d189d3b0fad77adf115696a7b8a402954c39e01b67fa770830dea2f"
     },
     {
       "mode": "0644",
       "path": "docs/integrations.md",
-      "sha256": "ea74af8d871f5ecfc29bbcc56b51f3c0e4639df9e08faf1e15add5b40263d01e"
+      "sha256": "1fec3134db6d57e01587b9435576719e558ff01a70a1d3a45fd84cbfd15ac81a"
     },
     {
       "mode": "0644",
       "path": "docs/quickstart.md",
-      "sha256": "82ecdf3fe460179823c3f9445a93a833d2ebb8119e5d386334273216d3c1fcc1"
+      "sha256": "ebc97786d82443c5e47709d6cc1c0f25b81d3adbe2e935757f2a99d545f071cb"
     },
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "82741c91d59a336c646a3980ea178e8183dad9a88ef0b508a05acc56a2a5d0a1"
+      "sha256": "9c3cd0b1884b34fa6fc7dfe44ba34b303ecbf68db25cbda476377dcf9d26f91a"
     },
     {
       "mode": "0644",
       "path": "docs/roadmap.md",
-      "sha256": "f05cd17fc84b32f0874adaf9d2b67c1c53583afd7aab892f063761b3998f1e11"
+      "sha256": "0a2c2527283fd9493f60911620ed3cbe32fbab818bab0e80e67a54b626159214"
     },
     {
       "mode": "0755",
@@ -149,22 +149,22 @@
     {
       "mode": "0755",
       "path": "runtime/installer.mjs",
-      "sha256": "3d9b98bd7250ccdf6b062b36bfdfd0c307337c8da6e602f562bcec7f8d8126e2"
+      "sha256": "309a2a464c4ada5c477d3855228ee74adf83022671cbcbe12f244ff8f8c8a99d"
     },
     {
       "mode": "0644",
       "path": "runtime/render.mjs",
-      "sha256": "13347dcfa9cf734614f0a8d3d03680c582f6b9c28db379bcb5d096dfbee8f976"
+      "sha256": "b73e16597acd2ef5a0ae7f78d45036eee40eb49afa192779d929cc49f730d204"
     },
     {
       "mode": "0644",
       "path": "runtime/sdw.mjs",
-      "sha256": "8c57c1c0f29b633d0f770f2d3ebd8ee7f92f61f6c423f580017ee19078089463"
+      "sha256": "97d5e74c2aafc79b80a51ac13d74927575a5495b37b022b4325889f3f93e4a35"
     },
     {
       "mode": "0755",
       "path": "scripts/public-smoke.sh",
-      "sha256": "7975f9b5cec2df94121612d46c6fef25eb21fd073872301f2e40b1774e980193"
+      "sha256": "e7b015a7b30359af831fe4edbd392427b8fc440938adeaec9684e69a5c0687e4"
     },
     {
       "mode": "0644",

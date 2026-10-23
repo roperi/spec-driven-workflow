@@ -15,6 +15,10 @@ friction (confusion, repeated work, blocked access), and a few bounded
 process improvement with an owner and an explicit trigger, not one row per
 observation.
 
+Apply the shared layout rule in `.sdw/agents/shared/workflow.md` §Records while
+summarizing: file stray records under `evidence/` and promote durable findings
+to project-owned documents, linked from this record.
+
 Deferred product or technical work is explicitly out of the retrospective. When
 the work surfaced such items, route them to the issue tracker and/or record them
 in `next.md`; the retrospective may state that they were routed, but it does not

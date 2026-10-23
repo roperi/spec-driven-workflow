@@ -13,7 +13,7 @@ flowchart TD
   A --> H[node .sdw/sdw.mjs check]
   H --> N[next.md handoff]
   N --> R[Same or another harness resumes]
-  P --> I[Codex/OpenCode native projection]
+  P --> I[Codex/OpenCode/Claude Code native projection]
 ```
 
 Start with [Quick start](quickstart.md), then use the [Command and stage
@@ -45,15 +45,15 @@ claim is substantively correct.
 
 The installer owns `.sdw/sdw.mjs`, `.sdw/installer.mjs`, `.sdw/render.mjs`,
 `.sdw/agents/`, `.sdw/templates/`, `.sdw/docs/`, selected native projections,
-and its marker block in `AGENTS.md`. `.sdw/work/` and `.sdw/project-context/`
-are user-owned. Git tracks useful Markdown artifacts; private raw logs can
-remain ignored.
+the managed block in `AGENTS.md`, and the Claude `.claude/rules/sdw.md` discovery
+rule. `.sdw/work/` and `.sdw/project-context/` are user-owned. Git tracks useful
+Markdown artifacts; private raw logs can remain ignored.
 
 ## Support
 
-Native files and direct primary-session routes are supplied for Codex and
-OpenCode. Invoke SDW with the user's objective; `sdw.workflow` owns creation of
-the work directory and initial artifacts and the whole authorized lifecycle in
+Native files and direct primary-session routes are supplied for Codex, OpenCode,
+and Claude Code. Invoke SDW with the user's objective; `sdw.workflow` owns creation
+of the work directory and initial artifacts and the whole authorized lifecycle in
 one primary session, and `sdw.resume` continues an existing work item in the same
 or another supported harness. Other harnesses can read the canonical Markdown
 prompts directly.

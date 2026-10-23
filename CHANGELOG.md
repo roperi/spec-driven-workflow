@@ -5,6 +5,32 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Claude Code is now a native integration. `install.sh --tools claude`
+  projects all thirteen canonical prompts to `.claude/agents/sdw.*.md` with only
+  `name` and `description` frontmatter, and installs `.claude/rules/sdw.md` as
+  the Claude discovery and activation rule. The rule reuses the existing managed
+  bootstrap text, so Claude can find `.sdw/agents/sdw.workflow.md` and
+  `.sdw/agents/sdw.resume.md` independently of `CLAUDE.md`/`AGENTS.md`
+  resolution. `update.sh` preserves the recorded selection and ownership
+  behavior, and `codex,opencode,claude` can be selected together. Documented
+  routes are the goal-only `claude -p "Use SDW ..."` form and the explicit
+  `claude --agent sdw.workflow` form, with the caveat that a custom agent body
+  replaces Claude Code's default system prompt. No model, permission,
+  extension, hook, settings, `CLAUDE.md`, or skill files are managed, and the
+  canonical workflow content is unchanged.
+
+- **NEW**: Work-directory layout is now defined and drift is visible. The top
+  level of `.sdw/work/<work-id>/` holds only the canonical artifacts in use plus
+  an optional `README.md`; every supporting record — decision memos, findings,
+  change tables, superseded handoffs, raw logs — lives under `evidence/` and is
+  linked from the canonical records by that path. `evidence/decisions/`,
+  `evidence/findings/`, and `evidence/history/` are a suggested, non-mandatory
+  sub-layout. At wrap, durable knowledge a future unrelated task would need is
+  promoted to project-owned documents and linked from `validation.md` or
+  `retrospect.md`. `check` and `resume` print a non-blocking layout warning that
+  names stray top-level files, capped at ten names plus a remainder count; exit
+  codes, record schemas, and the authorized read set are unchanged.
+
 - **CHANGE**: Early demonstrable value and understandable design trade-offs — the
   shared lifecycle instructions now make the earliest safe useful observable
   checkpoint explicit without weakening the whole-outcome contract. Every stop,

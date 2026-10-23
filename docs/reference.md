@@ -99,6 +99,19 @@ metadata is reported, never silently mapped, and nothing is inferred from
 approval-sounding prose; closure checks report unresolved blockers and pending
 tasks.
 
+A work directory keeps a clean top level: only the canonical artifacts in use
+plus an optional `README.md`. Decision memos, findings, change tables,
+superseded handoffs and raw logs belong under `evidence/` and are linked from
+the canonical records by that path; `evidence/decisions/`,
+`evidence/findings/` and `evidence/history/` are a suggested, non-mandatory
+sub-layout. At wrap, durable knowledge a future unrelated task would need is
+promoted to project-owned documents and linked from `validation.md` or
+`retrospect.md`. `check` and `resume` print a non-blocking layout warning naming
+stray top-level files, capped at ten names; it never changes an exit status or
+the authorized read set. The exact rule lives in the
+[shared workflow instructions](../agents/shared/workflow.md), installed as
+`.sdw/agents/shared/workflow.md`.
+
 `next.md` also accepts one optional fixed field, `closure`, whose closed values
 declare the completion path: `full` (the default when absent), `planning-only`,
 `parked`, `interrupted`, `superseded`, or `abandoned`. Normal completion is

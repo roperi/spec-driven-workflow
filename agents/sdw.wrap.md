@@ -12,6 +12,10 @@ history or archiving branches requires explicit authorization. Compact work
 retains its evidence; an interrupted checkpoint is reconciled honestly
 before wrap, not bypassed.
 
+Apply the shared layout rule in `.sdw/agents/shared/workflow.md` §Records
+before closing: file stray records under `evidence/` and promote durable
+findings to project-owned documents.
+
 Run the closure check:
 
 ```sh

@@ -10,7 +10,7 @@ report includes:
 - what you expected to happen
 - what actually happened
 - the smallest reproduction you can describe
-- the harness (Codex or OpenCode) and versions you used
+- the harness (Codex, OpenCode, or Claude Code) and versions you used
 
 Issues are the authoritative intake path for reports and proposals. Public pull
 requests are not the development path for this project.
@@ -33,7 +33,7 @@ git -C "$fixture" init -q
 (
   cd "$fixture"
   SPEC_DRIVEN_WORKFLOW_SOURCE_DIR=/path/to/checkout \
-    bash /path/to/checkout/install.sh --tools codex,opencode
+    bash /path/to/checkout/install.sh --tools codex,opencode,claude
 )
 ```
 

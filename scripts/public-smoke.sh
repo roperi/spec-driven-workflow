@@ -31,13 +31,14 @@ printf 'consumer instructions\n' >"${SANDBOX_ROOT}/AGENTS.md"
 
 (
   cd "$SANDBOX_ROOT"
-  SPEC_DRIVEN_WORKFLOW_SOURCE_DIR="$REPO_ROOT" bash "${REPO_ROOT}/install.sh" --tools codex,opencode
+  SPEC_DRIVEN_WORKFLOW_SOURCE_DIR="$REPO_ROOT" bash "${REPO_ROOT}/install.sh" --tools codex,opencode,claude
   SPEC_DRIVEN_WORKFLOW_SOURCE_DIR="$REPO_ROOT" bash "${REPO_ROOT}/update.sh" --dry-run
   SPEC_DRIVEN_WORKFLOW_SOURCE_DIR="$REPO_ROOT" bash "${REPO_ROOT}/update.sh"
 )
 
-for relative in .sdw/sdw.mjs .sdw/installer.mjs .sdw/install.json .sdw/agents/sdw.workflow.md .sdw/agents/shared/workflow.md .sdw/templates/tasks.md .sdw/docs/integrations.md .codex/agents/sdw.workflow.toml .opencode/agents/sdw.workflow.md; do
+for relative in .sdw/sdw.mjs .sdw/installer.mjs .sdw/install.json .sdw/agents/sdw.workflow.md .sdw/agents/shared/workflow.md .sdw/templates/tasks.md .sdw/docs/integrations.md .codex/agents/sdw.workflow.toml .opencode/agents/sdw.workflow.md .claude/agents/sdw.workflow.md .claude/rules/sdw.md; do
   [[ -f "${SANDBOX_ROOT}/${relative}" ]] || fail "missing installed path: ${relative}"
 done
+grep -q '\.sdw/agents/sdw\.workflow\.md' "${SANDBOX_ROOT}/.claude/rules/sdw.md" || fail 'Claude discovery rule does not route to sdw.workflow'
 grep -q 'consumer instructions' "${SANDBOX_ROOT}/AGENTS.md" || fail 'consumer instructions were not preserved'
 printf 'Public smoke passed\n'

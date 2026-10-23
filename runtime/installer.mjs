@@ -14,10 +14,10 @@ const MANIFEST = '.sdw/install.json'
 const CANONICAL_AGENTS = AGENT_FILES
 const TEMPLATES = ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'retrospect.md', 'next.md', 'review.md', 'work.md', 'constitution.md', 'technical-context.md']
 const DOCS = ['integrations.md']
-const TOOLS = new Set(['codex', 'opencode'])
+const TOOLS = new Set(['codex', 'opencode', 'claude'])
 const BEGIN = '<!-- BEGIN SPEC-DRIVEN-WORKFLOW MANAGED BLOCK -->'
 const END = '<!-- END SPEC-DRIVEN-WORKFLOW MANAGED BLOCK -->'
-const USAGE = 'Usage: installer.mjs install|update [--tools codex,opencode] [--dry-run] [--source-dir DIR]'
+const USAGE = 'Usage: installer.mjs install|update [--tools codex,opencode,claude] [--dry-run] [--source-dir DIR]'
 
 class InstallerError extends Error {
   constructor(code, message) {
@@ -72,9 +72,9 @@ const parseArgs = (args) => {
 
 const selectedTools = (raw, manifest, command) => {
   const selected = raw ?? (command === 'update' ? manifest?.selected_tools?.join(',') : null)
-  if (!selected) fail('TOOLS_REQUIRED', `${command} requires --tools codex,opencode${command === 'update' ? ' or an existing .sdw/install.json selection' : ''}`)
+  if (!selected) fail('TOOLS_REQUIRED', `${command} requires --tools codex,opencode,claude${command === 'update' ? ' or an existing .sdw/install.json selection' : ''}`)
   const tools = [...new Set(selected.split(',').map((item) => item.trim()).filter(Boolean))]
-  if (!tools.length || tools.some((tool) => !TOOLS.has(tool))) fail('TOOLS_INVALID', `supported tools are codex and opencode; received ${selected}`)
+  if (!tools.length || tools.some((tool) => !TOOLS.has(tool))) fail('TOOLS_INVALID', `supported tools are codex, opencode, and claude; received ${selected}`)
   return tools
 }
 
@@ -267,18 +267,27 @@ const main = async (values) => {
   const rendererRoot = rendererLoaded.root ?? source.root
   for (const tool of tools) {
     for (const agent of CANONICAL_AGENTS) {
-      const content = tool === 'codex' ? renderer.renderCodex(sourcePath(rendererRoot, `agents/${agent}`)) : renderer.renderOpenCode(sourcePath(rendererRoot, `agents/${agent}`))
+      const content = tool === 'codex'
+        ? renderer.renderCodex(sourcePath(rendererRoot, `agents/${agent}`))
+        : tool === 'claude'
+          ? renderer.renderClaude(sourcePath(rendererRoot, `agents/${agent}`))
+          : renderer.renderOpenCode(sourcePath(rendererRoot, `agents/${agent}`))
       const destination = nativeRelative(tool, agent)
       desiredPaths.add(destination)
       prepareFile(plans, targetRoot, destination, content, manifest)
     }
+  }
+  if (tools.includes('claude')) {
+    const destination = '.claude/rules/sdw.md'
+    desiredPaths.add(destination)
+    prepareFile(plans, targetRoot, destination, bootstrapBlock(), manifest)
   }
   prepareBlock(plans, targetRoot, 'AGENTS.md', bootstrapBlock(), manifest)
 
   if (manifest) {
     for (const relative of Object.keys(manifest.files)) {
       if (relative === MANIFEST || desiredPaths.has(relative)) continue
-      const prunable = ['.codex/agents/', '.opencode/agents/', '.sdw/agents/']
+      const prunable = ['.codex/agents/', '.opencode/agents/', '.claude/agents/', '.claude/rules/', '.sdw/agents/']
       if (!prunable.some((prefix) => relative.startsWith(prefix))) continue
       const target = path.join(targetRoot, relative)
       if (!fs.existsSync(target)) continue
@@ -311,7 +320,11 @@ const main = async (values) => {
   process.stdout.write(`${values.dryRun ? 'Dry run complete' : `${values.command} complete`} for tools: ${tools.join(',')}\n`)
 }
 
-const nativeRelative = (tool, agent) => tool === 'codex' ? `.codex/agents/${agent.replace(/\.md$/u, '.toml')}` : `.opencode/agents/${agent}`
+const nativeRelative = (tool, agent) => {
+  if (tool === 'codex') return `.codex/agents/${agent.replace(/\.md$/u, '.toml')}`
+  if (tool === 'claude') return `.claude/agents/${agent}`
+  return `.opencode/agents/${agent}`
+}
 
 try {
   const args = parseArgs(process.argv.slice(2))

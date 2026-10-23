@@ -4,13 +4,14 @@ From a checked-out consumer repository, run the public launcher and select the
 native projections you use:
 
 ```bash
-bash install.sh --tools codex,opencode
+bash install.sh --tools codex,opencode,claude
 ```
 
 The launcher installs the shared helper and canonical prompts under `.sdw/`,
 then renders the selected native files. It does not change global harness
 configuration. Keep `AGENTS.md` project instructions; the installer adds one
-marker-delimited workflow block.
+marker-delimited workflow block. For Claude Code it also adds the
+`.claude/rules/sdw.md` discovery rule and does not create or modify `CLAUDE.md`.
 
 Start a work item by asking your agent to do the work using SDW, with the
 objective in plain language. The session creates `.sdw/work/<work-id>/` and its
@@ -33,9 +34,18 @@ codex --cd . "Use SDW for work item fix-login-timeout: Fix the login timeout."
 opencode run --dir . "Use SDW for work item fix-login-timeout: Fix the login timeout."
 ```
 
-The generated native agents (`.codex/agents/`, `.opencode/agents/`) are still
-available if you prefer to pin the `sdw.workflow` entrypoint explicitly; see
-[integrations.md](integrations.md).
+```bash
+claude -p "Use SDW for work item fix-login-timeout: Fix the login timeout."
+```
+
+For Claude Code, the goal-only form is the recommended default. You can also pin
+the entrypoint explicitly with `claude --agent sdw.workflow -p "<objective>"`;
+Claude replaces its default system prompt with the selected agent body in that
+form. See [integrations.md](integrations.md).
+
+The generated native agents (`.codex/agents/`, `.opencode/agents/`, and
+`.claude/agents/`) are still available if you prefer to pin the `sdw.workflow`
+entrypoint explicitly; see [integrations.md](integrations.md).
 
 The primary lifecycle session may continue through scope, specification, and
 planning when your request authorizes that work. It must preserve an explicit

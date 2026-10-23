@@ -34,8 +34,8 @@ scope → spec → plan → task → execute → validate → review → publish
 - **Proportional rigor** — compact records for small work and an explicit
   hardened profile for safety-boundary work, with project context reused across
   work items.
-- **One workflow, many tools** — canonical prompts projected natively into Codex
-  and OpenCode and readable as plain Markdown by any other tool.
+- **One workflow, many tools** — canonical prompts projected natively into Codex,
+  OpenCode, and Claude Code and readable as plain Markdown by any other tool.
 - **Isolated parallel work** — separate worktrees and work IDs to compare
   alternatives or build pieces, with deliberate selection and integration.
 
@@ -45,7 +45,7 @@ Run this inside the Git repository you want SDW to work in:
 
 ```bash
 cd your-project
-curl -fsSL https://raw.githubusercontent.com/roperi/spec-driven-workflow/main/install.sh | bash -s -- --tools codex,opencode
+curl -fsSL https://raw.githubusercontent.com/roperi/spec-driven-workflow/main/install.sh | bash -s -- --tools codex,opencode,claude
 ```
 
 Then open your coding agent in that repository and give it the objective in plain
@@ -55,6 +55,8 @@ language. For example:
 
 - **Codex** — start `codex` in the repository and paste the request.
 - **OpenCode** — start `opencode` and paste the request.
+- **Claude Code** — start `claude` and paste the request, or use
+  `claude --agent sdw.workflow` to select the entrypoint explicitly.
 
 The agent creates `.sdw/work/fix-login-timeout/`, drafts the initial artifacts,
 and carries the work through scope, specification, planning, and execution as far
@@ -64,14 +66,14 @@ planning-only request leaves an explicit stop in `next.md`.
 SDW requires Node.js 18 or newer and an ordinary Git repository; the one-line
 installer also needs `curl` or `wget`. The `--tools` list selects which native
 projections to generate, so pass only the tools you use. The installer writes the
-helper and canonical prompts under `.sdw/`, the selected native files, and one
-marker-delimited block in `AGENTS.md`. It never creates or modifies
-`.sdw/work/` or `.sdw/project-context/`, and it does not change credentials,
-permissions, models, or global tool settings.
+helper and canonical prompts under `.sdw/`, the selected native files, the
+managed `AGENTS.md` block, and Claude's `.claude/rules/sdw.md` discovery rule. It
+never creates or modifies `.sdw/work/` or `.sdw/project-context/`, and it does
+not change credentials, permissions, models, or global tool settings.
 
 Prefer a terminal command instead? The [quick start](docs/quickstart.md) and
-[integrations guide](docs/integrations.md) show the `codex` and `opencode run`
-forms.
+[integrations guide](docs/integrations.md) show the `codex`, `opencode run`, and
+`claude` forms.
 
 ## How it works
 
@@ -98,10 +100,10 @@ than proving it correct.
 
 ## Supported tools
 
-Codex and OpenCode receive native projections rendered from the same canonical
-prompts, so work started in one can be resumed in the other. Other tools can read
-the canonical Markdown prompts directly. See [integrations](docs/integrations.md)
-for the projected files and route details.
+Codex, OpenCode, and Claude Code receive native projections rendered from the
+same canonical prompts, so work started in one can be resumed in another. Other
+tools can read the canonical Markdown prompts directly. See
+[integrations](docs/integrations.md) for the projected files and route details.
 
 ## How SDW compares
 
@@ -112,7 +114,7 @@ plugs into, and where the work lives.
 
 | Tool | What it is | Works with | Process | State and continuity |
 | --- | --- | --- | --- | --- |
-| **SDW** | Markdown records + dependency-free Node helper (MIT) | Codex and OpenCode natively; any tool can read the canonical prompts | Full lifecycle `scope → … → wrap` with explicit stops; compact or hardened rigor | Repo files under `.sdw/work/`; resume across sessions, models, and supported tools through `next.md` |
+| **SDW** | Markdown records + dependency-free Node helper (MIT) | Codex, OpenCode, and Claude Code natively; any tool can read the canonical prompts | Full lifecycle `scope → … → wrap` with explicit stops; compact or hardened rigor | Repo files under `.sdw/work/`; resume across sessions, models, and supported tools through `next.md` |
 | [Spec Kit](https://github.com/github/spec-kit) | Python CLI + agent skills (MIT) | Many agents through integration keys | `constitution → specify → plan → tasks → implement → converge`, plus bug-fix and idea-assessment extensions | Project artifacts under `.specify/`; specs evolve over time |
 | [OpenSpec](https://github.com/Fission-AI/OpenSpec) | Node CLI + slash commands (MIT) | 30+ agents | `explore → propose → apply → archive`; lighter, revisable artifacts | `openspec/` specs and per-change folders; optional shared Stores for cross-repo planning |
 | [Superpowers](https://github.com/obra/superpowers) | Plugin and skill library (MIT) | Many agents and IDEs | Auto-triggered `brainstorm → worktree → plan → subagent/TDD execution → review → finish branch` | Design docs, plans, and git worktrees, organized around the active session |
