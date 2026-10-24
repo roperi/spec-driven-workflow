@@ -15,7 +15,7 @@ conversation.
 The lifecycle is one resumable flow:
 
 ```text
-scope → spec → plan → task → execute → validate → review → publish → finalize → retrospect → wrap
+scope → spec → plan → task → implement → validate → review → publish → finalize → retrospect → wrap
 ```
 
 ## What you get
@@ -59,7 +59,7 @@ language. For example:
   `claude --agent sdw.workflow` to select the entrypoint explicitly.
 
 The agent creates `.sdw/work/fix-login-timeout/`, drafts the initial artifacts,
-and carries the work through scope, specification, planning, and execution as far
+and carries the work through scope, specification, planning, and implementation as far
 as your request authorizes. You do not run a helper command to start. A
 planning-only request leaves an explicit stop in `next.md`.
 
@@ -81,7 +81,7 @@ Prefer a terminal command instead? The [quick start](docs/quickstart.md) and
 flowchart LR
   A[You give an objective] --> B[Scope and specification]
   B --> C[Plan and tasks]
-  C --> D[Execute one authorized task, with checkpoints]
+  C --> D[Implement one authorized task, with checkpoints]
   D --> E[Validate with real evidence]
   E --> F[Write next.md]
   F --> G[Resume in the same or another tool]

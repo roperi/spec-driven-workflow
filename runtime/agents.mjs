@@ -28,7 +28,7 @@ export const AGENTS = Object.freeze({
   'sdw.task': {
     description: 'Break an approved plan into actionable tasks with stable IDs, steps, and completion checks.',
   },
-  'sdw.execute': {
+  'sdw.implement': {
     description: 'Implement one authorized task and save its checkpoint evidence and next action.',
   },
   'sdw.validate': {
@@ -52,6 +52,14 @@ export const AGENTS = Object.freeze({
 })
 
 export const AGENT_FILES = Object.freeze(Object.keys(AGENTS).map((id) => `${id}.md`))
+
+// Retired responsibility names (issue #411 renamed execute to implement). They
+// are rejected, never accepted as aliases; the helper uses this map only to
+// name the replacement in the error that rejects them.
+export const RETIRED_RESPONSIBILITY_HINTS = Object.freeze({
+  'sdw.execute': 'sdw.implement',
+  execute: 'implement',
+})
 
 // sdw.workflow and sdw.resume are entrypoints, not next responsibilities.
 // next.md records one of the eleven bounded responsibilities, or none.

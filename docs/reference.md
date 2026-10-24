@@ -36,7 +36,7 @@ The canonical stages and their helper checks:
 | Specification (`sdw.spec`) | `scope.md`, `spec.md` | `check WORK_DIR spec` |
 | Plan (`sdw.plan`) | `scope.md`, `spec.md`, `plan.md`, `next.md` | `check WORK_DIR plan`; stop if planning-only was requested; no `tasks.md` required |
 | Tasks (`sdw.task`) | plan files + `tasks.md` | `check WORK_DIR task` |
-| Execute (`sdw.execute`) | planning files, `next.md` | one authorized unit, then checkpoint evidence |
+| Implement (`sdw.implement`) | planning files, `next.md` | one authorized unit, then checkpoint evidence |
 | Validate (`sdw.validate`) | planning files, `validation.md`, `next.md` | `check WORK_DIR validate` |
 | Review (`sdw.review`) | `review.md` plus evidence | pre-publication review; records context `self`/`fresh`/`independent` |
 | Publish (`sdw.publish`) | validation + review evidence | actual applicable authority required |
@@ -175,13 +175,13 @@ mutable authority.
 ## Delegation and repair handoffs
 
 Before releasing delegated implementation, the planning/task owner assesses the
-material decisions and coupled reasoning still left to the executor and either
+material decisions and coupled reasoning still left to the implementer and either
 resolves them, bounds a smaller coherent vertical unit, or records why ordinary
 implementation discretion suffices; a task ID, cohesion group, file count, or
 many AC/V references is not by itself delegation fitness. A blocking finding or
 failed validation states the original obligation, the reproduced failure, the
 expected result, and the finite completion evidence. Route by cause: an ordinary
-concrete defect against an unchanged contract returns to execution; a missing
+concrete defect against an unchanged contract returns to implementation; a missing
 design or delegation decision returns to the planning/task owner; a
 contradictory, stale, or infeasible verification returns to its author or the
 planning owner; a new requirement returns to scope/spec. Preserve observation
@@ -190,7 +190,7 @@ does not establish intended rejection or positive success. Before another repair
 handoff, compare the evidence for the same underlying obligation; recurring
 absence, an adjacent invariant escape, or an apparent resolution resting on
 invalid evidence triggers lifecycle-owner reassessment and a changed handoff,
-while a genuinely new bounded defect may still return directly to execution.
+while a genuinely new bounded defect may still return directly to implementation.
 Existing records carry the requirement and rationale, prior attempts and
 evidence with their limits, unresolved decisions and owners, the candidate,
 authority, and the exact next action so a fresh model or harness can continue;
@@ -215,7 +215,7 @@ Scope and plan state the first observable result and its recipient, the importan
 real dependency or uncertainty it exercises, the prerequisites required with
 their evidence, and the breadth deliberately deferred; a small complete path is
 ordered before independent breadth, and early delivery never waives a safety
-prerequisite. Execution compares evidence with the next observable checkpoint and
+prerequisite. Implementation compares evidence with the next observable checkpoint and
 changes the diagnosis, decomposition, or approach under the existing recurrence
 rules rather than repeating the same repair. Validation and review assess the
 actually demonstrated behavior, the necessity of the prerequisites, and the
@@ -381,7 +381,7 @@ selected work-item directory or its `evidence/` tree, and do not read archived
 into historical records only when a current pointer or an unresolved obligation
 requires them. The recorded
 `next_agent`, Agreement, Next action, Waiting on and Work context govern; a task
-or validate handoff does not become execute, and agents repair knowable record
+or validate handoff does not become implement, and agents repair knowable record
 gaps through explicit saves and continue within the recorded agreement. A work
 item may resume under a different harness or model than the one that recorded it.
 A user-chosen stage boundary does not by itself withdraw authority from an

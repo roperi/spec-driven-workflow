@@ -5,6 +5,18 @@ file.
 
 ## [Unreleased]
 
+- **BREAKING**: The lifecycle responsibility `execute` is renamed to
+  `implement`. The agent `sdw.execute` becomes `sdw.implement`, the helper
+  activity `execute` becomes `implement`, and the lifecycle is now
+  `scope → spec → plan → task → implement → validate → review → publish →
+  finalize → retrospect → wrap`. There is no alias: a saved
+  `next_agent: sdw.execute` and `check ... execute` are rejected with an error
+  that names `sdw.implement` / `implement`. `update.sh` removes the old managed
+  `sdw.execute.*` files and installs `sdw.implement.*` for every selected tool,
+  but it never edits your work records — change each in-flight
+  `.sdw/work/*/next.md` `next_agent` line to `sdw.implement` yourself. A locally
+  modified old managed file is still refused rather than deleted.
+
 - **FIX**: The installed Claude discovery rule (`.claude/rules/sdw.md`) now ends
   with a trailing newline. Repositories whose formatter enforces a final newline
   no longer rewrite the generated file, so Claude support installs and updates

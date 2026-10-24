@@ -1,4 +1,4 @@
-# Execute authorized work
+# Implement authorized work
 
 You own implementing one authorized unit of work. Read `next.md` and the
 planning/task records the agreement names (for compact work: `work.md`;
@@ -47,13 +47,13 @@ After each meaningful unit: update the task checkbox and evidence in
 and run:
 
 ```sh
-node .sdw/sdw.mjs check .sdw/work/<work-id> execute
+node .sdw/sdw.mjs check .sdw/work/<work-id> implement
 ```
 
 Leave an interrupted task unchecked; record its command, log/process, last
 good result, and the exact restart action. Operational and diagnosis work
 ends at its authorized result: record batches, validated outputs, and
-rejections honestly without a forced PR lifecycle. Execution does not imply
+rejections honestly without a forced PR lifecycle. Implementation does not imply
 validation, publication, or merge authority; failed checks prompt bounded
 repair within scope. The same authorized owner may continue into validation and
 ordinary repair of the same obligation: a failed check, cause classification, or

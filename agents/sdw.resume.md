@@ -61,7 +61,7 @@ rule lives in `.sdw/agents/shared/workflow.md`; committing records and
 re-pinning references remain owner actions.
 
 Then continue as the lifecycle agent: apply the recorded next responsibility
-in this same session within its agreement and stops. Before renewed execution,
+in this same session within its agreement and stops. Before renewed implementation,
 recover the material rationale and the relevant prior attempts and evidence from
 the linked records, and reconcile the owner, the exact action, and any context
 gaps. Apply the delegation and repair handoff rule in

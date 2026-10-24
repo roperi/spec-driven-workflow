@@ -19,8 +19,8 @@ delegated unit rather than the task count, and give each actionable unit finite
 completion evidence and a decision owner for any material gap. Apply the
 delegation and repair handoff rule in `.sdw/agents/shared/workflow.md`. Update
 `next.md` so the next responsibility is
-usually `sdw.execute` (or as the agreement directs), recording any
-deliberate change of executor session.
+usually `sdw.implement` (or as the agreement directs), recording any
+deliberate change of implementer session.
 
 For hardened work, `tasks.md` repeats the hardened declaration and adds an
 exact `## Negative-Space Readiness Audit` and task entries whose fields are

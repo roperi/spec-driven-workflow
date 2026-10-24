@@ -58,7 +58,7 @@ autonomous.
 ## Progression loop
 
 When you own a stage responsibility (sdw.scope, sdw.spec, sdw.plan, sdw.task,
-sdw.execute, sdw.validate, sdw.review, sdw.publish, sdw.finalize,
+sdw.implement, sdw.validate, sdw.review, sdw.publish, sdw.finalize,
 sdw.retrospect, sdw.wrap):
 
 1. Read the work item's `next.md` and the prerequisite records for your
@@ -109,7 +109,7 @@ Once selected, run the read-only helper on that exact directory
 and reconcile its identity and Git/worktree context before acting. The recorded
 `next_agent`, Agreement, Next action, Waiting on and Work context govern the
 saved responsibility and its stop and authority boundary; a task or validate
-handoff never silently becomes execute.
+handoff never silently becomes implement.
 
 Recover the context that responsibility needs — current decisions, blockers,
 material rationale, relevant prior failed attempts, and explicit
@@ -199,20 +199,20 @@ handoff rule owns the readiness and cause-aware routing decision once; the stage
 prompts that consume it point here instead of restating it.
 
 Before releasing delegated implementation, planning/task ownership assesses the
-material decisions and coupled reasoning still left to execution. It resolves
+material decisions and coupled reasoning still left to implementation. It resolves
 them with the decision owner, defines a smaller coherent vertical checkpoint
 with its own observable oracle, or records an evidenced reason that ordinary
 implementation discretion genuinely suffices. A task ID, cohesion group, file
 count, or many AC/V references does not by itself certify that a unit fits its
-intended executor. Established assurance, invariant, readiness, and seed
+intended implementer. Established assurance, invariant, readiness, and seed
 requirements are reused, not rewritten.
 
 A blocking finding or failed validation states the original obligation (or an
 explicitly proposed new requirement), the reproduced failure, the expected
 result, the affected paths or invariant, and the finite evidence that would
-complete it. Batch the complete findings, but the next execution unit need not
+complete it. Batch the complete findings, but the next implementation unit need not
 combine every distinct repair boundary. Missing architectural or product
-decisions belong with their owner before execution is asked to infer them.
+decisions belong with their owner before implementation is asked to infer them.
 
 Preserve observation strength. Distinguish an example corrected, a requirement
 verified, an intentional rejection, an invalid invocation, an unrelated
@@ -229,7 +229,7 @@ protected judge or an independent-oracle promise is not the implementer's to
 edit.
 
 Route by cause within the authorized lifecycle. An ordinary concrete defect
-against a resolved, unchanged contract returns to execution. A missing design or
+against a resolved, unchanged contract returns to implementation. A missing design or
 delegation decision returns to the planning/task owner. A verification
 contradiction, or a stale or infeasible check, returns to the
 verification author or planning owner. A new requirement returns to scope/spec.
@@ -253,10 +253,10 @@ alternative in the existing records and the same session when authorized. Do not
 send an unchanged larger patch list without that decision, and do not make a new
 verification project the default repair. A cause classification changes what the
 owner does next; it does not alone create a handoff or permission request. A
-genuinely new bounded defect may still return directly to execution, and no
+genuinely new bounded defect may still return directly to implementation, and no
 universal round count or model-selection rule applies.
 
-A fresh planning, execution, review, or repair session may use a different
+A fresh planning, implementation, review, or repair session may use a different
 model or harness. Preserve the material reasoning outcome in existing records:
 the requirement and rationale, rejected alternatives and assumptions, prior
 attempts and evidence with their limits, retained requirements, unresolved
@@ -338,7 +338,7 @@ equivalent project-owned document. A policy cannot authorize a direct push to th
 default branch.
 
 **Scope of responsibility.** This rule binds every responsibility that commits,
-pushes, or opens a pull request, not only `sdw.execute`. It is product-neutral.
+pushes, or opens a pull request, not only `sdw.implement`. It is product-neutral.
 It adds no lifecycle stage: merge and publication remain explicit, separately
 authorized human actions, and a pull-request stop is a stop, not an approval.
 
@@ -707,7 +707,7 @@ item per `Verifies` ID in the same order; a checked task may hold no `pending`
 item. A green local example does not complete a cohesion group while a shared
 invariant is contradicted.
 
-### Hardened execution
+### Hardened implementation
 
 Load the `AC###`/`V###` mappings and cohesion group before editing. Implement
 every named `V###` case where it is locally executable, recording red evidence

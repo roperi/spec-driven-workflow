@@ -18,7 +18,7 @@ When an engineering discovery challenges the scope or an upstream agreement,
 record the implication and return the decision to the appropriate owner; do
 not silently alter the agreement or replan approved work wholesale.
 
-Before releasing an approach for execution, assess the material decisions and
+Before releasing an approach for implementation, assess the material decisions and
 coupled reasoning still unresolved and either resolve them with their owner or
 bound a smaller coherent vertical result. Apply the delegation and repair handoff rule in
 `.sdw/agents/shared/workflow.md`.

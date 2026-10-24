@@ -15,6 +15,7 @@ import {
   PENDING_RECORD_STATUSES,
   RECORD_FORMATS,
   RECORD_STATUSES,
+  RETIRED_RESPONSIBILITY_HINTS,
   TERMINAL_RECORD_STATUSES,
 } from './agents.mjs'
 
@@ -39,7 +40,7 @@ const ACTIVITY_FILES = Object.freeze({
   spec: ['scope.md', 'spec.md'],
   plan: ['scope.md', 'spec.md', 'plan.md', 'next.md'],
   task: ['scope.md', 'spec.md', 'plan.md', 'tasks.md'],
-  execute: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'next.md'],
+  implement: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'next.md'],
   validate: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'next.md'],
   review: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'next.md', 'review.md'],
   publish: ['validation.md', 'next.md'],
@@ -101,6 +102,13 @@ class SdwError extends Error {
 
 const fail = (code, message) => {
   throw new SdwError(code, message)
+}
+
+// Retired responsibility names are rejected outright; the hint only points a
+// stale record or invocation at the replacement name.
+const retiredNameHint = (value) => {
+  const replacement = RETIRED_RESPONSIBILITY_HINTS[value]
+  return replacement ? `; '${value}' was renamed to '${replacement}' — use the new name` : ''
 }
 
 const usage = () => `Usage:
@@ -260,7 +268,7 @@ const parseNextRecord = (content, workDir) => {
   if (stored.has('next_agent') && stored.get('next_agent')) {
     const value = stored.get('next_agent')
     if (value === 'none') record.nextAgent = 'none'
-    else if (!NEXT_RESPONSIBILITIES.includes(value)) errors.push(`next.md: next_agent '${value}' is not a canonical responsibility ('none' or one of ${NEXT_RESPONSIBILITIES.join(', ')})`)
+    else if (!NEXT_RESPONSIBILITIES.includes(value)) errors.push(`next.md: next_agent '${value}' is not a canonical responsibility ('none' or one of ${NEXT_RESPONSIBILITIES.join(', ')})${retiredNameHint(value)}`)
     else record.nextAgent = value
   }
   // Status/next-agent coherence: terminal statuses pair with next_agent none;
@@ -486,7 +494,7 @@ const HARDENED_RESULT_FIELDS = Object.freeze([
 const HARDENED_ACTIVITY_FILES = Object.freeze({
   plan: ['spec.md', 'plan.md'],
   task: ['spec.md', 'plan.md', 'tasks.md'],
-  execute: ['spec.md', 'plan.md', 'tasks.md'],
+  implement: ['spec.md', 'plan.md', 'tasks.md'],
   handoff: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
   validate: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
   review: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
@@ -1455,7 +1463,7 @@ const layoutWarning = (workDir) => {
 
 const check = (workDirValue, activity) => {
   const workDir = resolveWorkDir(workDirValue)
-  if (!Object.hasOwn(ACTIVITY_FILES, activity)) fail('ACTIVITY_INVALID', `Unsupported activity '${activity}'; choose one of ${Object.keys(ACTIVITY_FILES).join(', ')}`)
+  if (!Object.hasOwn(ACTIVITY_FILES, activity)) fail('ACTIVITY_INVALID', `Unsupported activity '${activity}'; choose one of ${Object.keys(ACTIVITY_FILES).join(', ')}${retiredNameHint(activity)}`)
   const recordProbe = readWorkFile(workDir, 'next.md')
   let required = []
   let format = 'normal'
