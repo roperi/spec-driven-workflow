@@ -1436,6 +1436,16 @@ const save = (workDirValue, artifactValue) => {
 }
 
 const LAYOUT_WARNING_LIMIT = 10
+const EVIDENCE_BUDGET_WARNING_LIMIT = 10
+const EVIDENCE_SINGLE_FILE_LIMIT = 1024 * 1024
+const EVIDENCE_TOTAL_LIMIT = 20 * 1024 * 1024
+const EVIDENCE_FILE_COUNT_LIMIT = 500
+// Git metadata scans are proportional to the enclosing repository index, not to
+// the work item. The motivating consumer had 27,619 tracked paths (a few MiB of
+// NUL-delimited `ls-files` output); this bound leaves ample headroom beyond
+// Node's 1 MiB subprocess default while keeping memory bounded. The warning
+// output itself stays capped by EVIDENCE_BUDGET_WARNING_LIMIT.
+const EVIDENCE_METADATA_BUFFER_LIMIT = 64 * 1024 * 1024
 
 // Non-blocking observation of supporting records left at the top level of a
 // work directory. It names files only: it never reads them, never changes the
@@ -1459,6 +1469,165 @@ const layoutWarning = (workDir) => {
   const count = strays.length === 1 ? '1 supporting file' : `${strays.length} supporting files`
   const list = remaining > 0 ? `${shown.join(', ')}, … and ${remaining} more` : shown.join(', ')
   return `Layout warning: ${count} at the top level of the work directory (${list}); move them under evidence/ and link them from the canonical records.`
+}
+
+const formatEvidenceSize = (bytes) => {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`
+  if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KiB`
+  return `${bytes} B`
+}
+
+const cappedEvidenceList = (items) => {
+  const shown = items.slice(0, EVIDENCE_BUDGET_WARNING_LIMIT)
+  const remaining = items.length - shown.length
+  return remaining > 0 ? `${shown.join(', ')}, … and ${remaining} more` : shown.join(', ')
+}
+
+const parseIndexEntries = (listing) => {
+  const entries = []
+  const nonRegular = []
+  let malformed = 0
+  for (const record of listing.split('\0')) {
+    if (record === '') continue
+    const tab = record.indexOf('\t')
+    if (tab === -1) {
+      malformed += 1
+      continue
+    }
+    const [mode, oid, stage] = record.slice(0, tab).split(' ')
+    if (!mode || !oid || stage === undefined) {
+      malformed += 1
+      continue
+    }
+    if (stage !== '0') continue
+    const entryPath = record.slice(tab + 1)
+    if (mode !== '100644' && mode !== '100755') {
+      nonRegular.push(entryPath)
+      continue
+    }
+    entries.push({ oid, path: entryPath })
+  }
+  return { entries, malformed, nonRegular }
+}
+
+// Non-blocking observation of tracked evidence retention. It reads only index
+// metadata (`git ls-files` entries plus one object-size batch) and never file
+// content. It never changes the authorized read set or a check's exit status.
+const evidenceBudgetWarning = (workDir) => {
+  const nextResponsibility = 'Move bulk output to an ignored location or an archive and cite it by path, ref or tag plus a hash.'
+  // The common case has no evidence directory at all; skip both Git scans.
+  try {
+    if (!fs.statSync(path.join(workDir, 'evidence')).isDirectory()) return null
+  } catch {
+    return null
+  }
+  const root = gitProbe(workDir, ['rev-parse', '--show-toplevel'])
+  if (root === null) return null
+  const relative = path.relative(root, workDir).split(path.sep).join('/')
+  if (path.isAbsolute(relative) || relative === '..' || relative.startsWith('../')) {
+    return `Evidence budget warning: the work directory is outside its Git root, so the evidence budget was not assessed. ${nextResponsibility}`
+  }
+  const workPrefix = relative === '' ? '' : `${relative}/`
+  const evidencePrefix = `${workPrefix}evidence/`
+  // Scope the first listing to the work item. Only a work item that actually
+  // tracks evidence pays for the full-index scan needed to detect copies.
+  const evidenceListing = gitProbeRaw(root, ['ls-files', '-s', '-z', '--', `:(top,literal)${evidencePrefix}`])
+  if (evidenceListing === null) {
+    return `Evidence budget warning: the tracked evidence index scan failed, so the evidence budget was not assessed. ${nextResponsibility}`
+  }
+  const evidenceParsed = parseIndexEntries(evidenceListing)
+  const evidence = evidenceParsed.entries
+  const evidenceNonRegular = evidenceParsed.nonRegular.filter((entryPath) => entryPath.startsWith(evidencePrefix))
+  let malformed = evidenceParsed.malformed
+  if (evidence.length === 0 && malformed === 0 && evidenceNonRegular.length === 0) return null
+
+  let outsideOids = new Set()
+  let outsideScanFailed = false
+  // When the repository root is the work item there is nothing outside it, so
+  // the full-index scan is unnecessary and every evidence path is work-relative.
+  if (workPrefix !== '') {
+    const listing = gitProbeRaw(root, ['ls-files', '-s', '-z'])
+    if (listing === null) {
+      outsideScanFailed = true
+    } else {
+      const parsed = parseIndexEntries(listing)
+      malformed += parsed.malformed
+      outsideOids = new Set(
+        parsed.entries.filter((entry) => !entry.path.startsWith(workPrefix)).map((entry) => entry.oid),
+      )
+    }
+  }
+
+  const uniqueOids = [...new Set(evidence.map((entry) => entry.oid))]
+  const sizes = new Map()
+  const batch = uniqueOids.length
+    ? gitProbeInput(
+      root,
+      ['cat-file', '--batch-check=%(objectname) %(objectsize)'],
+      `${uniqueOids.join('\n')}\n`,
+    )
+    : ''
+  const sizeScanFailed = batch === null
+  const missingOids = new Set()
+  for (const line of (batch ?? '').split('\n')) {
+    const match = /^([0-9a-f]+) (\d+)$/u.exec(line)
+    if (match) {
+      sizes.set(match[1], Number(match[2]))
+    } else {
+      const [oid, status] = line.split(' ')
+      if (oid && status === 'missing') missingOids.add(oid)
+    }
+  }
+  // Missing blobs are expected in a partial clone and are not a budget breach.
+  const partialClone = missingOids.size > 0
+    && gitProbe(root, ['config', '--get-regexp', 'promisor|partialclone']) !== null
+  const displayPath = (entry) => entry.path.slice(workPrefix.length)
+  const measured = evidence.map((entry) => ({ ...entry, size: sizes.get(entry.oid) ?? null }))
+  const unresolved = measured.filter((entry) => entry.size === null && !(partialClone && missingOids.has(entry.oid)))
+  const sized = measured
+    .filter((entry) => entry.size !== null)
+    .sort((left, right) => right.size - left.size || left.path.localeCompare(right.path))
+  const total = sized.reduce((sum, entry) => sum + entry.size, 0)
+  const oversized = sized.filter((entry) => entry.size > EVIDENCE_SINGLE_FILE_LIMIT)
+  // The empty blob is shared by every empty file; derive its OID from the
+  // repository object format instead of hardcoding SHA-1.
+  const emptyBlobOid = evidence.length
+    ? gitProbeInput(root, ['hash-object', '-t', 'blob', '--stdin'], '')
+    : null
+  const copies = measured.filter((entry) => entry.oid !== emptyBlobOid && entry.size !== 0 && outsideOids.has(entry.oid))
+  const breaches = []
+  if (oversized.length) {
+    breaches.push(`the single-file limit ${formatEvidenceSize(EVIDENCE_SINGLE_FILE_LIMIT)} is exceeded by ${oversized.length} tracked file${oversized.length === 1 ? '' : 's'}`)
+  }
+  if (total > EVIDENCE_TOTAL_LIMIT) {
+    const qualifier = unresolved.length ? ' at least' : ''
+    breaches.push(`tracked evidence totals${qualifier} ${formatEvidenceSize(total)}, over the ${formatEvidenceSize(EVIDENCE_TOTAL_LIMIT)} total limit`)
+  }
+  if (evidence.length > EVIDENCE_FILE_COUNT_LIMIT) {
+    breaches.push(`${evidence.length} tracked evidence files exceed the ${EVIDENCE_FILE_COUNT_LIMIT}-file limit`)
+  }
+  if (copies.length) {
+    breaches.push(`tracked evidence copies ${copies.length === 1 ? 'a file' : 'files'} from outside the work directory (${cappedEvidenceList(copies.map(displayPath))})`)
+  }
+  if (evidenceNonRegular.length) {
+    breaches.push(`${evidenceNonRegular.length} tracked evidence entr${evidenceNonRegular.length === 1 ? 'y uses' : 'ies use'} a non-regular mode and ${evidenceNonRegular.length === 1 ? 'was' : 'were'} not included in the budget`)
+  }
+  if (sizeScanFailed) {
+    breaches.push('the evidence size scan failed, so size limits were not assessed')
+  } else if (unresolved.length) {
+    breaches.push(`the size of ${unresolved.length} tracked evidence file${unresolved.length === 1 ? '' : 's'} is unavailable (${cappedEvidenceList(unresolved.map(displayPath))}), so size limits were not fully assessed`)
+  }
+  if (outsideScanFailed) {
+    breaches.push('the repository index scan failed, so copies were not assessed')
+  }
+  if (malformed) {
+    breaches.push(`${malformed} tracked index entr${malformed === 1 ? 'y' : 'ies'} could not be parsed, so the evidence budget may be incomplete`)
+  }
+  if (breaches.length === 0) return null
+  const offenders = sized.length
+    ? ` Largest tracked evidence: ${cappedEvidenceList(sized.map((entry) => `${displayPath(entry)} (${formatEvidenceSize(entry.size)})`))}.`
+    : ''
+  return `Evidence budget warning: ${breaches.join('; ')}.${offenders} ${nextResponsibility}`
 }
 
 const check = (workDirValue, activity) => {
@@ -1517,8 +1686,9 @@ const check = (workDirValue, activity) => {
   const assurance = format === 'compact' ? { errors: [], profile: null } : hardenedConsistency(workDir, activity, reports)
   errors.push(...assurance.errors)
   const layout = layoutWarning(workDir)
+  const evidence = evidenceBudgetWarning(workDir)
   if (errors.length) {
-    return [`Check failed for ${activity}:`, ...errors.map((error) => `- ${error}`), ...(layout ? [layout] : [])].join('\n')
+    return [`Check failed for ${activity}:`, ...errors.map((error) => `- ${error}`), ...(layout ? [layout] : []), ...(evidence ? [evidence] : [])].join('\n')
   }
   const progressReport = reports.find((report) => report.artifact === 'tasks.md')
   const progress = progressReport ? taskProgress(progressReport.content) : null
@@ -1537,6 +1707,7 @@ const check = (workDirValue, activity) => {
   return [
     `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}${durabilityNote}`,
     ...(layout ? [layout] : []),
+    ...(evidence ? [evidence] : []),
   ].join('\n')
 }
 
@@ -1559,6 +1730,34 @@ const execGit = (args) => execFileSync('git', args, { encoding: 'utf8', stdio: [
 const gitProbe = (workDir, args) => {
   try {
     return execFileSync('git', ['-C', workDir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+  } catch {
+    return null
+  }
+}
+
+// Untrimmed variant for NUL-delimited metadata listings, where a trailing
+// newline is data. The index listing can exceed Node's default 1 MiB subprocess
+// buffer at the repository scale this warning is meant to observe.
+const gitProbeRaw = (workDir, args) => {
+  try {
+    return execFileSync('git', ['-C', workDir, ...args], {
+      encoding: 'utf8',
+      maxBuffer: EVIDENCE_METADATA_BUFFER_LIMIT,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+  } catch {
+    return null
+  }
+}
+
+const gitProbeInput = (workDir, args, input) => {
+  try {
+    return execFileSync('git', ['-C', workDir, ...args], {
+      encoding: 'utf8',
+      input,
+      maxBuffer: EVIDENCE_METADATA_BUFFER_LIMIT,
+      stdio: ['pipe', 'pipe', 'ignore'],
+    }).trim()
   } catch {
     return null
   }
@@ -2050,6 +2249,7 @@ const resume = (value) => {
     ...readDiagnostics,
     READ_EXPANSION_GUIDANCE,
     layoutWarning(workDir),
+    evidenceBudgetWarning(workDir),
     'Resume is read-only; inspect and repair artifacts with explicit saves before continuing.',
   ].filter(Boolean).join('\n')
 }

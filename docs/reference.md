@@ -112,6 +112,21 @@ the authorized read set. The exact rule lives in the
 [shared workflow instructions](../agents/shared/workflow.md), installed as
 `.sdw/agents/shared/workflow.md`.
 
+Track the canonical records plus only the small supporting files a record cites
+or a test reads. Raw or bulk output — probe dumps, logs, build bundles,
+datasets — stays untracked in a location the repository ignores (suggested:
+`evidence/raw/`, ignored by a committed repository `.gitignore`) or in an
+external archive, and the record that relies on it cites a pointer: a path, ref,
+or tag, plus a hash. Never copy a source or build tree into the work directory;
+cite the commit and path instead. A tracked record summarizes the finding it
+needs, so a fresh checkout resumes from the records alone. `check` and `resume`
+print a non-blocking evidence budget warning when one tracked evidence file
+exceeds 1 MiB, tracked evidence exceeds 20 MiB or 500 files, or a tracked
+evidence file is byte-identical to a tracked file outside the work directory. It
+names the breached limits, a capped offender list, and the copies, and it never
+changes an exit status or the authorized read set. The exact rule lives in the
+same shared workflow instructions.
+
 `next.md` also accepts one optional fixed field, `closure`, whose closed values
 declare the completion path: `full` (the default when absent), `planning-only`,
 `parked`, `interrupted`, `superseded`, or `abandoned`. Normal completion is

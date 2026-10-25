@@ -10,6 +10,8 @@ Project instructions in `AGENTS.md`/`CLAUDE.md`, Codex configuration, OpenCode
 configuration, Claude Code configuration, `.sdw/work/`, and
 `.sdw/project-context/` remain user-owned. The installer preserves their unrelated
 content. Do not put credentials or private raw logs in tracked work artifacts.
+Keep raw or bulk output in an ignored location or an external archive and cite
+it by pointer, as the shared retention rule requires.
 
 Edit `.sdw/project-context/constitution.md` and
 `.sdw/project-context/technical-context.md` deliberately as the project's durable

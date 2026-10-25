@@ -42,6 +42,9 @@ contradictory checks to their owner without editing the agreed judge or
 requirements. Apply the delegation and repair handoff rule in
 `.sdw/agents/shared/workflow.md`.
 
+Apply the shared retention rule in `.sdw/agents/shared/workflow.md` §Records
+when writing evidence.
+
 After each meaningful unit: update the task checkbox and evidence in
 `tasks.md`, update `next.md` while pointing to the following responsibility,
 and run:

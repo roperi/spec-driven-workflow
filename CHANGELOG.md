@@ -5,6 +5,18 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Work items now define evidence retention. A work item tracks the
+  canonical records and only the small supporting files a record cites or a test
+  reads; raw or bulk output stays in a repository-ignored location (suggested
+  `evidence/raw/`, ignored by a committed `.gitignore`) or an external archive,
+  and records cite it by a path, ref, or tag plus a hash. Source and build trees
+  are never copied, and tracked records remain enough to resume without the
+  bulk. `sdw.implement`, `sdw.validate`, `sdw.finalize`, and `sdw.wrap` point at
+  the rule. `check` and `resume` print a non-blocking evidence budget warning
+  when one tracked evidence file exceeds 1 MiB, tracked evidence exceeds 20 MiB
+  or 500 files, or a tracked evidence file is byte-identical to a tracked file
+  outside the work directory; exit codes are unchanged.
+
 - **BREAKING**: The lifecycle responsibility `execute` is renamed to
   `implement`. The agent `sdw.execute` becomes `sdw.implement`, the helper
   activity `execute` becomes `implement`, and the lifecycle is now

@@ -16,6 +16,9 @@ Apply the shared layout rule in `.sdw/agents/shared/workflow.md` §Records
 before closing: file stray records under `evidence/` and promote durable
 findings to project-owned documents.
 
+Apply the shared retention rule in `.sdw/agents/shared/workflow.md` §Records
+before closing.
+
 Run the closure check:
 
 ```sh

@@ -12,6 +12,9 @@ test counts; keep simulations, automated checks, real service acceptance, and
 human demonstrations distinct, and apply the shared review guidance in
 `.sdw/agents/shared/workflow.md`.
 
+Apply the shared retention rule in `.sdw/agents/shared/workflow.md` §Records
+when adding evidence.
+
 For hardened work, record the exact candidate and `Validation context`
 (`self`, `fresh`, or `independent`) and one result per `V###` with `Proves`,
 `Source`, `Expected`, `Observed`, `Resulting state`, `Oracle matched`,

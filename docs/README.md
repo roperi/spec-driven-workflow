@@ -47,7 +47,9 @@ The installer owns `.sdw/sdw.mjs`, `.sdw/installer.mjs`, `.sdw/render.mjs`,
 `.sdw/agents/`, `.sdw/templates/`, `.sdw/docs/`, selected native projections,
 the managed block in `AGENTS.md`, and the Claude `.claude/rules/sdw.md` discovery
 rule. `.sdw/work/` and `.sdw/project-context/` are user-owned. Git tracks useful
-Markdown artifacts; private raw logs can remain ignored.
+Markdown artifacts and the small supporting files their records cite; keep raw
+or bulk output in an ignored location or an external archive and cite it by
+pointer.
 
 ## Support
 

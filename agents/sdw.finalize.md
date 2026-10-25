@@ -35,6 +35,9 @@ checkout switch — intentional untracking is a repository `.gitignore` decision
 and names the owner and next responsibility. The single rule lives in
 `.sdw/agents/shared/workflow.md`.
 
+Apply the shared retention rule in `.sdw/agents/shared/workflow.md` §Records
+before recording terminal closure.
+
 Run the finalize check:
 
 ```sh

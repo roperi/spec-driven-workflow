@@ -313,8 +313,8 @@ work-item and continuation records SDW writes under its work directory — are n
 project changes. They are exempt from the required feature-branch and
 pull-request route above, and the project's own bookkeeping or change-flow policy
 governs how they land. The unconditional prohibition on pushing the default
-branch directly still applies to them. The separate bookkeeping-exemption
-discussion owns how those records are stored and retained; this rule only draws
+branch directly still applies to them. The [Retention rule](#records) in
+§Records owns how those records are stored and retained; this rule only draws
 the boundary.
 
 **Default branch and edge cases.** Identify the default branch by resolving
@@ -480,6 +480,16 @@ it by that `evidence/` path. `evidence/decisions/`, `evidence/findings/`, and
 knowledge that outlives the work item — facts, decisions, or references a
 future unrelated task would need — is promoted to project-owned documents and
 linked from `validation.md` or `retrospect.md`.
+
+**Retention.** A work item tracks its canonical records and only the small
+supporting files a record cites or a test reads. Raw or bulk output — probe
+dumps, logs, build bundles, datasets — is not tracked: keep it in a location the
+repository ignores (suggested `evidence/raw/`, ignored by a committed repository
+`.gitignore`) or in an external archive, and cite it from the record that relies
+on it with a pointer: a path, ref, or tag, plus a hash. Never copy a source or
+build tree into the work item; cite the commit and path instead. A tracked record
+summarizes the finding it needs, so a fresh checkout resumes from the tracked
+records alone without the bulk.
 
 ## Project context
 
