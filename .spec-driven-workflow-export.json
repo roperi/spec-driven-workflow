@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "3b3328c73a835fc579f20c35a0c7381ed45813c8cc19366fe51b236e6433a2e1",
+  "export_tree_sha256": "df7efdcfbbeee3573962ff06e09b0147c47537284dc2b36ca40f0b006ddd46cb",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "beacf95b97ef2d27b50b6a01583605fedc73d86b3cb61f805aaf7922806de434"
+      "sha256": "89cbc1693cc7213613bcf311e74dccfa6a8f39a439ccc46e4f7e1a3524df4211"
     },
     {
       "mode": "0644",
@@ -34,7 +34,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.finalize.md",
-      "sha256": "29787dcd0c3103e762353ab5fe5dc2f0f2276fc02add20022a336032e4cf5d2b"
+      "sha256": "03c1dcd40767c51c5a8e757e1532577beebf68753d00ae96a864d138e9e4e269"
     },
     {
       "mode": "0644",
@@ -59,7 +59,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.retrospect.md",
-      "sha256": "e4c5356ed18cee12d8b2861bd6e78180a9f13038d08ced789b20c1b0049fb0a7"
+      "sha256": "d89eadf83fbffa5cf275996cc4c3d49b3531a195d28a46510c761ea6b04b0309"
     },
     {
       "mode": "0644",
@@ -94,12 +94,12 @@
     {
       "mode": "0644",
       "path": "agents/sdw.wrap.md",
-      "sha256": "e5376f87fa650c4c42f99c6e05f39f791b09997456718b6fc2d3d824e80758db"
+      "sha256": "fa7dbf921b0c7fad222272f15251219bdfc4d2f33fd75f29d9d37c11455fbdb3"
     },
     {
       "mode": "0644",
       "path": "agents/shared/workflow.md",
-      "sha256": "4c7b3e6bf55f471094f55a479ff86c359b4aed3cb7e08f4b023256c3e7912cff"
+      "sha256": "0f3811fa504151b0e01d0def58dd6ed9b55c28573263ead34448ebef6d394052"
     },
     {
       "mode": "0644",
@@ -129,7 +129,7 @@
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "03574e05adc157ddc22fe9c6b65652a9a14a2e4f478a5107835e6f8abad25b49"
+      "sha256": "01b3f5d3a510a867854b26fe3faae43e50201a662a76f1ffdec19745e33574d3"
     },
     {
       "mode": "0644",
@@ -159,7 +159,7 @@
     {
       "mode": "0644",
       "path": "runtime/sdw.mjs",
-      "sha256": "5d20de2710d77d0e2868088e99d64e4e02b18f88c558396c654cbc1ed7ab1a40"
+      "sha256": "72eaa163dc164e30adcd0f7f6ce0aae1c42eb9864d7c7794c61ae1cbe8cb36d1"
     },
     {
       "mode": "0755",
@@ -174,7 +174,7 @@
     {
       "mode": "0644",
       "path": "templates/next.md",
-      "sha256": "ecbec9e628b5978052a3499d66a32b0db87d207c8fed9fdde60bd662fcae88c1"
+      "sha256": "44f7948c9c0574371e4a69926a266982b25348c016ebbf4d5e970d18ab4f88da"
     },
     {
       "mode": "0644",

@@ -136,7 +136,19 @@ passed the review or retrospect responsibility must carry `review.md` and
 `interrupted`, `superseded`, `abandoned`) bounds the endpoint and does not
 require them. `parked` requires `status: waiting`; `interrupted` requires
 `waiting` or `abandoned`; `superseded` and `abandoned` require `abandoned`.
-Compact records bypass the closure contract. A missing
+Compact records bypass the closure contract.
+
+A reviewed, published PR is a valid normal endpoint: the work item closes on its
+own branch before the merge, the PR records the human merge, and the work item
+does not re-record it. If the agreement explicitly names the merge itself as the
+endpoint, the item is not complete until a human with that authority confirms it
+or the record carries applicable external evidence; a post-merge bookkeeping
+record rides on the next change's branch or the project's documented bookkeeping
+route, never the default branch. Closure records ride the final review-feedback
+push or one small final records push; `check wrap` is the agent's self-check, not
+a human, CI, or merge gate, and small PR-ending work may use the compact path.
+
+A missing
 responsibility is reported with a diagnostic naming it (for example, `normal
 completion requires review.md (the review responsibility) or a recorded closure
 exception`), so a historical complete record that omitted an artifact is flagged
@@ -165,7 +177,18 @@ absent from the repository), a recorded branch the current checkout cannot see,
 and a recorded branch that does not contain the work item, naming the condition,
 the evidence source, the owner, and the next responsibility. A resolving
 reference still makes an untracked work directory durable; a work directory
-outside Git control is reported as unknown and does not fail. The assessment is
+outside Git control is reported as unknown and does not fail.
+
+When the recorded branch is absent, the assessment resolves the work item's
+current path (including `.sdw/work/archive/<id>/next.md`) in a locally resolved
+default branch: `origin/HEAD` first, then `origin/main`, `origin/master`, local
+`main`, and local `master`. It reports a local-evidence-only note when a ref
+contains the item, and fails closed when no ref contains it or no default
+resolves. A deleted branch's tip is not resolved. This fallback is for the
+records' durability only; `reconcile` remains remote-default-only. A
+merge-ending record that pins a candidate keeps it reachable or omits the pin.
+
+The assessment is
 read-only: it never fetches and never mutates records, refs, or remotes, and it
 never grants commit, push, merge, closure, or publication authority. The fields
 are optional, so existing records remain readable, and the exact rule lives in
@@ -181,6 +204,14 @@ closure; unknown, inaccessible, or absent remote state stays explicitly unknown
 and fails closed, and reconciliation never grants merge, closure, or publication
 authority. A record written before an external action completed moves from
 `waiting` to `reconcile` and then to `complete` or `abandoned` once reconciled.
+A reviewed, published PR is the default endpoint; `complete` means that endpoint
+was reached, not that a human merged, and reconciliation adds no new
+merge-completion outcome.
+
+A project may archive a closed work item; archived-ness is `status: complete`
+plus `next_agent: none`. Archive on the work branch before the merge, and reach
+archived items by explicit path; resume discovery is not widened. SDW ships no
+archive command or work-README template.
 
 Compact work uses `work.md` (purpose/boundary, intended result, approach,
 actions/progress, checks/results, outcome/lessons) plus `next.md`; expand to

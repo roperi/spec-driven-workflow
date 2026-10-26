@@ -1674,7 +1674,7 @@ const check = (workDirValue, activity) => {
     durability = durabilityAssessment(workDir, row.record)
     // A failing durability report carries the condition, evidence source,
     // owner, and next responsibility, not the condition alone.
-    if (durability.conditions.length) errors.push(...durability.lines)
+    if (durability.conditions.length) errors.push(...durabilityReportLines(durability))
   }
   if (row && CLOSURE_ACTIVITIES.has(activity) && row.record?.status === 'complete' && format === 'normal') {
     const tasksReport = reports.find((report) => report.artifact === 'tasks.md')
@@ -1706,6 +1706,7 @@ const check = (workDirValue, activity) => {
   const durabilityNote = durability ? `; durability ${durability.state}` : ''
   return [
     `Check passed for ${activity} (${format} records): ${reports.map((report) => report.artifact).join(', ')}${suffix}${nextNote}${assuranceNote}${durabilityNote}`,
+    ...(durability?.notes ?? []),
     ...(layout ? [layout] : []),
     ...(evidence ? [evidence] : []),
   ].join('\n')
@@ -1779,6 +1780,28 @@ const defaultBranchRef = (workDir) => {
     if (gitExit(workDir, ['rev-parse', '--verify', '--quiet', `refs/remotes/${candidate}`]) === 0) return candidate
   }
   return null
+}
+
+// The durability assessment is allowed to fall back to a local default branch
+// when the recorded work branch has been deleted after a normal merge-and-clean
+// cycle. This is intentionally separate from defaultBranchRef above: reconcile
+// remains remote-default-only and reports unknown when no remote default can be
+// resolved. The fallback is local evidence for the records' continuity only.
+const durabilityDefaultRefs = (workDir) => {
+  const refs = []
+  const add = (ref) => {
+    if (ref && !refs.includes(ref)) refs.push(ref)
+  }
+  const symbolic = gitProbe(workDir, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD'])
+  if (symbolic && symbolic.startsWith('origin/')
+    && gitExit(workDir, ['rev-parse', '--verify', '--quiet', `refs/remotes/${symbolic}`]) === 0) add(symbolic)
+  for (const candidate of ['origin/main', 'origin/master']) {
+    if (gitExit(workDir, ['rev-parse', '--verify', '--quiet', `refs/remotes/${candidate}`]) === 0) add(candidate)
+  }
+  for (const candidate of ['main', 'master']) {
+    if (gitExit(workDir, ['rev-parse', '--verify', '--quiet', `refs/heads/${candidate}`]) === 0) add(candidate)
+  }
+  return refs
 }
 
 const RECONCILE_DISCLAIMER = 'Local Git ancestry is local evidence only: it does not prove a remote PR merge or GitHub issue closure, and reconciliation grants no merge, closure, or publication authority.'
@@ -1901,6 +1924,7 @@ const durabilityAssessment = (workDir, record) => {
     return {
       state: 'unknown',
       conditions: [],
+      notes: [],
       lines: [
         'Durability: unknown — no Git repository for WORK_DIR; durability is not assessable.',
         'Durability evidence: the work directory is outside Git control.',
@@ -1916,9 +1940,12 @@ const durabilityAssessment = (workDir, record) => {
   // only 'origin'; enumerate every configured remote's tracking refs.
   const remotes = (gitProbe(workDir, ['remote']) ?? '').split(/\s+/u).filter(Boolean)
   const conditions = []
+  const notes = []
   let resolved = null
   if (record?.branch) {
     const branch = record.branch
+    // workDir may be the repository root, where the relative path is empty.
+    const itemPath = relative ? `${relative}/next.md` : 'next.md'
     if (!safeRefToken(branch)) {
       conditions.push(`the recorded branch '${branch}' is not a valid ref name; re-pin the reference`)
     } else {
@@ -1931,11 +1958,24 @@ const durabilityAssessment = (workDir, record) => {
         }
       }
       if (!local && remoteRef === null) {
-        conditions.push(`the recorded branch '${branch}' is not present in this checkout; restore the branch or re-pin the reference`)
+        // The normal merge-and-clean cycle deletes the work branch. The branch
+        // tip is gone, but the work item itself may already be contained in a
+        // locally resolved default branch. That is local evidence for continuity
+        // only; it never proves a remote merge.
+        const defaultRefs = durabilityDefaultRefs(workDir)
+        const containingRef = defaultRefs.find((ref) => (
+          gitExit(workDir, ['cat-file', '-e', '--end-of-options', `${ref}:${itemPath}`]) === 0
+        ))
+        if (containingRef) {
+          resolved = `the default branch '${containingRef}' contains this work item`
+          notes.push(`Durability note: the recorded branch '${branch}' is not present in this checkout, but the default branch '${containingRef}' contains this work item at ${itemPath}; this is local evidence only.`)
+        } else if (defaultRefs.length === 0) {
+          conditions.push(`the recorded branch '${branch}' is not present in this checkout, and no default branch can be resolved locally; restore the branch or re-pin the reference`)
+        } else {
+          conditions.push(`the recorded branch '${branch}' is not present in this checkout, and no locally resolved default branch contains this work item at ${itemPath}; restore the branch or re-pin the reference`)
+        }
       } else {
         const ref = local ? branch : remoteRef
-        // workDir may be the repository root, where the relative path is empty.
-        const itemPath = relative ? `${relative}/next.md` : 'next.md'
         if (gitExit(workDir, ['cat-file', '-e', '--end-of-options', `${ref}:${itemPath}`]) === 0) {
           resolved = `the recorded branch '${branch}' contains this work item`
         } else {
@@ -1980,7 +2020,16 @@ const durabilityAssessment = (workDir, record) => {
   lines.push('Durability evidence: local Git index, refs, and objects.')
   if (conditions.length || intentionallyUntracked) lines.push(`Durability owner: ${DURABILITY_OWNER}.`)
   if (conditions.length) lines.push('Durability next responsibility: commit the work directory or commit a repository .gitignore entry, and restore or re-pin the missing reference.')
-  return { state, conditions, lines }
+  return { state, conditions, notes, lines }
+}
+
+// Notes are informational and must remain visible in both a passing and a
+// failing durability report. They are kept out of `lines` so each output path
+// has to include them explicitly; this prevents a second condition (for example
+// an unreachable candidate) from hiding the containing-ref explanation.
+const durabilityReportLines = (durability) => {
+  if (!durability) return []
+  return [durability.lines[0], ...(durability.notes ?? []), ...durability.lines.slice(1)]
 }
 
 const waitingCondition = (content) => (meaningfulSection(content, 'Waiting on') ?? '').split(/\r?\n/u)[0]?.trim() ?? ''
@@ -2222,7 +2271,7 @@ const resume = (value) => {
       }
       reconciliationNote = reconciliationReport(workDir, parsed, waitingCondition(nextProbe.content)).join('\n')
       const durability = durabilityAssessment(workDir, record)
-      durabilityNote = durability.lines.join('\n')
+      durabilityNote = durabilityReportLines(durability).join('\n')
       for (const condition of durability.conditions) {
         inconsistencies.push(`next.md: ${condition} (owner: ${DURABILITY_OWNER})`)
       }

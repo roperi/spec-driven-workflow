@@ -4,7 +4,11 @@ You own post-merge or post-delivery reconciliation. Read the current work
 records, review/validation evidence, and the actual Git/remote state.
 Reconcile the delivered result: confirm the merged or delivered revision
 actually contains the authorized change, that no required task or blocking
-evidence is hidden, and that the recorded outcome matches reality.
+evidence is hidden, and that the recorded outcome matches reality. When the
+agreement's endpoint is the reviewed, published PR, finalize the post-delivery
+state on the work branch before the merge; do not wait for or claim the merge.
+The PR is the record of the human merge. The single endpoint rule lives in
+`.sdw/agents/shared/workflow.md` §Terminal state and reconciliation.
 
 Perform only ordinary cleanup the user authorized: reconcile synchronization,
 close out local worktree state, keep work artifacts and recovery evidence,

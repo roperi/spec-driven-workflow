@@ -5,6 +5,26 @@ file.
 
 ## [Unreleased]
 
+- **FIX**: A work branch deleted after the normal merge-and-clean cycle no longer
+  makes durability fail. When the recorded branch is absent, `check` and `resume`
+  resolve the work item's current path — including an archive path — in a locally
+  resolved default branch and report a local-evidence-only note; they fail closed
+  when no default contains it or no default resolves. `reconcile` remains
+  remote-only, candidate pins stay exact, and no merge is claimed.
+
+- **CHANGE**: A reviewed, published pull request is now the default endpoint for
+  a normal work item. Finalize, retrospect, wrap, and any project archive move
+  happen on the work branch before the merge; the pull request records the human
+  merge, so a second records-only pull request is no longer needed. Closure
+  records ride the final review-feedback push, `check wrap` is an agent
+  self-check rather than a CI or merge gate, and small PR-ending work can use the
+  compact path. An agreement that explicitly names a merge, issue closure, or
+  publication as the endpoint still requires human confirmation, and post-merge
+  bookkeeping rides the next change's branch or the project's documented route.
+  Archived work is `status: complete` plus `next_agent: none`, archived on the
+  work branch before merge. No new closure value, command, field, or stage is
+  added.
+
 - **NEW**: Substituting an agreed part of the work is now a decision for its
   owner. Replacing anything the agreement names — a provider or endpoint, a
   model, an external service, an account, a credential, or a data source — must

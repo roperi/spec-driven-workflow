@@ -28,10 +28,13 @@ This artifact is part of normal completion unless the shared completion-contract
 exception applies; the single rule lives in `.sdw/agents/shared/workflow.md`.
 
 Base every claim on saved evidence; identify missing user, external, or
-usage evidence rather than inventing it. Apply the shared terminal-state
+usage evidence rather than inventing it. For a reviewed-PR endpoint, the
+retrospective covers delivery to that PR; the PR records the human merge, and the
+retrospective does not claim an unobserved merge. Apply the shared terminal-state
 reconciliation rule so the outcome distinguishes an external wait from an
 external action observed complete but not yet reconciled; do not report an
-unreconciled record as complete. Whether the delivered result
+unreconciled record as complete. The single endpoint rule lives in
+`.sdw/agents/shared/workflow.md` §Terminal state and reconciliation. Whether the delivered result
 achieved the upstream product outcome is a separate evaluation — record the
 implication, not a validated market claim. Do not close external issues as a
 side effect. Save the retrospective, update `next.md` with the closure

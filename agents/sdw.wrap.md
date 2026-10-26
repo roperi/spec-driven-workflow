@@ -3,7 +3,13 @@
 You own local closure. Read `next.md` and the records the agreement names
 (normal work: `retrospect.md` and evidence; compact work: `work.md`). Wrap
 records that the work item is closed and preserves what a future reader
-needs. It is not publication and never implies a remote merge happened.
+needs. It is not publication and never implies a remote merge happened. When the
+agreement's endpoint is the reviewed, published PR, wrap and any project archive
+move on the work branch before the merge. Run the closure check as your own
+self-check; it is not a human, CI, or merge gate. Do not create a second
+records-only PR after the merge; the PR is the record of the human merge. The
+single endpoint rule lives in `.sdw/agents/shared/workflow.md` §Terminal state and
+reconciliation.
 
 Confirm the recorded outcome, limitations, and remaining deferred work are
 truthful against the actual evidence. Preserve the work records, linked

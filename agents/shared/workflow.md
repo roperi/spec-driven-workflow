@@ -332,6 +332,23 @@ branch directly still applies to them. The [Retention rule](#records) in
 §Records owns how those records are stored and retained; this rule only draws
 the boundary.
 
+**Closing on the work PR.** For the default PR endpoint in §Terminal state and
+reconciliation, finalize its post-delivery state, write the retrospective and
+wrap, and make any project archive move on the work branch before the merge. The
+closure records ride the final review-feedback push, or one small final records
+push when there is no feedback; the agent runs `check wrap` before that push.
+`check wrap` is the agent's structural self-check, not a human task, a CI step, or
+a merge gate, and a project that does not use the wrap stage does not run it.
+Small PR-ending work may use the existing compact path without the full
+retrospect/wrap artifacts. Do not create a second records-only pull request after
+the merge.
+
+**Post-merge bookkeeping.** If a bookkeeping record genuinely must be written
+after the merge — for example because the agreement names the merge itself as the
+endpoint, or a publication record depends on it — it rides on the next change's
+branch or the project's documented bookkeeping route. It never lands directly on
+the default branch. The unconditional prohibition above applies to it.
+
 **Default branch and edge cases.** Identify the default branch by resolving
 `origin/HEAD`, falling back to a local `main` or `master`. If it cannot be
 determined, do not guess: record the uncertainty and act conservatively under the
@@ -397,9 +414,20 @@ publication authority, and observing a changed external state never authorizes a
 remote action. A record written before an external action completed is handled
 explicitly: once the action is observed complete, move the record to `reconcile`,
 then reconcile it to `complete` or `abandoned` with the observed evidence
-recorded. A work item whose endpoint was a merge, issue closure, or publication
-is not `complete` until a human with that authority confirms it or the record
-carries the applicable external evidence.
+recorded.
+
+By default, a normal work item's endpoint is its reviewed, published pull
+request. The work item closes on its own branch before the merge: the delivery is
+finalized through the post-delivery path, the retrospective and wrap are written
+there, and a project that archives does so there. The human merge is a separate
+action, and the pull request is its record; the work item does not re-record the
+merge. `complete` means the authorized endpoint was reached, not that a human
+merged. `check` adds no merge note and `reconcile` adds no new outcome; local
+evidence never proves a remote merge.
+
+When the agreement explicitly names a merge, issue closure, or publication as
+the work item's endpoint, the item is not `complete` until a human with that
+authority confirms it or the record carries the applicable external evidence.
 
 ## Completion contract and closure exceptions
 
@@ -463,6 +491,19 @@ reference resolves it. A work directory ignored by a committed repository
 not silently permissive. A work directory outside Git control is reported as
 unknown and does not fail.
 
+When a recorded branch is absent, the assessment asks whether the work item's
+current path — including `.sdw/work/archive/<id>/next.md` when the project
+archived before the merge — is contained in a locally resolved default branch. It
+uses `origin/HEAD` first, then `origin/main`, `origin/master`, local `main`, and
+local `master`, and it does not fetch. A containing ref resolves the pin with a
+local-evidence-only note; no containing ref, or no locally resolved default,
+fails closed with a distinct diagnostic. A deleted branch's tip is not resolved.
+A branch that still exists keeps the existing requirement that it contain the work
+item. This local fallback is for the records' durability only; `reconcile`
+remains remote-default-only and reports unknown when no remote default resolves.
+A record that pins a candidate must keep that candidate reachable across the
+merge or omit the pin.
+
 The assessment checks structure and declared coherence only. It is read-only: it
 never fetches, mutates records, refs, or remotes, and it never grants commit,
 push, merge, closure, or publication authority; committing records and
@@ -505,6 +546,12 @@ on it with a pointer: a path, ref, or tag, plus a hash. Never copy a source or
 build tree into the work item; cite the commit and path instead. A tracked record
 summarizes the finding it needs, so a fresh checkout resumes from the tracked
 records alone without the bulk.
+
+**Project archives.** A project may archive a closed work item; archived-ness is
+`status: complete` plus `next_agent: none`. Archive on the work item's own branch
+before the merge, and reach an archived item by explicit path; do not widen
+resume discovery to enumerate archive trees. SDW ships no archive command and no
+work-README template.
 
 ## Project context
 
