@@ -48,7 +48,11 @@ Before a material decision — one that changes material cost, deployment,
 safety, scope, or ongoing operational burden — the plain summary explains the
 outcome, what is excluded, the operational prerequisites and the burden of
 keeping them, the simplest credible alternative, the risks and effort
-uncertainty, and the effect on time to first value. Record the rationale and the
+uncertainty, and the effect on time to first value. Substituting anything the
+agreement names — a provider or endpoint, a model, an external service, an
+account, a credential, or a data source — is a material decision: put it to its
+owner plainly, with a recommendation, before the substitute is used, and never
+report it afterwards as a completed fact. Record the rationale and the
 trigger that would reopen the decision in the existing records. A new material
 cost, deployment, safety, scope, or operational burden reopens the affected
 decision: earlier blanket approval is neither evidence of comprehension nor
@@ -241,6 +245,11 @@ continue unaffected authorized work. Preserve conflicting evidence and protected
 bytes; an affected obligation stays incomplete while independent authorized work
 continues, and mixed causes may have separate next actions.
 
+Accepting a delegated or repair report includes checking it against the
+agreement's binding constraints and decisions; an undisclosed substitution, a
+reinterpreted condition, or a skipped demonstration goes back to its owner with
+the evidence instead of being accepted.
+
 Before another repair handoff, compare prior evidence for the same underlying
 obligation. Recurring absence, an adjacent path escaping the same invariant, an
 apparent resolution resting on invalid evidence, or a persistent interpretation
@@ -283,10 +292,16 @@ checkpoint; early delivery never waives a safety prerequisite, protected
 evidence, an explicit user limit, or an authority boundary. Where a real
 dependency is unavailable or unauthorized, name the owner and the smallest safe
 useful checkpoint, and keep the outstanding live or human acceptance explicit
-rather than substituting a simulation for it. Prefer the smallest coherent
-vertical delivery unit over speculative horizontal construction, and let these
-existing shared sections stay the single owner of each rule rather than
-repeating the policy in every stage.
+rather than treating a simulation as that acceptance. A simulated, fixture, or
+documentation result counts as the first useful demonstration only when the real
+dependency genuinely cannot be obtained within current authority — not because it
+has merely not been arranged yet — and the records then state why it is
+unavailable, who owns it, and what ends the exception. Present the first result to
+its recipient with a way to see or run it; that is not a gate, and authorized work
+continues unless the recipient asked to observe the result first. Prefer the
+smallest coherent vertical delivery unit over speculative horizontal construction,
+and let these existing shared sections stay the single owner of each rule rather
+than repeating the policy in every stage.
 
 The rule is proportional. Compact work uses `work.md` and the existing `next.md`
 sections; simple ordinary work needs only the explanation it warrants; the same
@@ -544,12 +559,14 @@ remote. Return ordinary findings batched in one consolidated pass rather than
 stopping at the first blocker.
 
 Review assesses the actual demonstrated behavior and the delivery strategy
-around it: whether the first useful checkpoint was reached, whether the
-prerequisites were necessary for it, which real boundaries remain unresolved,
-and how strong the evidence is. Simulations, automated checks, real service
-acceptance, and human demonstrations stay distinct; a requested human
+around it: whether the first useful checkpoint was reached and shown to its
+recipient, whether the prerequisites were necessary for it, which real boundaries
+remain unresolved, and how strong the evidence is. Simulations, automated checks,
+real service acceptance, and human demonstrations stay distinct; a requested human
 demonstration is never silently replaced, and an early success does not satisfy
-unrelated final acceptance or a safety guarantee.
+unrelated final acceptance or a safety guarantee. A simulated first checkpoint
+without the recorded reason, owner, and end condition is a finding, not an
+accepted demonstration.
 
 Review is a bounded responsibility. Ordinary findings return to the accountable
 implementer for targeted repair and revalidation without a mandatory new full

@@ -199,7 +199,10 @@ expected result, and the finite completion evidence. Route by cause: an ordinary
 concrete defect against an unchanged contract returns to implementation; a missing
 design or delegation decision returns to the planning/task owner; a
 contradictory, stale, or infeasible verification returns to its author or the
-planning owner; a new requirement returns to scope/spec. Preserve observation
+planning owner; a new requirement returns to scope/spec. Accepting a delegated or
+repair report includes checking it against the agreement's binding constraints and
+decisions; an undisclosed substitution, a reinterpreted condition, or a skipped
+demonstration goes back to its owner rather than being accepted. Preserve observation
 strength — an invalid invocation, a missing capability, or an unrelated error
 does not establish intended rejection or positive success. Before another repair
 handoff, compare the evidence for the same underlying obligation; recurring
@@ -230,7 +233,12 @@ Scope and plan state the first observable result and its recipient, the importan
 real dependency or uncertainty it exercises, the prerequisites required with
 their evidence, and the breadth deliberately deferred; a small complete path is
 ordered before independent breadth, and early delivery never waives a safety
-prerequisite. Implementation compares evidence with the next observable checkpoint and
+prerequisite. A simulated, fixture, or documentation result counts as that
+demonstration only when the real dependency genuinely cannot be obtained within
+current authority — not because it has merely not been arranged yet — with the
+reason, the dependency's owner, and the end condition recorded; the result is then
+presented to its recipient with a way to see or run it, which is not a gate.
+Implementation compares evidence with the next observable checkpoint and
 changes the diagnosis, decomposition, or approach under the existing recurrence
 rules rather than repeating the same repair. Validation and review assess the
 actually demonstrated behavior, the necessity of the prerequisites, and the
@@ -241,7 +249,11 @@ Before a material decision — one that changes material cost, deployment, safet
 scope, or ongoing operational burden — the user receives a plain-language
 explanation of the outcome, exclusions, operational prerequisites and their
 ongoing burden, the simplest credible alternative, the risks and effort
-uncertainty, and the effect on time to first value. The rationale and the trigger
+uncertainty, and the effect on time to first value. Substituting anything the
+agreement names — a provider or endpoint, a model, an external service, an
+account, a credential, or a data source — is a material decision: put it to its
+owner with a recommendation before the substitute is used, and never report it
+afterwards as a completed fact. The rationale and the trigger
 that would reopen the decision are recorded in the existing records, and an
 earlier blanket approval is neither evidence of comprehension nor authority for
 unagreed expansion. Human-facing reports, `next.md`, and handoffs name the

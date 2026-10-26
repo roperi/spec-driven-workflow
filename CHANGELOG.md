@@ -5,6 +5,22 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Substituting an agreed part of the work is now a decision for its
+  owner. Replacing anything the agreement names — a provider or endpoint, a
+  model, an external service, an account, a credential, or a data source — must
+  be put to the owner plainly, with a recommendation, before the substitute is
+  used, and is never reported afterwards as a completed fact. A simulated,
+  fixture, or documentation result counts as the first useful demonstration only
+  when the real dependency genuinely cannot be obtained within current authority
+  — not because it has merely not been arranged yet — and the records then state
+  why it is unavailable, who owns it, and what ends the exception; the first
+  result is presented to its recipient with a way to see or run it, which is not
+  an approval gate. Accepting a delegated or repair report includes checking it
+  against the agreement's binding constraints and decisions, and review asks
+  whether the recipient was shown the first checkpoint and treats an unexcepted
+  simulated one as a finding. No new section, record field, command, or stage is
+  added.
+
 - **NEW**: Work items now define evidence retention. A work item tracks the
   canonical records and only the small supporting files a record cites or a test
   reads; raw or bulk output stays in a repository-ignored location (suggested
