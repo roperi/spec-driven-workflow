@@ -5,6 +5,12 @@ file.
 
 ## [Unreleased]
 
+- **FIX**: The durability check for a deleted work branch is stricter. When the
+  recorded branch is absent, `check` and `resume` now accept the default branch
+  only if it holds the work item's `next.md` with identical content; a branch
+  deleted without merging no longer passes because an earlier copy of the record
+  reached the default branch. A different version is reported and fails closed.
+
 - **FIX**: A work branch deleted after the normal merge-and-clean cycle no longer
   makes durability fail. When the recorded branch is absent, `check` and `resume`
   resolve the work item's current path — including an archive path — in a locally

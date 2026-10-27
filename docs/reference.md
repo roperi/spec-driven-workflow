@@ -181,7 +181,7 @@ outside Git control is reported as unknown and does not fail.
 
 When the recorded branch is absent, the assessment resolves the work item's
 current path (including `.sdw/work/archive/<id>/next.md`) in a locally resolved
-default branch: `origin/HEAD` first, then `origin/main`, `origin/master`, local
+default branch, requiring identical `next.md` content: `origin/HEAD` first, then `origin/main`, `origin/master`, local
 `main`, and local `master`. It reports a local-evidence-only note when a ref
 contains the item, and fails closed when no ref contains it or no default
 resolves. A deleted branch's tip is not resolved. This fallback is for the

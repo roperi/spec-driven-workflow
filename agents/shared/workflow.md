@@ -493,7 +493,8 @@ unknown and does not fail.
 
 When a recorded branch is absent, the assessment asks whether the work item's
 current path — including `.sdw/work/archive/<id>/next.md` when the project
-archived before the merge — is contained in a locally resolved default branch. It
+archived before the merge — is contained in a locally resolved default branch with
+identical `next.md` content; an earlier or different copy does not count. It
 uses `origin/HEAD` first, then `origin/main`, `origin/master`, local `main`, and
 local `master`, and it does not fetch. A containing ref resolves the pin with a
 local-evidence-only note; no containing ref, or no locally resolved default,

@@ -1963,14 +1963,22 @@ const durabilityAssessment = (workDir, record) => {
         // locally resolved default branch. That is local evidence for continuity
         // only; it never proves a remote merge.
         const defaultRefs = durabilityDefaultRefs(workDir)
+        // Path presence is not enough: an earlier copy of next.md on the default
+        // branch would otherwise vouch for a branch deleted without merging. The
+        // default branch must hold exactly the record being assessed.
+        const localBlob = gitProbe(workDir, ['hash-object', '--', path.join(workDir, 'next.md')])
+        const refHolds = (ref) => gitExit(workDir, ['cat-file', '-e', '--end-of-options', `${ref}:${itemPath}`]) === 0
         const containingRef = defaultRefs.find((ref) => (
-          gitExit(workDir, ['cat-file', '-e', '--end-of-options', `${ref}:${itemPath}`]) === 0
+          refHolds(ref) && localBlob !== null
+          && gitProbe(workDir, ['rev-parse', '--verify', '--end-of-options', `${ref}:${itemPath}`]) === localBlob
         ))
         if (containingRef) {
           resolved = `the default branch '${containingRef}' contains this work item`
-          notes.push(`Durability note: the recorded branch '${branch}' is not present in this checkout, but the default branch '${containingRef}' contains this work item at ${itemPath}; this is local evidence only.`)
+          notes.push(`Durability note: the recorded branch '${branch}' is not present in this checkout, but the default branch '${containingRef}' contains this work item at ${itemPath} with identical content; this is local evidence only.`)
         } else if (defaultRefs.length === 0) {
           conditions.push(`the recorded branch '${branch}' is not present in this checkout, and no default branch can be resolved locally; restore the branch or re-pin the reference`)
+        } else if (defaultRefs.some(refHolds)) {
+          conditions.push(`the recorded branch '${branch}' is not present in this checkout, and the locally resolved default branch holds a different version of this work item at ${itemPath}; restore the branch or re-pin the reference`)
         } else {
           conditions.push(`the recorded branch '${branch}' is not present in this checkout, and no locally resolved default branch contains this work item at ${itemPath}; restore the branch or re-pin the reference`)
         }
