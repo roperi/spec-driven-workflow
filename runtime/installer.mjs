@@ -33,6 +33,23 @@ const lstatOrNull = (target) => {
 const sha256 = (content) => crypto.createHash('sha256').update(content).digest('hex')
 const sourcePath = (root, relative) => path.join(root, relative)
 
+// Shared managed-destination guard. The manifest is planned outside
+// prepareFile, so it must use the same symlink refusal as every other managed
+// file; otherwise a symlinked manifest can be read, compared, and reported as
+// unchanged without ever replacing the link.
+const assertSafeDestination = (targetRoot, relative) => {
+  const target = path.join(targetRoot, relative)
+  if (!target.startsWith(`${targetRoot}${path.sep}`)) fail('UNSAFE_PATH', `managed destination escapes target: ${relative}`)
+  const parts = relative.split(/[\\/]/u)
+  let parent = targetRoot
+  for (const part of parts.slice(0, -1)) {
+    parent = path.join(parent, part)
+    if (lstatOrNull(parent)?.isSymbolicLink()) fail('UNSAFE_PATH', `${relative}: destination parent is a symlink`)
+  }
+  if (lstatOrNull(target)?.isSymbolicLink()) fail('UNSAFE_PATH', `${relative}: destination is a symlink`)
+  return target
+}
+
 const gitRoot = () => {
   try { return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim() } catch { fail('NOT_GIT_REPOSITORY', 'target must be an ordinary Git repository') }
 }
@@ -100,7 +117,7 @@ const validateManifestPaths = (targetRoot, parsed) => {
 }
 
 const readManifest = (targetRoot) => {
-  const filename = path.join(targetRoot, MANIFEST)
+  const filename = assertSafeDestination(targetRoot, MANIFEST)
   if (!fs.existsSync(filename)) return null
   try {
     const parsed = JSON.parse(fs.readFileSync(filename, 'utf8'))
@@ -168,15 +185,7 @@ const replaceBlock = (current, block, expectedHash, relative, manifest) => {
 }
 
 const prepareFile = (plans, targetRoot, relative, content, manifest) => {
-  const target = path.join(targetRoot, relative)
-  if (!target.startsWith(`${targetRoot}${path.sep}`)) fail('UNSAFE_PATH', `managed destination escapes target: ${relative}`)
-  const parts = relative.split(path.sep)
-  let parent = targetRoot
-  for (const part of parts.slice(0, -1)) {
-    parent = path.join(parent, part)
-    if (lstatOrNull(parent)?.isSymbolicLink()) fail('UNSAFE_PATH', `${relative}: destination parent is a symlink`)
-  }
-  if (lstatOrNull(target)?.isSymbolicLink()) fail('UNSAFE_PATH', `${relative}: destination is a symlink`)
+  const target = assertSafeDestination(targetRoot, relative)
   const expected = manifest?.files?.[relative]
   let current
   try { current = fs.readFileSync(target) } catch (error) { if (error.code !== 'ENOENT') fail('TARGET_UNREADABLE', `${relative}: cannot read destination: ${error.message}`) }
@@ -313,11 +322,17 @@ const main = async (values) => {
     blocks,
   }
   const manifestContent = `${JSON.stringify(nextManifest, null, 2)}\n`
-  if (!manifest) {
-    const manifestTarget = path.join(targetRoot, MANIFEST)
-    if (fs.existsSync(manifestTarget)) fail('OWNERSHIP_CONFLICT', `${MANIFEST}: existing file is not a recognized SDW manifest`)
-  }
-  plans.push({ type: manifest ? 'update' : 'create', relative: MANIFEST, content: Buffer.from(manifestContent), hash: sha256(manifestContent) })
+  const manifestTarget = assertSafeDestination(targetRoot, MANIFEST)
+  if (!manifest && fs.existsSync(manifestTarget)) fail('OWNERSHIP_CONFLICT', `${MANIFEST}: existing file is not a recognized SDW manifest`)
+  let currentManifest = null
+  try { currentManifest = fs.readFileSync(manifestTarget) } catch (error) { if (error.code !== 'ENOENT') fail('TARGET_UNREADABLE', `${MANIFEST}: cannot read destination: ${error.message}`) }
+  const manifestBuffer = Buffer.from(manifestContent)
+  plans.push({
+    type: currentManifest ? (Buffer.compare(currentManifest, manifestBuffer) === 0 ? 'unchanged' : 'update') : 'create',
+    relative: MANIFEST,
+    content: manifestBuffer,
+    hash: sha256(manifestBuffer),
+  })
   applyPlans(plans, targetRoot, values.dryRun)
   process.stdout.write(`${values.dryRun ? 'Dry run complete' : `${values.command} complete`} for tools: ${tools.join(',')}\n`)
 }

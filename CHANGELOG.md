@@ -5,6 +5,13 @@ file.
 
 ## [Unreleased]
 
+- **FIX**: `update --dry-run` now reports `Unchanged .sdw/install.json` when the
+  rendered manifest already matches, so a clean install can be distinguished
+  from a modified one. A hand-edited recorded file with a rewritten manifest
+  hash is still reported. A symlinked `.sdw/install.json` is rejected like every
+  other managed destination before comparison, so it is never reported as
+  unchanged.
+
 - **FIX**: The durability check for a deleted work branch is stricter. When the
   recorded branch is absent, `check` and `resume` now accept the default branch
   only if it holds the work item's `next.md` with identical content; a branch
