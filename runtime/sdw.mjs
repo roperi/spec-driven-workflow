@@ -2084,6 +2084,15 @@ const regularFile = (target) => {
   }
 }
 
+const realDirectory = (target) => {
+  try {
+    const stat = fs.lstatSync(target)
+    return stat.isDirectory() && !stat.isSymbolicLink()
+  } catch {
+    return false
+  }
+}
+
 // A record-named token is a locator only when it looks like one named file;
 // arbitrary backticked prose, absolute paths, and directory/glob references
 // (a trailing slash or a `*`) are not file locators and are never reported.
@@ -2117,22 +2126,29 @@ const symlinkComponent = (target) => {
 // Resolve one record-named locator against the work directory and the actual Git
 // checkout root (the current worktree, never its sibling/main checkout). An
 // explicit `./` locator is work-relative only; any other relative locator probes
-// both bases. Exactly one distinct safe regular file resolves; two distinct
-// matches are an ambiguity diagnostic; a symlink in any component is unsafe; no
-// match is unresolved. This is a filesystem diagnostic, not inferred intent.
+// both bases. Exactly one distinct safe regular file resolves; exactly one
+// distinct safe directory is a `directory` outcome (it exists but is never
+// expanded or authorized); two distinct matches are an ambiguity diagnostic; a
+// symlink in any component is unsafe; no match is unresolved. This is a
+// filesystem diagnostic, not inferred intent.
 const resolveNamedLocator = (token, workDir, checkoutRoot) => {
   const bases = token.startsWith('./')
     ? [workDir]
     : [workDir, ...(checkoutRoot && checkoutRoot !== workDir ? [checkoutRoot] : [])]
-  const matches = []
+  const matches = new Map()
   for (const base of bases) {
     const absolute = path.resolve(base, token)
     if (symlinkComponent(absolute) !== null) return { status: 'unsafe', absolute: null }
-    if (regularFile(absolute)) matches.push(absolute)
+    if (regularFile(absolute)) matches.set(absolute, 'file')
+    else if (realDirectory(absolute)) matches.set(absolute, 'directory')
   }
-  const distinct = [...new Set(matches)]
-  if (distinct.length > 1) return { status: 'ambiguous', absolute: null }
-  if (distinct.length === 1) return { status: 'resolved', absolute: distinct[0] }
+  if (matches.size > 1) return { status: 'ambiguous', absolute: null }
+  if (matches.size === 1) {
+    const [[absolute, kind]] = matches
+    return kind === 'file'
+      ? { status: 'resolved', absolute }
+      : { status: 'directory', absolute: null }
+  }
   return { status: 'unresolved', absolute: null }
 }
 
@@ -2173,10 +2189,13 @@ const authorizedReads = (workDir) => {
     const resolution = resolveNamedLocator(token, workDir, checkoutRoot)
     if (resolution.status === 'resolved') {
       add(resolution.absolute)
+    } else if (resolution.status === 'directory') {
+      // An existing directory is named, not missing; the read set lists files,
+      // so it is neither expanded nor reported.
     } else if (resolution.status === 'unsafe') {
       diagnostics.push(`Unsafe locator: ${token} (a path component is a symlink; not authorized)`)
     } else if (resolution.status === 'ambiguous') {
-      diagnostics.push(`Ambiguous locator: ${token} (two distinct files match; work-relative and checkout-root bases conflict)`)
+      diagnostics.push(`Ambiguous locator: ${token} (two distinct files or directories match; work-relative and checkout-root bases conflict)`)
     } else {
       diagnostics.push(`Unresolved locator: ${token} (not found under the work directory or the checkout root)`)
     }

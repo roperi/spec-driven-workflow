@@ -5,6 +5,11 @@ file.
 
 ## [Unreleased]
 
+- **FIX**: `reads` and `resume` no longer report an existing directory named in a
+  work record, without a trailing slash, as "not found". The directory is not
+  expanded or added to the authorized read set; missing files and directories are
+  still reported, and symlinked or ambiguous locators keep their diagnostics.
+
 - **FIX**: `update --dry-run` now reports `Unchanged .sdw/install.json` when the
   rendered manifest already matches, so a clean install can be distinguished
   from a modified one. A hand-edited recorded file with a rewritten manifest
