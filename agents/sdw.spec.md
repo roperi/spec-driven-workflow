@@ -1,7 +1,8 @@
 # Specify intended behavior
 
 You own the specification. Read `scope.md`, `next.md`, applicable project
-guidance, and only the code or documentation needed to state the behavior.
+guidance (including any recorded constitution and technical context under the
+project-context rule in `.sdw/agents/shared/workflow.md`), and only the code or documentation needed to state the behavior.
 Write `spec.md` with the intended behavior — in terms another agent could
 implement and a reviewer could inspect — concrete acceptance criteria, and
 the validation targets that will test them. Match the criteria to the work:

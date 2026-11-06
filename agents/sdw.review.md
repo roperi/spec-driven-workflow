@@ -13,6 +13,10 @@ first useful checkpoint was reached, whether the prerequisites were necessary,
 and which real boundaries remain unresolved — and keep simulations, automated
 checks, real acceptance, and human demonstrations distinct.
 
+Verify the plan's `## Constitution Check` against the candidate under the
+project-context rule in `.sdw/agents/shared/workflow.md`; a missing, stale, or
+unjustified check is a finding.
+
 For hardened work, review semantic sufficiency rather than accepting the
 structural pass: inspect whether the stimuli, oracles, preserved invariants,
 recovery states, readiness dispositions, and negative-space coverage actually

@@ -10,6 +10,9 @@ not moved the outcome or a recurring repair, and change the diagnosis,
 decomposition, or approach under the shared continuing-by-evidence guidance in
 `.sdw/agents/shared/workflow.md`.
 
+Stay within the plan's `## Constitution Check` and its named exceptions under
+the project-context rule in `.sdw/agents/shared/workflow.md`.
+
 Make only the changes the agreement authorizes, using ordinary repository
 tools. Apply test-first development where relevant, including a failing
 reproduction for bug fixes. Respect the project's scope: a startup brief or

@@ -1,5 +1,5 @@
 {
-  "export_tree_sha256": "d593a175caaf6d670f0ccfd37293f78d978e76a473284e2db96c60eacb357bc0",
+  "export_tree_sha256": "0d3e8b0f22acdbfd9d224a5e60230334135be1b3b047c49b0137738865f96520",
   "files": [
     {
       "mode": "0644",
@@ -19,7 +19,7 @@
     {
       "mode": "0644",
       "path": "CHANGELOG.md",
-      "sha256": "1602d64de66f1eedd36b2c535d491091f5513befeb5ac03b754424d75847cd59"
+      "sha256": "5f5642558443739fe95fae4ffe451d748a7c67a0ba2db06b7f027d277560dceb"
     },
     {
       "mode": "0644",
@@ -39,12 +39,12 @@
     {
       "mode": "0644",
       "path": "agents/sdw.implement.md",
-      "sha256": "e55c6cae1b3c5f128b95d695b17fe0b0733fb5b92e226554acda61f1d67810e7"
+      "sha256": "2d60d6227a1871afe2cf737b685cf3f36c17d6c14f13ea2a18c18bad1150aebf"
     },
     {
       "mode": "0644",
       "path": "agents/sdw.plan.md",
-      "sha256": "aedb460c39408d0a57bb3b6abc22997a2232aecab6854ad09c322fb3ae8abed2"
+      "sha256": "8d1eaaa64cd01a2e7f0c2813f4b03bc0ba5e33ff871f3dde204948f80e947fae"
     },
     {
       "mode": "0644",
@@ -64,17 +64,17 @@
     {
       "mode": "0644",
       "path": "agents/sdw.review.md",
-      "sha256": "885085d27481ae15156c34b4059c4547e05974f570c05f583278c8fc685d0c78"
+      "sha256": "0ef218fc0868543797efd936b97860c5e5bf40ab202c6363afa789f14a9eb76d"
     },
     {
       "mode": "0644",
       "path": "agents/sdw.scope.md",
-      "sha256": "8f7418b53bf10bbd4ba78780f90202d7f7a172e4975ab29d9494c39a458b4bc4"
+      "sha256": "b829655bfc4d30bb9cc703dc1d5d2a4a635616d6b6448aaab4057e9465059208"
     },
     {
       "mode": "0644",
       "path": "agents/sdw.spec.md",
-      "sha256": "aefaea1d6745ef01e1e1cd9a7724c28d53316bbab51bd0f169560a406da26e50"
+      "sha256": "f10e6de1c7d847267eec38de2999143f94dc38a8a9a8497fdf35859d10bdb5a0"
     },
     {
       "mode": "0644",
@@ -89,7 +89,7 @@
     {
       "mode": "0644",
       "path": "agents/sdw.workflow.md",
-      "sha256": "0d856eeaaa5ee6ab057b2d0d28789dcec23a5d10ed95e07015c4114bb4381b12"
+      "sha256": "7cfa17deba86600893fc8ea87d713ff351b97294eaf099047b37303d7425bb7e"
     },
     {
       "mode": "0644",
@@ -99,7 +99,7 @@
     {
       "mode": "0644",
       "path": "agents/shared/workflow.md",
-      "sha256": "5a874e5bbdb032b6e70ae9b515bf70c5f79638b5db8059231546c7be3cb27228"
+      "sha256": "64bb38911d269ac28469ceb04955f62d11d10768e02344d92bd803a0b609a94f"
     },
     {
       "mode": "0644",
@@ -114,7 +114,7 @@
     {
       "mode": "0644",
       "path": "docs/customization.md",
-      "sha256": "6f72925466116c5aaa0b058d2b1a61bd783c5b8e18a1fa0c49d19eb4831f5cc1"
+      "sha256": "020a71fe433854217195f95fdcd11774b4176d95cd81ee5527d12ad04a6c443b"
     },
     {
       "mode": "0644",
@@ -124,12 +124,12 @@
     {
       "mode": "0644",
       "path": "docs/quickstart.md",
-      "sha256": "ebc97786d82443c5e47709d6cc1c0f25b81d3adbe2e935757f2a99d545f071cb"
+      "sha256": "7dc5f788c32a0b45bf53c6c2058a14f1a31e118230811df580e7d83f2c489111"
     },
     {
       "mode": "0644",
       "path": "docs/reference.md",
-      "sha256": "b6d4f3fe0800f3eb5f954eab4d41266ddf773a3ad2d53e97d7e94c588b8460a1"
+      "sha256": "0c4a169e7b4eddcedd0aab15e2e2808fdbf57980602766e5925d7af018d68489"
     },
     {
       "mode": "0644",
@@ -149,7 +149,7 @@
     {
       "mode": "0755",
       "path": "runtime/installer.mjs",
-      "sha256": "7963f0279d5dfc93513099709fb8f234e06eef3417e38807c1f766fb9de1df57"
+      "sha256": "4881ea3bb54224232abc94c8a7f6f6577ab2a5a8638c09df9dfcb62f3f4f3cf9"
     },
     {
       "mode": "0644",
@@ -159,7 +159,7 @@
     {
       "mode": "0644",
       "path": "runtime/sdw.mjs",
-      "sha256": "5789f8fb5359bcc31af594f7f30a1ed4bb9c6389fc490c0b7bdb00956cb150fb"
+      "sha256": "923afe66f7cc23fa1147dfdeb79b42ee388bfce22ef8959d26143ffddbeeb941"
     },
     {
       "mode": "0755",
@@ -179,7 +179,7 @@
     {
       "mode": "0644",
       "path": "templates/plan.md",
-      "sha256": "404bbfc3bd42b47273744a2ed36772af792a316877bf202b0d32098a2036290d"
+      "sha256": "e4ed1519bfe3cc685dd8fd6a5a3b359ca99e92f8b873a8ea815f7abb865b4f0a"
     },
     {
       "mode": "0644",

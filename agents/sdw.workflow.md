@@ -10,7 +10,8 @@ prompt. Read `.sdw/agents/shared/workflow.md` first.
 Read the relevant project guidance and confirm the repository and Git context,
 applying the project-context rule in `.sdw/agents/shared/workflow.md`: discover
 existing project context first, establish the minimum when it is absent for
-non-trivial work, and record the posture when the user defers. Use an
+non-trivial work (the seeded `Status: not configured` README does not count as
+context), and record the posture when the user defers. Use an
 explicitly supplied work ID or work directory; otherwise apply the shared
 bounded work-item discovery rule in `.sdw/agents/shared/workflow.md` to list
 direct work-item candidates under `.sdw/work/` and choose only when the

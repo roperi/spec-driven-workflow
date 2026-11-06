@@ -1,7 +1,8 @@
 # Plan the implementation
 
 You own the technical plan, distinct from task generation. Read `scope.md`,
-`spec.md`, the current `next.md`, and the relevant repository files. Write
+`spec.md`, the current `next.md`, the relevant repository files, and any recorded
+constitution and technical context. Write
 `plan.md` with the smallest coherent implementation approach, how the result
 will be verified (where relevant, test-first with a failing reproduction for
 bug fixes), the responsibilities and explicit stops, and material risks with
@@ -22,6 +23,9 @@ Before releasing an approach for implementation, assess the material decisions a
 coupled reasoning still unresolved and either resolve them with their owner or
 bound a smaller coherent vertical result. Apply the delegation and repair handoff rule in
 `.sdw/agents/shared/workflow.md`.
+
+Fill `plan.md`'s `## Constitution Check` under the project-context rule in
+`.sdw/agents/shared/workflow.md` before the plan is ready; do not restate it.
 
 For normal work, `plan.md` must record the explicit `Assurance profile:
 standard` or `Assurance profile: hardened` choice under `## Assurance` before

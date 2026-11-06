@@ -23,13 +23,17 @@ docs. The technical context is the current stack, repository map, commands,
 environment, and boundaries. Keep both concise, reuse
 existing project documents instead of duplicating them, and replace all template
 guidance and placeholders with real content. SDW reads them across work items;
-their guidance templates live in `.sdw/templates/`.
+their guidance templates live in `.sdw/templates/`. Until you do, the seeded
+`.sdw/project-context/README.md` says `Status: not configured`; once a
+constitution exists, every normal plan needs a meaningful `## Constitution
+Check`, which `check` verifies structurally. Delete or keep the README as you
+prefer; it is yours.
 
 ## Adopting updated guidance
 
 Updating SDW refreshes the managed prompts and templates under `.sdw/agents/`
-and `.sdw/templates/`; it never creates or modifies `.sdw/project-context/` or
-`.sdw/work/`. Treat these as three separate actions, in plain language:
+and `.sdw/templates/`; it never creates or modifies `.sdw/project-context/` (a fresh install seeds only
+the unconfigured README) or `.sdw/work/`. Treat these as three separate actions, in plain language:
 
 1. **Updating managed guidance.** Run `update.sh` as usual; this is what changes
    the instructions and templates.

@@ -5,6 +5,16 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: Project context is now visible and binding in the normal lifecycle. A
+  fresh install seeds `.sdw/project-context/README.md` marked
+  `Status: not configured`; it is a notice, never a placeholder constitution, and
+  is not managed by `update`. Plan templates gain a `## Constitution Check`, and
+  when a checkout has `.sdw/project-context/constitution.md`, `check` and
+  `resume` require a meaningful `## Constitution Check` in `plan.md` (structure
+  only; compliance is not judged). Existing normal plans in such a checkout need
+  the section, and a plan that predates the constitution can say so honestly.
+  Compact work and checkouts without a constitution are unaffected.
+
 - **FIX**: `reads` and `resume` no longer report an existing directory named in a
   work record, without a trailing slash, as "not found". The directory is not
   expanded or added to the authorized read set; missing files and directories are

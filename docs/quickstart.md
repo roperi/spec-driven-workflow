@@ -17,12 +17,15 @@ Start a work item by asking your agent to do the work using SDW, with the
 objective in plain language. The session creates `.sdw/work/<work-id>/` and its
 initial artifacts; you do not need to initialize the helper separately.
 
-For a new or non-trivial project, that first session also checks for project
-context under `.sdw/project-context/` — a constitution of durable, checkable
-articles and a technical context. If none exists it asks a few plain-language
-questions and records a minimal version from the shipped guidance templates, so
-later work stays aligned. Trivial edits in a repository whose conventions are
-already visible do not need this.
+A fresh install seeds `.sdw/project-context/README.md` with
+`Status: not configured` so the gap is visible; it is a notice, not project law.
+For a new or non-trivial project, the first session checks for project context
+there — a constitution of durable, checkable articles and a technical context.
+If none is recorded it asks a few plain-language questions and records a minimal
+version from the shipped guidance templates, or records a context posture in
+`scope.md` if you defer. Once a constitution exists, each normal plan must carry
+a `## Constitution Check` naming the applicable articles. Trivial edits in a
+repository whose conventions are already visible do not need this.
 
 For a terminal command instead:
 

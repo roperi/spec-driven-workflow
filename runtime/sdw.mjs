@@ -196,6 +196,33 @@ const meaningfulSection = (content, heading) => {
   return body.join('\n').trim()
 }
 
+// Conditional structural gate: when the work item's checkout has a regular
+// .sdw/project-context/constitution.md, plan.md must carry a meaningful
+// '## Constitution Check'. Presence and unfinished-template content only; the
+// helper never judges which articles apply or whether the plan complies.
+const constitutionCheckErrors = (workDir, planContent) => {
+  const root = (() => {
+    try { return execFileSync('git', ['-C', workDir, 'rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() } catch { return null }
+  })()
+  if (!root) return []
+  let hasConstitution = false
+  try {
+    let current = root
+    for (const part of ['.sdw', 'project-context']) {
+      current = path.join(current, part)
+      if (!fs.lstatSync(current).isDirectory()) return []
+    }
+    hasConstitution = fs.lstatSync(path.join(current, 'constitution.md')).isFile()
+  } catch { return [] }
+  if (!hasConstitution) return []
+  const reason = 'this checkout has .sdw/project-context/constitution.md'
+  const body = meaningfulSection(planContent, 'Constitution Check')
+  if (body === null) return [`plan.md: missing required section '## Constitution Check' because ${reason}; name the applicable articles or record why the plan predates the constitution`]
+  if (!body) return [`plan.md: section '## Constitution Check' is empty; add meaningful content because ${reason}`]
+  if (/^\s*(?:TODO|TBD|FIXME)\b/imu.test(body) || unresolvedSections(planContent, 'Constitution Check')) return [`plan.md: section '## Constitution Check' still contains unfinished template placeholders; refine it because ${reason}`]
+  return []
+}
+
 const unresolvedSections = (content, heading) => {
   const body = meaningfulSection(content, heading)
   if (!body) return false
@@ -1685,6 +1712,10 @@ const check = (workDirValue, activity) => {
   }
   const assurance = format === 'compact' ? { errors: [], profile: null } : hardenedConsistency(workDir, activity, reports)
   errors.push(...assurance.errors)
+  const planReport = reports.find((report) => report.artifact === 'plan.md')
+  if (format === 'normal' && planReport && !planReport.errors.some((error) => error.includes('missing or unreadable')) && !CLOSURE_ACTIVITIES.has(activity) && activity !== 'handoff') {
+    errors.push(...constitutionCheckErrors(workDir, planReport.content))
+  }
   const layout = layoutWarning(workDir)
   const evidence = evidenceBudgetWarning(workDir)
   if (errors.length) {
@@ -2271,6 +2302,10 @@ const resume = (value) => {
   const compact = nextReport !== undefined && parseNextRecord(nextReport.content, workDir).record?.format === 'compact'
   const assurance = compact ? { errors: [], profile: null } : hardenedConsistency(workDir, 'resume', reports)
   inconsistencies.push(...assurance.errors)
+  const resumePlan = reports.find((report) => report.artifact === 'plan.md')
+  const resumeComplete = nextReport !== undefined && parseNextRecord(nextReport.content, workDir).record?.status === 'complete'
+  // Closed work is not planned further, so a later-adopted constitution does not reopen it.
+  if (!compact && !resumeComplete && resumePlan && resumePlan.content) inconsistencies.push(...constitutionCheckErrors(workDir, resumePlan.content))
   const assuranceLine = compact
     ? 'assurance: compact records bypass assurance parsing'
     : assurance.profile === 'hardened'

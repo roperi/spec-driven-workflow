@@ -17,6 +17,26 @@ const DOCS = ['integrations.md']
 const TOOLS = new Set(['codex', 'opencode', 'claude'])
 const BEGIN = '<!-- BEGIN SPEC-DRIVEN-WORKFLOW MANAGED BLOCK -->'
 const END = '<!-- END SPEC-DRIVEN-WORKFLOW MANAGED BLOCK -->'
+const CONTEXT_README = '.sdw/project-context/README.md'
+const CONTEXT_README_CONTENT = `# Project context
+
+**Status: not configured.**
+
+SDW reads this directory for durable project context:
+
+- \`constitution.md\` — development law governing how specifications become code.
+- \`technical-context.md\` — stack, repository map, authoritative commands, and
+  hard boundaries.
+
+The first non-trivial SDW work item establishes the minimum from
+\`.sdw/templates/constitution.md\` and \`.sdw/templates/technical-context.md\`, or
+records a context posture in its \`scope.md\` under Constraints. Trivial bounded
+work does not need this ceremony.
+
+This directory is user-owned. SDW reads it; install may seed this notice once
+when the directory is absent; install and update never create, overwrite, or
+modify \`constitution.md\`, \`technical-context.md\`, or any other file here.
+`
 const USAGE = 'Usage: installer.mjs install|update [--tools codex,opencode,claude] [--dry-run] [--source-dir DIR]'
 
 class InstallerError extends Error {
@@ -309,7 +329,7 @@ const main = async (values) => {
   }
 
   const files = {}
-  for (const plan of plans) if (!plan.block && plan.type !== 'remove') files[plan.relative] = plan.hash
+  for (const plan of plans) if (!plan.block && !plan.seed && plan.type !== 'remove') files[plan.relative] = plan.hash
   const blocks = { 'AGENTS.md': sha256(bootstrapBlock()) }
   const nextManifest = {
     schema_version: 1,
@@ -333,6 +353,20 @@ const main = async (values) => {
     content: manifestBuffer,
     hash: sha256(manifestBuffer),
   })
+  if (!manifest) {
+    // Fresh install only: seed one unconfigured notice when the user-owned
+    // directory is absent. Never follow a symlinked path or touch an existing
+    // directory, and keep the notice out of the manifest.
+    let blocked = false
+    let walk = targetRoot
+    for (const part of ['.sdw', 'project-context']) {
+      walk = path.join(walk, part)
+      const stat = lstatOrNull(walk)
+      if (stat?.isSymbolicLink()) blocked = true
+      if (part === 'project-context' && stat) blocked = true
+    }
+    if (!blocked) plans.push({ type: 'create', relative: CONTEXT_README, content: Buffer.from(CONTEXT_README_CONTENT), seed: true })
+  }
   applyPlans(plans, targetRoot, values.dryRun)
   process.stdout.write(`${values.dryRun ? 'Dry run complete' : `${values.command} complete`} for tools: ${tools.join(',')}\n`)
 }

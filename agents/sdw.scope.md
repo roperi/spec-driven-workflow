@@ -5,7 +5,8 @@ repository instructions, and the project's direction/constitution/technical
 context (`.sdw/project-context/` or equivalent project-owned documents — reuse
 them by reference, do not copy them into the work item). Apply the
 project-context rule in `.sdw/agents/shared/workflow.md`: discover existing
-context first, establish the minimum when it is absent for non-trivial work, and
+context first (the seeded `Status: not configured` README is not context),
+establish the minimum when it is absent for non-trivial work, and
 record the context posture under Constraints when the user defers. Missing
 project direction is not proof of missing intent; read what exists and clarify
 material gaps in plain language without demanding a business brief, and do not

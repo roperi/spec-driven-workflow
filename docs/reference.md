@@ -322,8 +322,22 @@ content. When useful context is absent for first non-trivial work, hardened, or
 cross-cutting work, `sdw.workflow`/`sdw.scope`
 elicit the minimum and record it here; trivial bounded changes are exempt. When
 the user defers, the assumed conventions and invariants are recorded as a context
-posture in `scope.md` under Constraints. `.sdw/project-context/` is user-owned:
-install and update never create or modify it. The exact rule lives in the
+posture in `scope.md` under Constraints. A fresh install seeds only
+`.sdw/project-context/README.md` (`Status: not configured`) when the directory is
+absent; it is never recorded in `.sdw/install.json`, and install and update never
+create `constitution.md` or `technical-context.md`, touch an existing directory,
+or follow a symlinked path. `.sdw/project-context/` is user-owned.
+
+Plans carry a `## Constitution Check` (template guidance in
+`.sdw/templates/plan.md`): the applicable articles and how the approach satisfies
+them, technical-context constraints, and any exception with rationale, owner, and
+validation evidence; with no constitution, the `scope.md` posture. When the
+checkout has a regular `.sdw/project-context/constitution.md`, `check` (for the
+plan-bearing activities) and `resume` require that section to be present and
+meaningful; the helper checks structure only, never which articles apply or
+whether the plan complies, and compact work is unaffected. A plan that predates
+the constitution satisfies the check by saying so honestly, with an owner and
+evidence. The exact rule lives in the
 [shared workflow instructions](../agents/shared/workflow.md), which are installed
 as `.sdw/agents/shared/workflow.md`.
 

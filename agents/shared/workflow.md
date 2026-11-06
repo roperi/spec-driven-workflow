@@ -567,6 +567,11 @@ Before agreeing scope for a new work item, discover what exists: `README.md`,
 conventions, architecture, or principles document. Prefer those over creating
 new documents.
 
+A fresh install seeds only `.sdw/project-context/README.md` carrying
+`Status: not configured`. That notice is not project context: treat an absent
+directory, or one holding only that README, as no recorded context. Configured
+context means a real `constitution.md` and/or `technical-context.md`.
+
 If useful context is absent:
 
 - For first non-trivial work, hardened work, or cross-cutting work, elicit the
@@ -595,8 +600,24 @@ the work relies on, and proceed only within that stated posture. Never claim a
 principle or invariant that was not established. A missing context file is not
 by itself an error once the posture is recorded.
 
+Before a plan is ready, read the recorded constitution and technical context
+and fill the plan's `## Constitution Check`: the applicable articles and how the
+approach satisfies them, the technical-context constraints, and any exception
+with rationale, owner, and validation evidence. With no constitution, record the
+`scope.md` context posture and why there is nothing to check. Implementation
+stays within the agreed check, and review verifies it against the candidate; a
+missing, stale, or unjustified check is a finding. When the checkout has a
+regular `.sdw/project-context/constitution.md`, `node .sdw/sdw.mjs check`
+requires a meaningful `## Constitution Check` in `plan.md`; it checks the
+section's presence and content only, never compliance. A plan recorded before
+the constitution existed satisfies it by honestly stating that the plan predates
+the constitution, with an owner and evidence.
+
 `.sdw/project-context/` is user-owned: SDW reads it and may create it
-deliberately, but install and update never modify it.
+deliberately. A fresh install may seed the single unconfigured README when the
+directory is absent; install and update never create or modify any other file
+there, never touch an existing directory, and do not record the README as
+managed.
 
 ## Review context and pre-publication review
 

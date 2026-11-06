@@ -7,6 +7,16 @@ earliest safe useful observable checkpoint before independent breadth. See the
 shared guidance on the first useful demonstration in
 `.sdw/agents/shared/workflow.md`.
 
+## Constitution Check
+
+TODO: read `.sdw/project-context/constitution.md` and `technical-context.md`
+and replace this guidance. Name the applicable constitution articles and how the
+approach satisfies them; the technical-context facts that constrain the approach
+(stack, commands, boundaries); and any exception with its rationale, owner, and
+validation evidence. With no recorded constitution, state the context posture
+from `scope.md` and why there is nothing to check. See the project-context rule
+in `.sdw/agents/shared/workflow.md`.
+
 ## Verification Approach
 
 TODO: describe how the plan's results will be verified without yet breaking them into tasks.
