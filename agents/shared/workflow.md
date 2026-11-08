@@ -62,8 +62,7 @@ autonomous.
 ## Progression loop
 
 When you own a stage responsibility (sdw.scope, sdw.spec, sdw.plan, sdw.task,
-sdw.implement, sdw.validate, sdw.review, sdw.publish, sdw.finalize,
-sdw.retrospect, sdw.wrap):
+sdw.implement, sdw.validate, sdw.review, sdw.deliver):
 
 1. Read the work item's `next.md` and the prerequisite records for your
    responsibility. Reconcile the saved context against the actual repository
@@ -77,8 +76,13 @@ sdw.retrospect, sdw.wrap):
    applying the next canonical instructions in this same session within the
    recorded agreement. Do not end the user session merely because a stage
    completed, and do not spawn a new agent for the next stage.
-5. Stop only for a user-requested boundary or handoff, a material decision or
-   missing prerequisite outside the agreement, or completed work. Failed
+5. After plan approval, stops are exceptions, not stage boundaries. Stop only
+   for a decision the agreement reserves to a person (merge, issue closure, or
+   external publication when not granted), a material self-review finding,
+   evidence contradicting the spec or scope, a missing prerequisite or
+   credential, a review mode that waits on a person, a user-requested boundary
+   or handoff, or completed work. A self-review with no material findings
+   proceeds to `sdw.deliver` without asking. Failed
    checks prompt bounded repair inside the authorized scope. Continue the
    authorized work by evidence rather than ending the session because a stage
    or attempt ended; apply the continuing-by-evidence rule below.
@@ -333,15 +337,16 @@ branch directly still applies to them. The [Retention rule](#records) in
 the boundary.
 
 **Closing on the work PR.** For the default PR endpoint in §Terminal state and
-reconciliation, finalize its post-delivery state, write the retrospective and
-wrap, and make any project archive move on the work branch before the merge. The
-closure records ride the final review-feedback push, or one small final records
-push when there is no feedback; the agent runs `check wrap` before that push.
-`check wrap` is the agent's structural self-check, not a human task, a CI step, or
-a merge gate, and a project that does not use the wrap stage does not run it.
-Small PR-ending work may use the existing compact path without the full
-retrospect/wrap artifacts. Do not create a second records-only pull request after
-the merge.
+reconciliation, `sdw.deliver` closes the item on the work branch after CI and
+before external review: it reconciles the records, writes the retrospective, and
+makes any project archive move there, then runs `check deliver` (the agent's
+structural self-check, not a human task, a CI step, or a merge gate). The closing
+records are amended in the same push as review feedback only when something
+changed. Small PR-ending work may use the compact path without the retrospective.
+Nothing is written after the merge, and no second records-only pull request
+exists. A requested "stop at the PR" or "stop before merge" withholds merge,
+issue-closure, and publication authority; it does not stop delivery work or leave
+closure owed.
 
 **Post-merge bookkeeping.** If a bookkeeping record genuinely must be written
 after the merge — for example because the agreement names the merge itself as the
@@ -371,8 +376,8 @@ default branch.
 
 **Scope of responsibility.** This rule binds every responsibility that commits,
 pushes, or opens a pull request, not only `sdw.implement`. It is product-neutral.
-It adds no lifecycle stage: merge and publication remain explicit, separately
-authorized human actions, and a pull-request stop is a stop, not an approval.
+It adds no lifecycle stage: merge and publication are governed by the authority
+guard in §Delivery policy, and a pull-request stop is a stop, not an approval.
 
 ## Terminal state and reconciliation
 
@@ -395,7 +400,7 @@ authorized human actions, and a pull-request stop is a stop, not an approval.
 in Waiting on. `complete` requires no unresolved Waiting on and no unchecked
 task. `reconcile` is not terminal and requires a canonical next responsibility.
 
-When a session resumes or finalizes a work item, reconcile the record against
+When a session resumes or delivers a work item, reconcile the record against
 visible state before trusting a `waiting` status. Run the read-only helper:
 
 ```sh
@@ -417,12 +422,16 @@ then reconcile it to `complete` or `abandoned` with the observed evidence
 recorded.
 
 By default, a normal work item's endpoint is its reviewed, published pull
-request. The work item closes on its own branch before the merge: the delivery is
-finalized through the post-delivery path, the retrospective and wrap are written
-there, and a project that archives does so there. The human merge is a separate
-action, and the pull request is its record; the work item does not re-record the
-merge. `complete` means the authorized endpoint was reached, not that a human
-merged. `check` adds no merge note and `reconcile` adds no new outcome; local
+request. `sdw.deliver` closes the item on its own branch before the merge: the
+records are reconciled, the retrospective is written there, and a project that
+archives does so there. `complete` means the authorized endpoint was reached, not that a human
+merged; the outcome says "delivered to PR #N; awaiting review/merge"
+while unmerged. Because the record is `complete` before the merge, the actions
+that follow (merge when granted, sync, clean) are driven by the live pull-request
+state and the Delivery policy, not by a record write: `sdw.resume` on a complete
+item whose PR is open and merge-ready, under a policy that grants merge, performs
+the merge; on an observed merged PR it performs sync and clean. Neither writes a
+record. `check` adds no merge note and `reconcile` adds no new outcome; local
 evidence never proves a remote merge.
 
 When the agreement explicitly names a merge, issue closure, or publication as
@@ -432,9 +441,9 @@ authority confirms it or the record carries the applicable external evidence.
 ## Completion contract and closure exceptions
 
 Normal completion is proportional to the declared lifecycle path. A `full`
-record whose position has passed the review or retrospect responsibility must
-carry that responsibility's artifact: a normal `status: complete` record
-requires `review.md` and `retrospect.md`. Compact work keeps its smaller
+record whose position has passed the review responsibility, or that is
+`complete` (past deliver), must carry that responsibility's artifact: a normal
+`status: complete` record requires `review.md` and `retrospect.md`. Compact work keeps its smaller
 `work.md` plus `next.md` contract and is never required to add them.
 
 `next.md` accepts one optional fixed field, `closure`, whose closed values
@@ -469,7 +478,7 @@ commit), and `durability` (an optional reason documenting a work directory that
 is intentionally untracked under a committed repository `.gitignore`). They are
 optional and default to absent, so records written before them stay readable.
 
-`resume` and `check` for `handoff`, `finalize`, and `wrap` run a read-only
+`resume` and `check` for `handoff` and `deliver` run a read-only
 durability assessment against the work directory's enclosing Git repository. It
 reports an untracked work directory and whether a committed repository
 `.gitignore` explains its absence; a recorded candidate that is
@@ -483,8 +492,8 @@ session — and the next responsibility: commit the records or commit a reposito
 Intentional untracking is a repository-level decision expressed by a committed
 repository `.gitignore` entry, not a per-record `durability` reason, and not a
 checkout-local, global, or uncommitted ignore. An untracked work directory that a
-committed repository `.gitignore` does not ignore fails `check handoff`,
-`finalize`, or `wrap` regardless of any `durability` reason, unless a recorded
+committed repository `.gitignore` does not ignore fails `check handoff`
+or `deliver` regardless of any `durability` reason, unless a recorded
 reference resolves it. A work directory ignored by a committed repository
 `.gitignore` is reported as intentionally untracked and does not fail; a recorded
 `durability` reason is shown as documentation only. The default is therefore
@@ -533,7 +542,7 @@ artifacts in use, plus an optional `README.md`. Every other supporting record
 the work produces — decision memos, findings, change tables, superseded
 handoffs, raw logs — lives under `evidence/`, and the canonical records link to
 it by that `evidence/` path. `evidence/decisions/`, `evidence/findings/`, and
-`evidence/history/` are a suggested, non-mandatory sub-layout. At wrap, durable
+`evidence/history/` are a suggested, non-mandatory sub-layout. At delivery, durable
 knowledge that outlives the work item — facts, decisions, or references a
 future unrelated task would need — is promoted to project-owned documents and
 linked from `validation.md` or `retrospect.md`.
@@ -671,17 +680,18 @@ is escalated to the planning owner, and no decline is permanent.
 
 ## External review
 
-External review of a published candidate is a separate, later activity. The
-primary lifecycle session (`sdw.workflow`/`sdw.resume`) owns requesting it,
-waiting for it, and addressing it, under explicit user direction; it is not a
-lifecycle stage and adds no agent. The pull request is its system of record:
-findings, responses, and resolution live in the pull request thread, and SDW
-does not mirror that thread into a per-finding `review.md` ledger.
+External review of a published candidate is a step of `sdw.deliver`, owned by
+the primary lifecycle session (`sdw.workflow`/`sdw.resume`); it adds no stage or
+agent. The mode comes from the Delivery policy (§Delivery policy). The pull
+request is its system of record: findings, responses, and resolution live in the
+pull request thread, and SDW does not mirror that thread into a per-finding
+`review.md` ledger.
 
-The session addresses the findings the user directs it to address with ordinary
-bounded implementation, re-validating material repairs, then stops. It does not
-re-invoke a reviewer automatically, and it does not merge, close, or publish
-without explicit applicable authority; a human merge bounds the loop.
+The session addresses findings with ordinary bounded implementation,
+re-validating material repairs, and amends the closing records only when the
+result changed. It never re-invokes a reviewer outside the policy's round limit,
+and it does not merge, close, or publish without a grant under the authority
+guard.
 
 A deferred finding, and a material decline or escalation, is recorded exactly
 once at item level — in `next.md` with an owner and an explicit trigger, and/or
@@ -693,6 +703,55 @@ disposition ledger remain readable; nothing forces a rewrite.
 This rule uses existing Markdown, Git, and platform review facilities; it adds no
 command, stage, artifact, required section, parser field, or default-path
 requirement, treats human and automated reviewers alike, and names no provider.
+
+## Delivery policy
+
+A project states how it delivers once, as prose under a `## Delivery` heading in
+`.sdw/project-context/technical-context.md`. The helper does not parse it. The
+section names:
+
+- **Review**: `none`, `self`, `automated`, or `human`. `none`: merge-ready as soon
+  as CI and the closing records are in. `self`: the pre-publication review is the
+  review. `automated`: the agent requests it if the mechanism needs a trigger,
+  waits, and addresses findings up to the stated round limit. `human`: the agent
+  reports "waiting on <reviewer>" with the PR link and stops; on resume after
+  approval it continues from the merge-ready step.
+- **CI**: whether the agent fixes failures within the item's scope or only
+  reports them.
+- **Merge**: `on the owner's word` or `agent merges when merge-ready`.
+- **After merge**: sync and clean, as below.
+- **Issue closure**: `via a PR reference` (the merge closes it; the agent does
+  nothing further), `by the agent` (after an observed merge of the item's own PR,
+  the agent closes the item's issue with the hosting tool and confirms the closed
+  state there; this is the only closure the agent performs), or `by the owner`
+  (the agent reports closure as owed). This line governs a post-merge action on a
+  PR-ending item and does not make closure the work item's endpoint: such an item
+  stays `complete` and no mode writes a record; the final report states the
+  observed issue state. Only an Agreement that names issue closure as the endpoint
+  does that, and then §Terminal state and reconciliation applies unchanged: the
+  item is not `complete` until closure is confirmed, so `deliver` ends it
+  `waiting` on the merge and closure, and a later session reconciles it from the
+  observed external evidence.
+
+An item may override any line in the Agreement of `next.md`. At plan approval the
+agent states the **effective** policy (project default plus override) in plain
+language. With no Delivery section the default applies and is named: pre-publication
+review only; fix CI failures within scope; merge on the owner's word; sync and
+clean after an observed merge; issue closure only through a PR reference the owner
+wrote.
+
+**Authority guard.** Merge, issue closure, external publication (including release
+or public export), and deletion beyond sync and clean are never inherited. They
+are allowed only when the Delivery section or an item override grants them, and
+the grant is restated at plan approval. A newer explicit stop from the user wins.
+
+**Sync and clean.** After an observed merge of the item's own PR (the hosting
+tool's PR state, not local ancestry), the agent may without further authority
+update the default branch from `origin` fast-forward only, delete the merged work
+branch locally and on the remote, prune stale remote references, and remove a
+worktree it created for this item when clean. It never deletes alternatives,
+unmerged branches, unrelated worktrees, or locally modified files, never forces,
+and never acts on a merge it did not observe.
 
 ## Progressive assurance
 

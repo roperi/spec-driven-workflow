@@ -43,37 +43,33 @@ const ACTIVITY_FILES = Object.freeze({
   implement: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'next.md'],
   validate: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'next.md'],
   review: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'next.md', 'review.md'],
-  publish: ['validation.md', 'next.md'],
-  finalize: ['tasks.md', 'validation.md', 'next.md'],
-  retrospect: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'retrospect.md', 'next.md'],
-  wrap: ['validation.md', 'retrospect.md', 'tasks.md', 'next.md'],
+  deliver: ['validation.md', 'retrospect.md', 'tasks.md', 'next.md'],
   handoff: ['next.md'],
 })
 
 // Compact work items use work.md + next.md for every working activity.
 const COMPACT_ARTIFACTS = Object.freeze(['work.md', 'next.md'])
-const CLOSURE_ACTIVITIES = new Set(['finalize', 'wrap'])
+const CLOSURE_ACTIVITIES = new Set(['deliver'])
 
 // Normal completion is proportional to the declared lifecycle path. These are
 // the responsibilities whose artifacts a normal record must carry once it has
 // advanced past them (canonical lifecycle order = NEXT_RESPONSIBILITIES order).
 const REQUIRED_ARTIFACT_RESPONSIBILITIES = Object.freeze({
   'sdw.review': 'review.md',
-  'sdw.retrospect': 'retrospect.md',
+  'sdw.deliver': 'retrospect.md',
 })
 
-// A declared closure exception replaces the full finalize/wrap input set with
+// A declared closure exception replaces the full deliver input set with
 // the bounded artifacts its endpoint genuinely produces; compact work never
 // reaches this table because it bypasses the closure contract.
 const CLOSURE_ACTIVITY_FILES = Object.freeze({
   'planning-only': Object.freeze({
-    finalize: Object.freeze(['scope.md', 'spec.md', 'plan.md', 'next.md']),
-    wrap: Object.freeze(['scope.md', 'spec.md', 'plan.md', 'next.md']),
+    deliver: Object.freeze(['scope.md', 'spec.md', 'plan.md', 'next.md']),
   }),
-  parked: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
-  interrupted: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
-  superseded: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
-  abandoned: Object.freeze({ finalize: Object.freeze(['next.md']), wrap: Object.freeze(['next.md']) }),
+  parked: Object.freeze({ deliver: Object.freeze(['next.md']) }),
+  interrupted: Object.freeze({ deliver: Object.freeze(['next.md']) }),
+  superseded: Object.freeze({ deliver: Object.freeze(['next.md']) }),
+  abandoned: Object.freeze({ deliver: Object.freeze(['next.md']) }),
 })
 
 const AGENT_DIR = (() => {
@@ -525,13 +521,10 @@ const HARDENED_ACTIVITY_FILES = Object.freeze({
   handoff: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
   validate: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
   review: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
-  publish: ['plan.md', 'tasks.md', 'validation.md'],
-  finalize: ['plan.md', 'tasks.md', 'validation.md'],
-  retrospect: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
-  wrap: ['plan.md', 'tasks.md', 'validation.md'],
+  deliver: ['plan.md', 'tasks.md', 'validation.md'],
   resume: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
 })
-const HARDENED_RESULT_ACTIVITIES = new Set(['validate', 'review', 'publish', 'finalize', 'retrospect', 'wrap'])
+const HARDENED_RESULT_ACTIVITIES = new Set(['validate', 'review', 'deliver'])
 const HARDENED_ID = Object.freeze({
   AC: /^AC(?!000)\d{3}$/u,
   V: /^V(?!000)\d{3}$/u,
@@ -1899,7 +1892,7 @@ const reconcileState = (workDir, record) => {
     state.detail = `could not determine ancestry against ${baseRef}; external state is unknown`
   }
   state.outcome = reconciliationOutcome(record, state.observed)
-  if (!state.nextResponsibility && state.outcome === 'awaiting reconciliation') state.nextResponsibility = 'sdw.finalize'
+  if (!state.nextResponsibility && state.outcome === 'awaiting reconciliation') state.nextResponsibility = 'sdw.deliver'
   return state
 }
 
@@ -1922,7 +1915,7 @@ const reconciliationReport = (workDir, parsed, condition) => {
 // failed. The optional `branch`, `candidate`, and `durability` references carry
 // the declared durable location; the helper resolves them rather than judging
 // prose.
-const DURABILITY_ACTIVITIES = new Set(['handoff', 'finalize', 'wrap'])
+const DURABILITY_ACTIVITIES = new Set(['handoff', 'deliver'])
 const DURABILITY_OWNER = 'the work-item owner session'
 
 // Recorded references are authored frontmatter values. Reject values that Git

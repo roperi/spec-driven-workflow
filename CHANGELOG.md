@@ -5,6 +5,21 @@ file.
 
 ## [Unreleased]
 
+- **BREAKING**: One stage, `sdw.deliver`, replaces `sdw.publish`, `sdw.finalize`,
+  `sdw.retrospect`, and `sdw.wrap`, so SDW ships ten prompts instead of thirteen.
+  It publishes the accepted candidate, closes the records on the work branch after
+  CI and before external review, and merges, syncs, and cleans only as authorized;
+  nothing is written after the merge, so no second records-only pull request is
+  needed. The old names are rejected with a hint and are not aliased: edit a saved
+  `next_agent` to `sdw.deliver` once, and use `check deliver` in place of the four
+  old checks. `update.sh` removes the retired files; a locally modified one stops
+  the update with the usual ownership conflict. A project can now state how it
+  delivers once, in a `## Delivery` section of
+  `.sdw/project-context/technical-context.md` (review mode, CI handling, who
+  merges, issue closure). Merge, issue closure, external publication, and deletion
+  beyond sync and clean are never assumed without that grant. After plan approval
+  the agent stops only for exceptions, not at every stage boundary.
+
 - **NEW**: Project context is now visible and binding in the normal lifecycle. A
   fresh install seeds `.sdw/project-context/README.md` marked
   `Status: not configured`; it is a notice, never a placeholder constitution, and

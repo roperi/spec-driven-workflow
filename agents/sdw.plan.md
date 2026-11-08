@@ -36,6 +36,11 @@ scope. Hardened plans add the eight ordered Assurance fields and a
 `## Cohesion Groups` section. The complete grammar lives once in
 `.sdw/agents/shared/workflow.md`; do not restate it.
 
+At plan approval, state the effective Delivery policy (project default plus any
+item override, or the named default when the project has none) in plain language
+and record it in the Agreement; the rule lives in `.sdw/agents/shared/workflow.md`
+§Delivery policy and is not restated here.
+
 Save `plan.md`, update `next.md` (fields plus the Agreement describing what
 is authorized next and where to stop), and run:
 

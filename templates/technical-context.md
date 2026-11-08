@@ -111,3 +111,20 @@ TODO: forbidden paths, data, systems, and actions.
      update the constitution only through its amendment process." -->
 
 TODO: when and how this file is kept current.
+
+## Delivery
+
+<!-- State how this project delivers, once, so no prompt has to repeat it. Prose
+     only; the helper does not parse it. Name each line or delete the ones that
+     keep the default. Merge, issue closure, external publication, and deletion
+     beyond sync and clean are never inherited; they apply only if granted here
+     or in an item's Agreement. -->
+
+- Review: none | self | automated (mechanism, round limit) | human (reviewer).
+- CI: agent fixes failures within the item's scope | agent only reports them.
+- Merge: on the owner's word | agent merges when merge-ready.
+- After merge: sync and clean (default branch fast-forward, delete the merged work branch).
+- Issue closure: via a PR reference | by the agent | by the owner.
+
+TODO: replace with this project's delivery policy, or delete to use the default
+(pre-publication review only; fix CI within scope; merge on the owner's word).

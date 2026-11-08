@@ -46,6 +46,13 @@ the external cycle at item level — the pull request as the system of record an
 rule in `.sdw/agents/shared/workflow.md`; do not mirror per-finding dispositions
 into `review.md` and do not re-invoke a reviewer automatically.
 
+When a complete record's pull request is open, inspect the live PR state under
+the Delivery policy in `.sdw/agents/shared/workflow.md` §Delivery policy: if it
+is merge-ready and the effective policy grants merge, perform the merge; if the
+PR is observed merged, perform sync and clean; otherwise report the state and
+who acts next. None of these writes a record, and none widens the authority
+guard.
+
 Apply the shared terminal-state reconciliation rule to the reported status. A
 `waiting` record is externally blocked only when reconciliation cannot observe
 the external action as complete; when the report shows it complete, move the

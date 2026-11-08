@@ -62,9 +62,12 @@ a supported continuation recorded in `next.md`, not a forced restart.
 
 Separate planning (`sdw.plan`) from task generation (`sdw.task`); if the user
 requested understanding before task breakdown, stop there and record it.
-Things reaching publication, review, merge, finalization, retrospective, and
-wrap have distinct meanings; a requested PR stop preserves the remaining
-merge/finalization work. Do not change unrelated files.
+After plan approval, continue through every stage; stop only for the exceptions
+in the shared progression loop. A clean self-review proceeds to `sdw.deliver`
+without asking. Publication, review, merge, and issue closure have distinct
+meanings; a requested PR stop withholds merge, closure, and publication
+authority but does not stop delivery work, so closing records are still written
+on the branch. Do not change unrelated files.
 
 When a failed check, review finding, or repair return is not resolving an agreed
 obligation, own the cause and convergence disposition within your authority:

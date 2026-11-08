@@ -15,7 +15,7 @@ conversation.
 The lifecycle is one resumable flow:
 
 ```text
-scope → spec → plan → task → implement → validate → review → publish → finalize → retrospect → wrap
+scope → spec → plan → task → implement → validate → review → deliver
 ```
 
 ## What you get
@@ -114,7 +114,7 @@ plugs into, and where the work lives.
 
 | Tool | What it is | Works with | Process | State and continuity |
 | --- | --- | --- | --- | --- |
-| **SDW** | Markdown records + dependency-free Node helper (MIT) | Codex, OpenCode, and Claude Code natively; any tool can read the canonical prompts | Full lifecycle `scope → … → wrap` with explicit stops; compact or hardened rigor | Repo files under `.sdw/work/`; resume across sessions, models, and supported tools through `next.md` |
+| **SDW** | Markdown records + dependency-free Node helper (MIT) | Codex, OpenCode, and Claude Code natively; any tool can read the canonical prompts | Full lifecycle `scope → … → deliver` with explicit stops; compact or hardened rigor | Repo files under `.sdw/work/`; resume across sessions, models, and supported tools through `next.md` |
 | [Spec Kit](https://github.com/github/spec-kit) | Python CLI + agent skills (MIT) | Many agents through integration keys | `constitution → specify → plan → tasks → implement → converge`, plus bug-fix and idea-assessment extensions | Project artifacts under `.specify/`; specs evolve over time |
 | [OpenSpec](https://github.com/Fission-AI/OpenSpec) | Node CLI + slash commands (MIT) | 30+ agents | `explore → propose → apply → archive`; lighter, revisable artifacts | `openspec/` specs and per-change folders; optional shared Stores for cross-repo planning |
 | [Superpowers](https://github.com/obra/superpowers) | Plugin and skill library (MIT) | Many agents and IDEs | Auto-triggered `brainstorm → worktree → plan → subagent/TDD execution → review → finish branch` | Design docs, plans, and git worktrees, organized around the active session |

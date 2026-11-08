@@ -1,6 +1,6 @@
 // Canonical SDW agent inventory.
 //
-// Single source of truth for the thirteen sdw.* agents. The helper, renderer,
+// Single source of truth for the ten sdw.* agents. The helper, renderer,
 // and installer consume this module so their inventories cannot drift.
 // agents/shared/workflow.md is shared lifecycle instruction content, not a
 // native selectable agent; it must never be counted or projected as one.
@@ -37,17 +37,8 @@ export const AGENTS = Object.freeze({
   'sdw.review': {
     description: 'Review a candidate before publication and record the review context and findings.',
   },
-  'sdw.publish': {
-    description: 'Publish an accepted candidate through authorized channels with truthful source and publication evidence.',
-  },
-  'sdw.finalize': {
-    description: 'Reconcile the actual delivered result and perform only ordinary Git cleanup that is authorized.',
-  },
-  'sdw.retrospect': {
-    description: 'Record the evidence-based process retrospective: outcome, what worked, friction, and a few bounded improvements.',
-  },
-  'sdw.wrap': {
-    description: 'Record work-item closure, preserve relevant records and context, and close the work item honestly.',
+  'sdw.deliver': {
+    description: 'Deliver an accepted candidate: publish it, close the records on the branch, run external review per the Delivery policy, and merge, sync, and clean only as authorized.',
   },
 })
 
@@ -59,15 +50,24 @@ export const AGENT_FILES = Object.freeze(Object.keys(AGENTS).map((id) => `${id}.
 export const RETIRED_RESPONSIBILITY_HINTS = Object.freeze({
   'sdw.execute': 'sdw.implement',
   execute: 'implement',
+  // Issue #448 folded the four trailing stages into sdw.deliver.
+  'sdw.publish': 'sdw.deliver',
+  publish: 'deliver',
+  'sdw.finalize': 'sdw.deliver',
+  finalize: 'deliver',
+  'sdw.retrospect': 'sdw.deliver',
+  retrospect: 'deliver',
+  'sdw.wrap': 'sdw.deliver',
+  wrap: 'deliver',
 })
 
 // sdw.workflow and sdw.resume are entrypoints, not next responsibilities.
-// next.md records one of the eleven bounded responsibilities, or none.
+// next.md records one of the eight bounded responsibilities, or none.
 export const ENTRYPOINT_AGENTS = Object.freeze(
   Object.keys(AGENTS).filter((id) => AGENTS[id].entrypoint === true),
 )
 
-// Declaration order here is the canonical lifecycle order (scope through wrap);
+// Declaration order here is the canonical lifecycle order (scope through deliver);
 // the helper uses it to decide whether a record has advanced past a
 // responsibility whose artifact must exist at completion.
 export const NEXT_RESPONSIBILITIES = Object.freeze(

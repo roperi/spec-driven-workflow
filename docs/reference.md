@@ -39,10 +39,7 @@ The canonical stages and their helper checks:
 | Implement (`sdw.implement`) | planning files, `next.md` | one authorized unit, then checkpoint evidence |
 | Validate (`sdw.validate`) | planning files, `validation.md`, `next.md` | `check WORK_DIR validate` |
 | Review (`sdw.review`) | `review.md` plus evidence | pre-publication review; records context `self`/`fresh`/`independent` |
-| Publish (`sdw.publish`) | validation + review evidence | actual applicable authority required |
-| Finalize (`sdw.finalize`) | tasks, validation, `next.md` | actual delivery reconciliation |
-| Retrospect (`sdw.retrospect`) | all relevant records | evidence-based process retrospective |
-| Wrap (`sdw.wrap`) | closure record | `check WORK_DIR wrap`; `next_agent: none` + `status: complete` for honest closure |
+| Deliver (`sdw.deliver`) | validation + review evidence, tasks, `retrospect.md`, `next.md` | `check WORK_DIR deliver`; applicable authority required; `next_agent: none` + `status: complete` for the authorized endpoint |
 
 SDW follows a **default change flow**: an agent must never push the default branch
 directly — an unconditional prohibition that no project policy overrides. Unless
@@ -87,7 +84,7 @@ either `## Follow-up` or `## Improvements` and still requires one of them.
 
 `next.md` records four required fixed fields (`work_id`, `record_format`,
 `next_agent`, `status`) plus readable Agreement / Next action / Waiting on /
-Work context sections. `next_agent` is one of the eleven bounded
+Work context sections. `next_agent` is one of the eight bounded
 responsibilities or `none`; `status` is one of `ready`, `waiting`, `reconcile`,
 `complete`, or `abandoned`. `ready` means a local next responsibility is pending;
 `waiting` records an external condition and its owner; `reconcile` records an
@@ -104,7 +101,7 @@ plus an optional `README.md`. Decision memos, findings, change tables,
 superseded handoffs and raw logs belong under `evidence/` and are linked from
 the canonical records by that path; `evidence/decisions/`,
 `evidence/findings/` and `evidence/history/` are a suggested, non-mandatory
-sub-layout. At wrap, durable knowledge a future unrelated task would need is
+sub-layout. At delivery, durable knowledge a future unrelated task would need is
 promoted to project-owned documents and linked from `validation.md` or
 `retrospect.md`. `check` and `resume` print a non-blocking layout warning naming
 stray top-level files, capped at ten names; it never changes an exit status or
@@ -131,22 +128,33 @@ same shared workflow instructions.
 declare the completion path: `full` (the default when absent), `planning-only`,
 `parked`, `interrupted`, `superseded`, or `abandoned`. Normal completion is
 proportional to that path: a `closure: full` normal record whose position has
-passed the review or retrospect responsibility must carry `review.md` and
+passed the review responsibility, or that is `complete`, must carry `review.md` and
 `retrospect.md`, while a declared exception (`planning-only`, `parked`,
 `interrupted`, `superseded`, `abandoned`) bounds the endpoint and does not
 require them. `parked` requires `status: waiting`; `interrupted` requires
 `waiting` or `abandoned`; `superseded` and `abandoned` require `abandoned`.
 Compact records bypass the closure contract.
 
-A reviewed, published PR is a valid normal endpoint: the work item closes on its
-own branch before the merge, the PR records the human merge, and the work item
-does not re-record it. If the agreement explicitly names the merge itself as the
+A reviewed, published PR is a valid normal endpoint: `sdw.deliver` closes the work
+item on its own branch after CI and before external review, and the PR records the human merge;
+the work item does not re-record it. If the agreement explicitly names the merge itself as the
 endpoint, the item is not complete until a human with that authority confirms it
 or the record carries applicable external evidence; a post-merge bookkeeping
 record rides on the next change's branch or the project's documented bookkeeping
-route, never the default branch. Closure records ride the final review-feedback
-push or one small final records push; `check wrap` is the agent's self-check, not
-a human, CI, or merge gate, and small PR-ending work may use the compact path.
+route, never the default branch. Closing records are amended only when review feedback
+changes something; `check deliver` is the agent's self-check, not a human, CI, or
+merge gate, and small PR-ending work may use the compact path.
+
+**Delivery policy.** A project may state how it delivers once, in a `## Delivery`
+section of `.sdw/project-context/technical-context.md`: review mode (`none`,
+`self`, `automated`, `human`), whether the agent fixes CI, who merges, and who
+closes the issue. An item may override any line in its `next.md` Agreement, and
+the effective policy is stated at plan approval. With no section the default
+applies: pre-publication review only, fix CI within scope, merge on the owner's
+word, sync and clean after an observed merge. Merge, issue closure, external
+publication, and deletion beyond sync and clean are never inherited; only an
+explicit grant allows them. After plan approval the agent stops only for
+exceptions, not at stage boundaries.
 
 A missing
 responsibility is reported with a diagnostic naming it (for example, `normal
@@ -169,8 +177,8 @@ untracked and does not fail. The default is therefore not silently permissive.
 branch where the work item's copy lives), `candidate` (the exact candidate
 commit), and `durability` (an optional reason documenting a work directory
 intentionally untracked under a committed repository `.gitignore`). A
-read-only durability assessment in `resume` and in the `handoff`, `finalize`, and
-`wrap` checks inspects the work directory's
+read-only durability assessment in `resume` and in the `handoff` and
+`deliver` checks inspects the work directory's
 enclosing Git repository and reports an untracked work directory, a
 recorded candidate that is unreachable from every local branch and remote (or
 absent from the repository), a recorded branch the current checkout cannot see,

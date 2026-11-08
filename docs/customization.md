@@ -20,7 +20,9 @@ project-specific, checkable articles; it governs how specifications become code,
 so operational procedure (commands, stack, boundaries, data handling) belongs in
 the technical context and product direction belongs in the roadmap or product
 docs. The technical context is the current stack, repository map, commands,
-environment, and boundaries. Keep both concise, reuse
+environment, and boundaries. Add a `## Delivery` section to the technical context to state once how the
+project delivers (review mode, CI handling, who merges, issue closure); without
+it the cautious default applies and merge stays with the owner. Keep both concise, reuse
 existing project documents instead of duplicating them, and replace all template
 guidance and placeholders with real content. SDW reads them across work items;
 their guidance templates live in `.sdw/templates/`. Until you do, the seeded
