@@ -32,9 +32,9 @@ WHAT IT IS NOT
   constrain nothing and dilute the binding rules.
 
 HOW SDW USES IT
-`sdw.scope`, `sdw.spec`, and `sdw.plan` identify the articles a work item must
-satisfy; review rejects a violation unless the work records an approved
-exception with its rationale, owner, and evidence. An article no work can
+`sdw.plan` identifies the articles a work item must satisfy in its scope,
+specification, and plan; review rejects a violation unless the work records an
+approved exception with its rationale, owner, and evidence. An article no work can
 violate is noise, so prefer a few enforceable rules over a long list.
 
 HOW TO BUILD YOURS (GREENFIELD OR EXISTING)

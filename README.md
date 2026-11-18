@@ -15,8 +15,13 @@ conversation.
 The lifecycle is one resumable flow:
 
 ```text
-scope → spec → plan → task → implement → validate → review → deliver
+plan → implement → validate → review → deliver
 ```
+
+`sdw.plan` writes the scope, specification, plan, and tasks in one stage and
+stops once, for your approval of the plan. When you are unsure whether the work
+is worth doing, it can open with an optional assess step that ends in a go,
+clarify, or stop decision for you.
 
 ## What you get
 

@@ -40,6 +40,12 @@ authority is missing, record the blocker and give the smallest concrete
 decision the user must make — do not guess. Known/contradictory next
 metadata is reported, never silently mapped to a different stage.
 
+A waiting assess decision resumes from `assess.md`: recover the question, the
+pass marks, the evidence, and the recorded recommendation, and wait for the
+owner's go, clarify, or stop unless the owner has now given it; a missing reply
+is not a decision. The assess rules live in `.sdw/agents/shared/workflow.md`
+§Planning and assess.
+
 When a published candidate is awaiting or has received external review, reconcile
 the external cycle at item level — the pull request as the system of record and
 `next.md` for any deferred or escalated item — under the shared external-review

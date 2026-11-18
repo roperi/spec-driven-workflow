@@ -49,9 +49,9 @@ const RENDERERS = Object.freeze({
 const renderDirectory = ({ tool, inputDir, outputDir }) => {
   const renderer = RENDERERS[tool]
   if (!renderer) throw new Error(`unsupported renderer tool: ${tool}`)
-  // Only the thirteen canonical sdw.* agent files are projected. Shared
-  // instruction content such as agents/shared/workflow.md is never counted
-  // or rendered as a native agent.
+  // Only the canonical sdw.* agent files listed in AGENT_FILES are
+  // projected. Shared instruction content such as agents/shared/workflow.md
+  // is never counted or rendered as a native agent.
   const files = fs.readdirSync(inputDir, { withFileTypes: true })
     .filter((entry) => entry.isFile() && AGENT_NAME_PATTERN.test(entry.name))
     .map((entry) => entry.name)

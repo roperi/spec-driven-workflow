@@ -32,10 +32,7 @@ The canonical stages and their helper checks:
 | Stage (`sdw.*`) | Main files | Stop/check |
 | --- | --- | --- |
 | Start (`sdw.workflow`) | initial records + `next.md` | choose a work item and boundary |
-| Scope (`sdw.scope`) | `scope.md` | `check WORK_DIR scope` |
-| Specification (`sdw.spec`) | `scope.md`, `spec.md` | `check WORK_DIR spec` |
-| Plan (`sdw.plan`) | `scope.md`, `spec.md`, `plan.md`, `next.md` | `check WORK_DIR plan`; stop if planning-only was requested; no `tasks.md` required |
-| Tasks (`sdw.task`) | plan files + `tasks.md` | `check WORK_DIR task` |
+| Plan (`sdw.plan`) | optional `assess.md`; `scope.md`, `spec.md`, `plan.md`, `tasks.md`, `next.md` | `check WORK_DIR plan`; one stop at plan approval (plus the assess decision when assess runs) |
 | Implement (`sdw.implement`) | planning files, `next.md` | one authorized unit, then checkpoint evidence |
 | Validate (`sdw.validate`) | planning files, `validation.md`, `next.md` | `check WORK_DIR validate` |
 | Review (`sdw.review`) | `review.md` plus evidence | pre-publication review; records context `self`/`fresh`/`independent` |
@@ -84,7 +81,7 @@ either `## Follow-up` or `## Improvements` and still requires one of them.
 
 `next.md` records four required fixed fields (`work_id`, `record_format`,
 `next_agent`, `status`) plus readable Agreement / Next action / Waiting on /
-Work context sections. `next_agent` is one of the eight bounded
+Work context sections. `next_agent` is one of the five bounded
 responsibilities or `none`; `status` is one of `ready`, `waiting`, `reconcile`,
 `complete`, or `abandoned`. `ready` means a local next responsibility is pending;
 `waiting` records an external condition and its owner; `reconcile` records an
@@ -131,7 +128,9 @@ proportional to that path: a `closure: full` normal record whose position has
 passed the review responsibility, or that is `complete`, must carry `review.md` and
 `retrospect.md`, while a declared exception (`planning-only`, `parked`,
 `interrupted`, `superseded`, `abandoned`) bounds the endpoint and does not
-require them. `parked` requires `status: waiting`; `interrupted` requires
+require them. `planning-only` has two accepted shapes: the planning package
+(`scope.md`, `spec.md`, `plan.md`, `next.md`), or an assess stop (`assess.md`
+plus `next.md`). `parked` requires `status: waiting`; `interrupted` requires
 `waiting` or `abandoned`; `superseded` and `abandoned` require `abandoned`.
 Compact records bypass the closure contract.
 
@@ -226,9 +225,31 @@ actions/progress, checks/results, outcome/lessons) plus `next.md`; expand to
 normal records only through an explicit superseding decision, keeping one
 mutable authority.
 
+## Planning and assess
+
+`sdw.plan` is one planning stage. It writes `scope.md`, `spec.md`, `plan.md`, and
+`tasks.md` in one run and stops once, at plan approval, where the owner approves
+the whole package and the effective Delivery policy; scope agreement and
+plan-before-tasks are not default stops, though a user may still ask for one. A
+precise, already authorized request needs no redundant approval.
+
+Assess is an optional opening of `sdw.plan` that decides whether the work is
+worth doing — go, clarify, or stop — before any scope is written. It runs only
+when the user asks, or accepts an offer for a "whether" question. Its record,
+`assess.md` (template `.sdw/templates/assess.md`), holds the Question, Riskiest
+Assumptions, Pass Marks (each with met, `Fails if`, `Unclear if`, and how the
+chosen sample could meet it), Evidence (kind and source), Evidence Against, and
+the Decision. Pass marks are saved before evidence is gathered; bounded evidence
+work (a spike, an inventory, a replay) is never merged as product; simulated or
+AI-generated evidence never alone justifies go. The decision is always a stop
+for the owner. A stop closes the item as `status: complete`, `closure:
+planning-only` with only `assess.md` and `next.md`. `check WORK_DIR plan` checks
+an existing `assess.md` structurally and never judges its evidence. The exact
+rules live in `.sdw/agents/shared/workflow.md` §Planning and assess.
+
 ## Delegation and repair handoffs
 
-Before releasing delegated implementation, the planning/task owner assesses the
+Before releasing delegated implementation, the planning owner assesses the
 material decisions and coupled reasoning still left to the implementer and either
 resolves them, bounds a smaller coherent vertical unit, or records why ordinary
 implementation discretion suffices; a task ID, cohesion group, file count, or
@@ -236,7 +257,7 @@ many AC/V references is not by itself delegation fitness. A blocking finding or
 failed validation states the original obligation, the reproduced failure, the
 expected result, and the finite completion evidence. Route by cause: an ordinary
 concrete defect against an unchanged contract returns to implementation; a missing
-design or delegation decision returns to the planning/task owner; a
+design or delegation decision returns to the planning owner; a
 contradictory, stale, or infeasible verification returns to its author or the
 planning owner; a new requirement returns to scope/spec. Accepting a delegated or
 repair report includes checking it against the agreement's binding constraints and
@@ -327,7 +348,7 @@ template carries a greenfield note so a brand-new project records what is
 decided and marks the rest open rather than inventing commands. Both require
 every placeholder and guidance comment to be replaced with project-specific
 content. When useful context is absent for first non-trivial work, hardened, or
-cross-cutting work, `sdw.workflow`/`sdw.scope`
+cross-cutting work, `sdw.workflow`/`sdw.plan`
 elicit the minimum and record it here; trivial bounded changes are exempt. When
 the user defers, the assumed conventions and invariants are recorded as a context
 posture in `scope.md` under Constraints. A fresh install seeds only

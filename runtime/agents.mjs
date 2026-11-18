@@ -1,6 +1,6 @@
 // Canonical SDW agent inventory.
 //
-// Single source of truth for the ten sdw.* agents. The helper, renderer,
+// Single source of truth for the seven sdw.* agents. The helper, renderer,
 // and installer consume this module so their inventories cannot drift.
 // agents/shared/workflow.md is shared lifecycle instruction content, not a
 // native selectable agent; it must never be counted or projected as one.
@@ -16,17 +16,8 @@ export const AGENTS = Object.freeze({
     description: 'Inspect a saved SDW work item and its actual repository state, then continue the authorized work without inventing state.',
     entrypoint: true,
   },
-  'sdw.scope': {
-    description: 'Agree and record the bounded contribution, rationale, exclusions, constraints, and useful result of a work item.',
-  },
-  'sdw.spec': {
-    description: 'Turn an agreed scope into intended behavior, acceptance criteria, and validation targets.',
-  },
   'sdw.plan': {
-    description: 'Turn scope and specification into a technical implementation and verification plan with explicit stops.',
-  },
-  'sdw.task': {
-    description: 'Break an approved plan into actionable tasks with stable IDs, steps, and completion checks.',
+    description: 'Plan a work item in one stage: optionally assess whether it is worth doing, then write scope, specification, plan, and tasks, and stop once for plan approval.',
   },
   'sdw.implement': {
     description: 'Implement one authorized task and save its checkpoint evidence and next action.',
@@ -59,15 +50,22 @@ export const RETIRED_RESPONSIBILITY_HINTS = Object.freeze({
   retrospect: 'deliver',
   'sdw.wrap': 'sdw.deliver',
   wrap: 'deliver',
+  // Issue #455 folded the four planning stages into sdw.plan.
+  'sdw.scope': 'sdw.plan',
+  scope: 'plan',
+  'sdw.spec': 'sdw.plan',
+  spec: 'plan',
+  'sdw.task': 'sdw.plan',
+  task: 'plan',
 })
 
 // sdw.workflow and sdw.resume are entrypoints, not next responsibilities.
-// next.md records one of the eight bounded responsibilities, or none.
+// next.md records one of the five bounded responsibilities, or none.
 export const ENTRYPOINT_AGENTS = Object.freeze(
   Object.keys(AGENTS).filter((id) => AGENTS[id].entrypoint === true),
 )
 
-// Declaration order here is the canonical lifecycle order (scope through deliver);
+// Declaration order here is the canonical lifecycle order (plan through deliver);
 // the helper uses it to decide whether a record has advanced past a
 // responsibility whose artifact must exist at completion.
 export const NEXT_RESPONSIBILITIES = Object.freeze(

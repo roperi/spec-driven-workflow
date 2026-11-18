@@ -50,9 +50,11 @@ The generated native agents (`.codex/agents/`, `.opencode/agents/`, and
 `.claude/agents/`) are still available if you prefer to pin the `sdw.workflow`
 entrypoint explicitly; see [integrations.md](integrations.md).
 
-The primary lifecycle session may continue through scope, specification, and
-planning when your request authorizes that work. It must preserve an explicit
-planning-only stop in `next.md`. For genuinely small work it records the compact
+The primary lifecycle session plans in one stage, `sdw.plan`: it writes the
+scope, specification, plan, and tasks together and stops once for your approval
+of the plan. If you are unsure whether the work is worth doing, ask it to assess
+first; it then stops for your go, clarify, or stop decision before writing any
+scope. It must preserve an explicit planning-only stop in `next.md`. For genuinely small work it records the compact
 `work.md` shape instead of the normal seven-file set. To inspect a saved handoff
 without changing it, run:
 

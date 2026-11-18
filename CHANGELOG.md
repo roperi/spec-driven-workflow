@@ -5,6 +5,28 @@ file.
 
 ## [Unreleased]
 
+- **BREAKING**: One planning stage, `sdw.plan`, replaces `sdw.scope`,
+  `sdw.spec`, `sdw.plan`, and `sdw.task`, so SDW ships seven prompts instead of
+  ten and the lifecycle is `plan → implement → validate → review → deliver`. It
+  writes the scope, specification, plan, and tasks in one run and stops once,
+  for your approval of the plan; it no longer stops separately to agree the
+  scope or before breaking the plan into tasks, though you can still ask it to.
+  The four records stay separate files. The old names are rejected with a hint
+  and are not aliased: edit a saved `next_agent` to `sdw.plan` once, and use
+  `check plan`, which now covers the whole planning package including
+  `tasks.md`, in place of `check scope`, `check spec`, and `check task`.
+  `update.sh` removes the retired files; a locally modified one stops the update
+  with the usual ownership conflict.
+
+- **NEW**: When you are unsure whether work is worth doing, `sdw.plan` can open
+  with an optional assess step, recorded in a new optional `assess.md`. It fixes
+  pass marks before looking at evidence, may do small throwaway evidence work
+  that is never merged, and always stops for your go, clarify, or stop decision.
+  A stop closes the work item honestly as `status: complete`,
+  `closure: planning-only` with only `assess.md` and `next.md`; no scope, plan,
+  or tasks are written. `check` validates the structure of `assess.md` only and
+  never judges its evidence.
+
 - **BREAKING**: One stage, `sdw.deliver`, replaces `sdw.publish`, `sdw.finalize`,
   `sdw.retrospect`, and `sdw.wrap`, so SDW ships ten prompts instead of thirteen.
   It publishes the accepted candidate, closes the records on the work branch after

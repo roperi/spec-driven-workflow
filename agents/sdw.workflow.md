@@ -35,13 +35,17 @@ Then refine `scope.md` (or `work.md`) and `next.md` yourself: the helper's
 scaffold is not scoping evidence. Save records only for responsibilities that
 occur; never manufacture completed stages.
 
-## Scope first
+## Planning gate
 
-For an unspecified ordinary request: inspect, clarify material gaps, and
-present the scope for agreement. A precise, initially authorized small edit
-needs no redundant approval. Scope records the bounded contribution, why it
-contributes upstream, exclusions, constraints, and the useful result. Do not
-silently grant publication, merge, or migration authority; ordinary requests
+Planning is one stage, `sdw.plan`, with one planning gate: plan approval. For an
+ordinary request, inspect, clarify only material gaps, write the whole planning
+package (scope, specification, plan, tasks), and present it for approval; scope
+agreement and plan-before-tasks are not default stops. When the user asks
+whether the work is worth doing, offer the optional assess opening; when it
+runs, the assess decision is a second, earlier stop for the owner. A precise,
+initially authorized small edit needs no redundant approval. Both stops and the
+assess rules live in `.sdw/agents/shared/workflow.md` §Planning and assess. Do
+not silently grant publication, merge, or migration authority; ordinary requests
 authorize local work and validate its result.
 
 ## Continuing the lifecycle
@@ -60,8 +64,8 @@ may resolve implementation, planning and verification responsibilities within
 its authorized context, and a user-chosen stage stop or harness/model change is
 a supported continuation recorded in `next.md`, not a forced restart.
 
-Separate planning (`sdw.plan`) from task generation (`sdw.task`); if the user
-requested understanding before task breakdown, stop there and record it.
+If the user requested an earlier boundary (scope only, or the plan before task
+breakdown), stop there and record it as a user-requested stop.
 After plan approval, continue through every stage; stop only for the exceptions
 in the shared progression loop. A clean self-review proceeds to `sdw.deliver`
 without asking. Publication, review, merge, and issue closure have distinct

@@ -61,8 +61,8 @@ autonomous.
 
 ## Progression loop
 
-When you own a stage responsibility (sdw.scope, sdw.spec, sdw.plan, sdw.task,
-sdw.implement, sdw.validate, sdw.review, sdw.deliver):
+When you own a stage responsibility (sdw.plan, sdw.implement, sdw.validate,
+sdw.review, sdw.deliver):
 
 1. Read the work item's `next.md` and the prerequisite records for your
    responsibility. Reconcile the saved context against the actual repository
@@ -86,6 +86,67 @@ sdw.implement, sdw.validate, sdw.review, sdw.deliver):
    checks prompt bounded repair inside the authorized scope. Continue the
    authorized work by evidence rather than ending the session because a stage
    or attempt ended; apply the continuing-by-evidence rule below.
+
+## Planning and assess
+
+`sdw.plan` is one planning stage. It writes `scope.md`, `spec.md`, `plan.md`, and
+`tasks.md` in one run, opened by an optional `assess.md`; the records stay
+separate files and keep their own rules. Its stops are these:
+
+**Planning gate.** Planning has one gate: plan approval. Present the whole
+package — scope, specification, plan, tasks, and the effective Delivery policy —
+and stop for the owner's approval, unless the request was precise and already
+authorized, in which case no redundant approval is asked. Scope agreement and
+plan-before-tasks are not stage boundaries. Inside the stage, stop before the
+gate only for the progression-loop exceptions, notably a material decision
+missing from the agreement, such as a scope that cannot be settled by reading. A
+user may still ask for an earlier boundary (scope only, plan before tasks,
+planning only); record it in `next.md` as a user-requested stop.
+
+**Assess is optional.** Assess decides whether the work is worth doing — go,
+clarify, or stop — before any scope is written. Run it when the user asks, or
+when the request is a "whether" question (should we build this, is it worth
+doing) and the user accepts your offer. Never impose it; decided work skips it,
+and an item without `assess.md` is unchanged.
+
+**The assess record.** `assess.md` has these sections: *Question* (what is
+being decided); *Riskiest Assumptions*; *Pass Marks*, each with what counts as
+met, `Fails if`, `Unclear if`, and one line on how it could be met with the
+chosen sample or evidence — pass marks size the product, not the assessment;
+*Evidence*, each item with its kind (observed behaviour, stated opinion, desk
+research, or simulated) and source, with unsourced claims marked as assumptions;
+*Evidence Against*; and *Decision*: the recommendation (go, clarify, or stop)
+with reasons, then the owner's decision with its date, and for go a hand-over
+summary that the scope consumes. `node .sdw/sdw.mjs check` checks these sections
+structurally and never judges the evidence or the decision.
+
+**Pass marks before evidence.** Pass marks are saved before any evidence is
+gathered — committed when the item is on a branch, or shown to the owner — so
+the order is visible in history. A content-free inventory (keys, counts, hashes,
+without reading content) may come first and may refine provisional marks; once
+evidence reading starts, the marks are fixed. The helper cannot prove this
+order; review inspects it.
+
+**Evidence work.** Bounded evidence work is allowed inside planning: a
+throwaway spike, an inventory, or a replay. It lives under the work item's
+`evidence/` (bulk output follows the retention rule in §Records) or a scratch
+location; it is never merged as product, and it is not implementation.
+Simulated or AI-generated evidence never alone justifies go; it can form
+hypotheses. "Not enough evidence" is a valid finding.
+
+**The decision is a required stop.** After the evidence, report the
+recommendation and stop for the owner: record `status: waiting` with the owner
+and the condition in `next.md`. This stop holds even when the session otherwise
+runs without stops; the decision is reserved to the owner, and a missing reply
+is not a decision.
+
+- **Go**: record the owner's decision in `assess.md` and continue to the scope.
+- **Clarify**: keep `status: waiting` with the blocking unknowns and their
+  owner; a later session resumes from `assess.md`.
+- **Stop**: record the decision and reasons in `assess.md`, and set `next.md` to
+  `next_agent: none`, `status: complete`, `closure: planning-only`. Write no
+  scope, specification, plan, or tasks; a starter `scope.md` from `start` is left
+  unrefined. The item is closed honestly with `assess.md` and `next.md`.
 
 ## Resuming and bounded work-item discovery
 
@@ -116,7 +177,7 @@ Once selected, run the read-only helper on that exact directory
 (`node .sdw/sdw.mjs resume .sdw/work/<work-id>`), then read the current handoff
 and reconcile its identity and Git/worktree context before acting. The recorded
 `next_agent`, Agreement, Next action, Waiting on and Work context govern the
-saved responsibility and its stop and authority boundary; a task or validate
+saved responsibility and its stop and authority boundary; a plan or validate
 handoff never silently becomes implement.
 
 Recover the context that responsibility needs — current decisions, blockers,
@@ -206,7 +267,7 @@ the next participant must actually resolve. This shared delegation and repair
 handoff rule owns the readiness and cause-aware routing decision once; the stage
 prompts that consume it point here instead of restating it.
 
-Before releasing delegated implementation, planning/task ownership assesses the
+Before releasing delegated implementation, planning ownership assesses the
 material decisions and coupled reasoning still left to implementation. It resolves
 them with the decision owner, defines a smaller coherent vertical checkpoint
 with its own observable oracle, or records an evidenced reason that ordinary
@@ -238,7 +299,7 @@ edit.
 
 Route by cause within the authorized lifecycle. An ordinary concrete defect
 against a resolved, unchanged contract returns to implementation. A missing design or
-delegation decision returns to the planning/task owner. A verification
+delegation decision returns to the planning owner. A verification
 contradiction, or a stale or infeasible check, returns to the
 verification author or planning owner. A new requirement returns to scope/spec.
 The same owner may resolve implementation, planning and verification
@@ -452,6 +513,9 @@ declare the path: `full` (the default when absent), `planning-only`, `parked`,
 retrospect artifacts at completion. A declared exception (`planning-only`,
 `parked`, `interrupted`, `superseded`, `abandoned`) bounds the endpoint, so the
 required set stays the bounded closure-activity set rather than the full path.
+`planning-only` has two accepted shapes: the planning package (`scope.md`,
+`spec.md`, `plan.md`, `next.md`), or an assess stop (`assess.md` plus `next.md`,
+per §Planning and assess).
 The exception values also constrain status: `parked` requires `status: waiting`;
 `interrupted` requires `waiting` or `abandoned`; `superseded` and `abandoned`
 require `status: abandoned` with the reason recorded. Declare the exception
@@ -531,7 +595,7 @@ blindly.
 
 Normal work uses `scope.md`, `spec.md`, `plan.md`, `tasks.md`,
 `validation.md`, `next.md`, and `retrospect.md` as each responsibility
-occurs, with optional `review.md` or other linked evidence. Genuinely small or
+occurs, with optional `assess.md`, `review.md`, or other linked evidence. Genuinely small or
 bounded work may use the compact `work.md` plus `next.md` shape instead;
 expand explicitly if the work grows, keeping one mutable authority. Do not
 manufacture completed work to fill a template; honest pending or unresolved

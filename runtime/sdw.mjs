@@ -22,6 +22,8 @@ import {
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url))
 
 const ARTIFACTS = Object.freeze({
+  // Optional: the assess opening of the planning stage (issue #455).
+  'assess.md': ['Question', 'Riskiest Assumptions', 'Pass Marks', 'Evidence', 'Evidence Against', 'Decision'],
   'scope.md': ['Objective', 'Rationale and Upstream Source', 'In Scope', 'Out of Scope', 'Constraints', 'Success'],
   'spec.md': ['Intended Behavior', 'Acceptance Criteria', 'Validation'],
   'plan.md': ['Approach', 'Verification Approach', 'Responsibilities and Stops', 'Risks'],
@@ -33,13 +35,11 @@ const ARTIFACTS = Object.freeze({
   'work.md': ['Purpose and Boundary', 'Intended Result', 'Approach', 'Actions and Progress', 'Checks and Results', 'Outcome and Lessons'],
 })
 
-// Normal-format activity requirements. Plan checks require scope/spec/plan and
-// next, not tasks: task generation is a separate, later responsibility.
+// Normal-format activity requirements. The single planning stage (issue #455)
+// produces the whole planning package, so plan checks require scope, spec,
+// plan, tasks, and next together.
 const ACTIVITY_FILES = Object.freeze({
-  scope: ['scope.md'],
-  spec: ['scope.md', 'spec.md'],
-  plan: ['scope.md', 'spec.md', 'plan.md', 'next.md'],
-  task: ['scope.md', 'spec.md', 'plan.md', 'tasks.md'],
+  plan: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'next.md'],
   implement: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'next.md'],
   validate: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'next.md'],
   review: ['scope.md', 'spec.md', 'plan.md', 'tasks.md', 'validation.md', 'next.md', 'review.md'],
@@ -51,6 +51,14 @@ const ACTIVITY_FILES = Object.freeze({
 const COMPACT_ARTIFACTS = Object.freeze(['work.md', 'next.md'])
 const CLOSURE_ACTIVITIES = new Set(['deliver'])
 
+// assess.md is optional. Where it exists, these activities check its structure;
+// the helper never judges its evidence or decision.
+const ASSESS_ACTIVITIES = new Set(['plan', 'handoff', 'deliver'])
+// An assess stop ends the item at planning without scope, spec, plan, or tasks
+// (a starter scope.md from `start` may exist and is not refined). It is the
+// planning-only closure of a record that carries assess.md and no plan.md.
+const ASSESS_STOP_FILES = Object.freeze(['assess.md', 'next.md'])
+
 // Normal completion is proportional to the declared lifecycle path. These are
 // the responsibilities whose artifacts a normal record must carry once it has
 // advanced past them (canonical lifecycle order = NEXT_RESPONSIBILITIES order).
@@ -61,7 +69,9 @@ const REQUIRED_ARTIFACT_RESPONSIBILITIES = Object.freeze({
 
 // A declared closure exception replaces the full deliver input set with
 // the bounded artifacts its endpoint genuinely produces; compact work never
-// reaches this table because it bypasses the closure contract.
+// reaches this table because it bypasses the closure contract. `planning-only`
+// has two accepted shapes: this planning set, or an assess stop
+// (ASSESS_STOP_FILES).
 const CLOSURE_ACTIVITY_FILES = Object.freeze({
   'planning-only': Object.freeze({
     deliver: Object.freeze(['scope.md', 'spec.md', 'plan.md', 'next.md']),
@@ -400,6 +410,18 @@ const artifactPresent = (workDir, artifact) => {
   try { return fs.lstatSync(artifactPath(workDir, artifact)).isFile() } catch { return false }
 }
 
+// Any directory entry, including a symlink or non-file, counts as existing so
+// an optional artifact in an unsafe shape is inspected (and reported) rather
+// than silently skipped.
+const artifactExists = (workDir, artifact) => {
+  try {
+    fs.lstatSync(artifactPath(workDir, artifact))
+    return true
+  } catch (error) {
+    return error.code !== 'ENOENT'
+  }
+}
+
 // The declared position of a normal record in the canonical lifecycle.
 // `next_agent` names the responsibility about to be performed, so its index is
 // the position *before* that responsibility; a required artifact R is demanded
@@ -515,8 +537,7 @@ const HARDENED_RESULT_FIELDS = Object.freeze([
   'Proves', 'Source', 'Expected', 'Observed', 'Resulting state', 'Oracle matched', 'Evidence', 'Limitations',
 ])
 const HARDENED_ACTIVITY_FILES = Object.freeze({
-  plan: ['spec.md', 'plan.md'],
-  task: ['spec.md', 'plan.md', 'tasks.md'],
+  plan: ['spec.md', 'plan.md', 'tasks.md'],
   implement: ['spec.md', 'plan.md', 'tasks.md'],
   handoff: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
   validate: ['spec.md', 'plan.md', 'tasks.md', 'validation.md'],
@@ -1681,6 +1702,10 @@ const check = (workDirValue, activity) => {
   const closure = row?.record?.closure ?? 'full'
   if (format === 'normal' && CLOSURE_ACTIVITIES.has(activity) && closure !== 'full') {
     required = [...(CLOSURE_ACTIVITY_FILES[closure]?.[activity] ?? required)]
+    if (closure === 'planning-only' && artifactExists(workDir, 'assess.md') && !artifactExists(workDir, 'plan.md')) required = [...ASSESS_STOP_FILES]
+  }
+  if (format === 'normal' && ASSESS_ACTIVITIES.has(activity) && !required.includes('assess.md') && artifactExists(workDir, 'assess.md')) {
+    required.unshift('assess.md')
   }
   const reports = required.map((artifact) => inspectArtifact(workDir, artifact))
   const errors = [
@@ -2074,6 +2099,7 @@ const waitingCondition = (content) => (meaningfulSection(content, 'Waiting on') 
 const READ_ORDER = Object.freeze([
   'next.md',
   'work.md',
+  'assess.md',
   'scope.md',
   'spec.md',
   'plan.md',
