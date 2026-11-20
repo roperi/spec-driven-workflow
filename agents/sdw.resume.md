@@ -59,6 +59,12 @@ PR is observed merged, perform sync and clean; otherwise report the state and
 who acts next. None of these writes a record, and none widens the authority
 guard.
 
+After an observed intermediate pull request merge (the Agreement plans several
+pull requests and this one was not the last), sync and clean under the shared
+authority, reconcile the `waiting` record to its recorded next responsibility
+with `status: ready`, and continue that responsibility; it is not an endpoint.
+The rule lives in `.sdw/agents/shared/workflow.md` §Delivery policy.
+
 Apply the shared terminal-state reconciliation rule to the reported status. A
 `waiting` record is externally blocked only when reconciliation cannot observe
 the external action as complete; when the report shows it complete, move the

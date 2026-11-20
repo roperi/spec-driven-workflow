@@ -486,8 +486,11 @@ const recordConsistency = (reports) => {
   return errors
 }
 
-// Honest closure checks. No prose phrase can certify that pending work was
-// approved for deferral: pending tasks and unresolved blockers are reported.
+// Honest closure checks. No prose phrase or list in next.md certifies that
+// pending work was approved for deferral: pending tasks and unresolved blockers
+// are reported. A pull request that is not the work item's last is delivered as
+// an intermediate pull request (gated by check review and check handoff), which
+// is not a closure, so this check does not apply to it.
 const closureConsistency = (reports) => {
   const errors = []
   const tasksReport = reports.find((report) => report.artifact === 'tasks.md')
@@ -509,7 +512,8 @@ const closureConsistency = (reports) => {
   if (parsed.record?.status === 'abandoned') return errors
   const pending = taskDetails(tasksReport.content).entries.filter((entry) => !entry.complete)
   if (pending.length) {
-    errors.push(`tasks.md: ${pending.length} unchecked task(s) remain; closure requires honest completion or an explicit recorded deferral destination in next.md — review them before claiming closure`)
+    const ids = pending.slice(0, 10).map((entry) => entry.id).join(', ') + (pending.length > 10 ? ', …' : '')
+    errors.push(`tasks.md: ${pending.length} unchecked task(s) remain (${ids}); closure requires every task complete — finish them, record a closure exception, or, if this pull request is not the work item's last, deliver it as an intermediate pull request (gate it with check review and check handoff and keep next.md non-terminal; see §Delivery policy)`)
   }
   return errors
 }

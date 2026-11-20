@@ -63,9 +63,10 @@ actions. The exact rule lives in the
 [shared workflow instructions](../agents/shared/workflow.md).
 
 `sdw.review` is the **pre-publication** review: it records the review context
-(`self`, `fresh`, or `independent`) and a ready/not-ready conclusion, and its
-`review.md` is frozen once the work item is published, so later external findings
-never append to it. External review of a published candidate is a separate, later
+(`self`, `fresh`, or `independent`) and a ready/not-ready conclusion, and each
+candidate's `review.md` section is frozen once that candidate is published (a
+later pull request adds a new section), so later external findings never append
+to it. External review of a published candidate is a separate, later
 activity: the pull request is its system of record, the primary lifecycle session
 owns requesting and addressing it under the user's direction, and a deferred,
 declined, or escalated finding is recorded at item level (owner and trigger) and
@@ -143,6 +144,12 @@ record rides on the next change's branch or the project's documented bookkeeping
 route, never the default branch. Closing records are amended only when review feedback
 changes something; `check deliver` is the agent's self-check, not a human, CI, or
 merge gate, and small PR-ending work may use the compact path.
+
+When the Agreement plans several pull requests, each one that is not the last is
+an intermediate pull request: it is gated by `check … review` and
+`check … handoff`, writes no retrospective, and leaves `next.md` non-terminal;
+only the last one closes the item. The rule lives in the shared workflow's
+Delivery policy (`.sdw/agents/shared/workflow.md`).
 
 **Delivery policy.** A project may state how it delivers once, in a `## Delivery`
 section of `.sdw/project-context/technical-context.md`: review mode (`none`,

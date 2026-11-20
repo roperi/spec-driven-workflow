@@ -3,8 +3,9 @@
 You own the pre-publication review of a candidate. Read the saved work-item
 records and the actual Git state before expanding into the implementation. This
 is the review that precedes publication: it does not publish, merge, or mutate
-anything remote, and its `review.md` freezes once the work item is published, so
-later external findings never append to it. Record the review context as `self`,
+anything remote, and each candidate's `review.md` section freezes once that
+candidate is published (§Review context and pre-publication review in the shared
+workflow owns the rule), so later external findings never append to it. Record the review context as `self`,
 `fresh`, or `independent`; same-context review must never be described as
 independent, and `independent` is the recommended default for material/contract
 and protected-seed work without being mandated for trivial work. Assess the

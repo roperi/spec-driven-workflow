@@ -373,7 +373,8 @@ sections; simple ordinary work needs only the explanation it warrants; the same
 participant may hold several responsibilities. Only the user chooses
 participants and authority, so no forced restart, automatic reviewer, subagent,
 issue filing, new ledger, state machine, or required schema/field is introduced.
-Pre-publication `review.md` still freezes at publication, and external findings
+Each published candidate's `review.md` section still freezes at publication
+(§Review context and pre-publication review), and external findings
 remain pull-request-owned under the shared external-review rule.
 
 ## Default change flow
@@ -498,6 +499,10 @@ evidence never proves a remote merge.
 When the agreement explicitly names a merge, issue closure, or publication as
 the work item's endpoint, the item is not `complete` until a human with that
 authority confirms it or the record carries the applicable external evidence.
+
+An observed intermediate merge (§Delivery policy, several pull requests) is not
+an endpoint: a `waiting` record reconciles to its recorded next responsibility
+with `status: ready`, never to `complete`.
 
 ## Completion contract and closure exceptions
 
@@ -728,9 +733,12 @@ Same-context review must never be described as independent. `independent` is the
 recommended default for material/contract and protected-seed work, but the choice
 is recorded, not mandated; trivial work may be `self`.
 
-`review.md` is the pre-publication artifact. Once the work item is published it is
-frozen: later external findings do not append to it, and a later phase reads it
-rather than mutating it.
+`review.md` is the pre-publication artifact. It takes one section per published
+candidate (one section for an item delivered through a single pull request;
+§Delivery policy for several). Each section is frozen once its pull request is
+published: later external findings do not append to it, and a later phase reads
+it rather than mutating it. The next slice's pre-publication review adds a new
+section. External findings still never append to it.
 
 For a work item carrying a protected verification seed or a claimed complete or
 universal observation or comparison oracle, this review names the judge's central
@@ -803,6 +811,22 @@ language. With no Delivery section the default applies and is named: pre-publica
 review only; fix CI failures within scope; merge on the owner's word; sync and
 clean after an observed merge; issue closure only through a PR reference the owner
 wrote.
+
+**Several pull requests.** The Agreement may plan delivery through several
+pull requests. It is recorded at plan approval: the slices, their order, and
+which pull request is the last. Without such a record the item ships through one
+pull request. An intermediate pull request (any pull request the Agreement does
+not name as the last) runs `sdw.deliver` steps 1, 2, 4, 5 and 6, gated by
+`check … review` before publishing and `check … handoff` before the records push.
+It does not close out: it writes no `retrospect.md`, does not run
+`check … deliver`, and leaves `next.md` non-terminal, with the next
+responsibility (normally `sdw.implement`), `waiting` on the merge with its owner
+when the next slice builds on it, otherwise `ready`. It carries no closing
+reference to the item's issue; only the last pull request may, under the issue
+closure line above. The last pull request is delivered as usual, including
+close-out and `check … deliver`: `complete` still requires every task checked,
+and no list in `next.md` replaces that. Merge, sync and clean, and the authority
+guard apply to each pull request unchanged.
 
 **Authority guard.** Merge, issue closure, external publication (including release
 or public export), and deletion beyond sync and clean are never inherited. They

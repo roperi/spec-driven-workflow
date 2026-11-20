@@ -6,6 +6,18 @@ one run. The Delivery policy and the authority guard live in
 without restating them. Before pushing or opening a pull request, follow the
 default change-flow rule in the same file; it owns the branch discipline.
 
+When the Agreement plans several pull requests and this one is not the last, it
+is an intermediate pull request (§Delivery policy owns the rule). Steps 1, 2, 4,
+5 and 6 apply unchanged. Replace step 3 with: set `next.md` non-terminal (the
+next responsibility, `waiting` on the merge with its owner or else `ready`), write
+no `retrospect.md`, run the handoff check below instead of `check … deliver`,
+then commit and push the records with the slice. The pull request carries no
+closing issue reference.
+
+```sh
+node .sdw/sdw.mjs check .sdw/work/<work-id> handoff
+```
+
 Do these in order:
 
 1. **Confirm authority.** Read the review, validation evidence, `next.md`, and
@@ -60,7 +72,7 @@ Do these in order:
    bounded implementation and re-validate material repairs. Amend the closing
    records in the same push only when something changed; record a deferred
    finding once in `next.md` with owner and trigger. Never mirror findings into
-   `review.md`, which stays frozen at publication.
+   `review.md`, whose section for a published candidate stays frozen.
 
 5. **Merge when merge-ready.** The PR is merge-ready when CI is at the required
    result, the closing records are in the PR, the review mode is satisfied, and
@@ -68,9 +80,13 @@ Do these in order:
    otherwise report merge-ready and wait for the owner's word.
 
 6. **Sync and clean after an observed merge** of the item's own PR, within the
-   shared sync-and-clean authority. Then give the final report: what was
-   delivered, the PR and merge revision, deferred work and its destination, and
-   that nothing else is owed. If the effective policy grants issue closure to the
+   shared sync-and-clean authority; this applies to every pull request. For an
+   intermediate pull request, then report the merge and the recorded next
+   responsibility; the item is not finished, so give no final report, close no
+   issue, and keep `next.md` non-terminal (§Delivery policy owns the rule). For
+   the item's last pull request, give the final report: what was delivered, the
+   PR and merge revision, deferred work and its destination, and that nothing
+   else is owed. If the effective policy grants issue closure to the
    agent, close the item's issue after the observed merge, confirm it reads closed
    in the hosting tool, and report that state; otherwise follow the policy's
    other closure modes and never close an issue without that grant. Closure mode
@@ -78,5 +94,7 @@ Do these in order:
    Agreement names issue closure as its endpoint was already set `waiting` in step
    3 and is reconciled later from the observed evidence.
 
-Write nothing to the repository after the merge. Stop truthfully when an
-authorized action completes or is blocked, and preserve unrelated dirty work.
+Write nothing to the repository after the merge of the item's last pull request
+(an intermediate pull request's next slice commits its records on its own
+branch). Stop truthfully when an authorized action completes or is blocked, and
+preserve unrelated dirty work.

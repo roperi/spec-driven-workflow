@@ -5,6 +5,19 @@ file.
 
 ## [Unreleased]
 
+- **NEW**: A work item can now be delivered through several pull requests.
+  When your plan splits the work, `sdw.plan` records the slices, their order, and
+  which pull request is the last. Each earlier pull request is delivered without
+  closing the item: it is checked with `check review` and `check handoff`, writes
+  no retrospective, and leaves `next.md` open for the next slice. The last pull
+  request closes the item as before, and an item is still only `complete` when
+  every task is checked. `review.md` keeps one section per published pull
+  request, and `sdw.resume` picks up the next slice after a merge.
+
+- **FIX**: When `check deliver` stops on unfinished tasks, its message now lists
+  them and points to the real options. It no longer suggests listing the
+  unfinished tasks in `next.md` to be let through, which was never accepted.
+
 - **BREAKING**: One planning stage, `sdw.plan`, replaces `sdw.scope`,
   `sdw.spec`, `sdw.plan`, and `sdw.task`, so SDW ships seven prompts instead of
   ten and the lifecycle is `plan → implement → validate → review → deliver`. It

@@ -150,7 +150,9 @@ Present the package for approval in the plain-summary contract. At approval,
 state the effective Delivery policy (project default plus any item override, or
 the named default when the project has none) in plain language and record it in
 the Agreement; the rule lives in `.sdw/agents/shared/workflow.md` §Delivery
-policy.
+policy. When the work ships through more than one pull request, record the
+split in the Agreement as well: the slices, their order, and which pull
+request is the last. Without that record the item ships through one pull request.
 Approval covers the scope, specification, plan, tasks, and Delivery policy at
 once. Apply the planning gate in §Planning and assess: stop for approval unless
 the request was precise and already authorized. After approval, record
